@@ -48,7 +48,7 @@
         </div>
       </div>
       <!-- 代码编辑器 -->
-      <div class="monacoEditor mt10">
+      <div class="monaco-editor" ref="editorWrapRef">
         <bk-resize-layout
           placement="bottom"
           collapsible
@@ -60,16 +60,16 @@
               <!--  顶部编辑器工具栏-->
               <header class="editor-toolbar">
                 <span class="p10" style="color: #ccc">代码编辑器</span>
-                <aside class="toolItems">
-                  <section class="toolItem" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
+                <aside class="tool-items">
+                  <section class="tool-item" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
                     <search width="18px" height="18px" />
                   </section>
-                  <!--                  <section class="toolItem">-->
+                  <!--                  <section class="tool-item">-->
                   <!--                    <upload width="18px" height="18px" />-->
                   <!--                  </section>-->
-                  <!--                  <section class="toolItem">-->
-                  <!--                    <filliscreen-line width="18px" height="18px" />-->
-                  <!--                  </section>-->
+                  <section class="tool-item" @click="handleFullScreenClick">
+                    <filliscreen-line width="18px" height="18px" />
+                  </section>
                 </aside>
               </header>
               <main class="editor-main-content" :class="{ 'show-valid-msg': isValidMsgVisible }">
@@ -818,7 +818,7 @@ import {
   Success,
   CloseLine,
   CollapseLeft,
-  // FilliscreenLine,
+  FilliscreenLine,
   // Upload,
 } from 'bkui-vue/lib/icon';
 import yaml from 'js-yaml';
@@ -1465,6 +1465,14 @@ const filterData = (val: string, action: 'add' | 'update') => {
     filterInputUpdate.value = val;
   }
 }
+
+const editorWrapRef = ref<HTMLElement | null>(null);
+// 编辑器全屏
+const handleFullScreenClick = () => {
+  if (editorWrapRef?.value?.requestFullscreen) {
+    editorWrapRef.value.requestFullscreen();
+  }
+};
 </script>
 <style scoped lang="scss">
 
@@ -1520,9 +1528,10 @@ const filterData = (val: string, action: 'add' | 'update') => {
     }
   }
 
-  .monacoEditor {
+  .monaco-editor {
     width: 100%;
     height: calc(100vh - 240px);
+    margin-bottom: 10px;
     border-radius: 2px;
     overflow: hidden;
 
@@ -1530,132 +1539,133 @@ const filterData = (val: string, action: 'add' | 'update') => {
       height: 100%;
       display: flex;
       flex-direction: column;
-    }
 
-    .editor-toolbar {
-      height: 40px;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #1a1a1a;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-      z-index: 6;
-
-      .toolItems {
-        height: 100%;
+      .editor-toolbar {
+        height: 40px;
+        position: relative;
         display: flex;
+        justify-content: space-between;
         align-items: center;
+        background-color: #1a1a1a;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+        z-index: 6;
 
-        .toolItem {
-          padding: 0 8px;
+        .tool-items {
+          height: 100%;
           display: flex;
           align-items: center;
-          cursor: pointer;
 
-          &.active, &:hover {
-            color: #ccc;
+          .tool-item {
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            color: #999;
+            cursor: pointer;
+
+            &.active, &:hover {
+              color: #ccc;
+            }
           }
         }
       }
-    }
 
-    .editor-main-content {
-      display: flex;
-      height: 100%;
-
-      .editor-side-bar {
-        width: 32px;
-        height: 100%;
+      .editor-main-content {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #1a1a1a;
+        height: 100%;
 
-        .editor-error-counters {
+        .editor-side-bar {
           width: 32px;
+          height: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: space-between;
+          background-color: #1a1a1a;
 
-          .error-count-item {
-            height: 34px;
-            width: 100%;
-            border-bottom: 1px solid #222;
+          .editor-error-counters {
+            width: 32px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            line-height: 12px;
-            font-size: 12px;
-            cursor: pointer;
 
-            &:last-child {
-              border-bottom: none;
+            .error-count-item {
+              height: 34px;
+              width: 100%;
+              border-bottom: 1px solid #222;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              line-height: 12px;
+              font-size: 12px;
+              cursor: pointer;
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              &:hover, &.active {
+                background-color: #333;
+              }
+            }
+          }
+
+          .editor-error-shifts {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+
+            .shift-btn {
+              width: 24px;
+              height: 24px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background: #4D4D4D;
+              border-radius: 2px;
+              cursor: pointer;
+
+              &:active {
+                background: #666;
+              }
             }
 
-            &:hover, &.active {
-              background-color: #333;
+            .shift-btn.prev {
+              transform: rotate(-90deg);
+            }
+
+            .shift-btn.next {
+              transform: rotate(90deg);
             }
           }
         }
+      }
 
-        .editor-error-shifts {
-          width: 100%;
+      .editor-footer-bar {
+        background-color: #1a1a1a;
+        box-shadow: 0 -2px 4px 0 #00000029;
+
+        .editor-footer-validate-btn {
+          height: 52px;
+          padding-left: 24px;
           display: flex;
-          flex-direction: column;
+          align-items: center;
+        }
+
+        .editor-message {
+          height: 52px;
+          padding-left: 24px;
+          padding-right: 24px;
+          display: flex;
           align-items: center;
           gap: 8px;
-
-          .shift-btn {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #4D4D4D;
-            border-radius: 2px;
-            cursor: pointer;
-
-            &:active {
-              background: #666;
-            }
-          }
-
-          .shift-btn.prev {
-            transform: rotate(-90deg);
-          }
-
-          .shift-btn.next {
-            transform: rotate(90deg);
-          }
+          background-color: #212121;;
+          font-size: 12px;
+          color: #DCDEE5;
+          border-left: 4px solid #34d97b;
         }
-      }
-    }
-
-    .editor-footer-bar {
-      background-color: #1a1a1a;
-      box-shadow: 0 -2px 4px 0 #00000029;
-
-      .editor-footer-validate-btn {
-        height: 52px;
-        padding-left: 24px;
-        display: flex;
-        align-items: center;
-      }
-
-      .editor-message {
-        height: 52px;
-        padding-left: 24px;
-        padding-right: 24px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background-color: #212121;;
-        font-size: 12px;
-        color: #DCDEE5;
-        border-left: 4px solid #34d97b;
       }
     }
 
