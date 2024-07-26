@@ -141,9 +141,9 @@
                 @click="handleErrorMsgClick(reason)"
               >
                 <span class="msg-part msg-icon"><warn fill="#EA3636" /></span>
-                <span class="msg-part msgHost"></span>
+                <span class="msg-part msg-host"></span>
                 <span class="msg-part msg-body">{{ reason.message }}</span>
-                <span class="msg-part msgErrorCode"></span>
+                <span class="msg-part msg-error-code">{{ reason.json_path }}</span>
                 <span v-if="reason.position" class="msg-part msgPos">
                   {{ `(${reason.position.lineNumber}, ${reason.position.column})` }}
                 </span>
@@ -1041,6 +1041,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
+      // console.log('errorReasons:');
       // console.log(errorReasons.value);
       updateEditorDecorations();
     }
