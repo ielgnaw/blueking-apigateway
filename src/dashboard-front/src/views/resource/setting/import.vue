@@ -110,24 +110,26 @@
                 </aside>
               </main>
               <footer class="editor-footer-bar">
-                <footer v-if="isValidMsgVisible" class="editor-message">
+                <article v-if="isValidMsgVisible" class="editor-message">
                   <success class="success-c" width="14px" height="14px" />
                   <span class="msg-part msg-body">校验通过</span>
                   <close-line
                     width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"
                     @click="() => { isValidMsgVisible = false }"
                   ></close-line>
-                </footer>
-                <main v-else class="editor-footer-validate-btn">
+                </article>
+                <article v-else class="editor-footer-validate-btn">
                   <bk-button
                     theme="primary"
                     size="small"
+                    :loading="isDataLoading"
+                    :disabled="isDataLoading"
                     @click="handleCheckData({ changeView: false })"
                   >
                     <play-shape />
                     {{ t('语法校验') }}
                   </bk-button>
-                </main>
+                </article>
               </footer>
             </div>
           </template>
@@ -914,22 +916,11 @@ const msgAsWarningNum = computed(() => {
   return errorReasons.value.filter(r => r.level === 'Warning').length;
 });
 
-// 防抖的代码校验
-// const debouncedCheckData = _.debounce((args) => {
-//   handleCheckData(args);
-// }, 1000);
-
-// 代码有变化时自动校验
+// 代码有变化时重置校验状态
 watch(editorText, () => {
   isCodeValid.value = false;
   isValidMsgVisible.value = false;
 });
-
-// checkbox hooks
-// const {
-//   selections,
-//   handleSelectionChange,
-// } = useSelection();
 
 // 设置editor的内容
 const setEditValue = () => {
