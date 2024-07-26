@@ -82,31 +82,41 @@
                   }"
                 />
                 <!--  右侧的代码 error, warning 计数器  -->
-                <aside class="editor-error-counters">
-                  <div
-                    class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Error' }"
-                    v-bk-tooltips="{ content: `Error: ${msgAsErrorNum}`, placement: 'left' }"
-                    @click="handleErrorCountClick('Error')"
-                  >
-                    <warn fill="#EA3636" />
-                    <span style="color:#EA3636">{{ msgAsErrorNum }}</span>
-                  </div>
-                  <div
-                    class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"
-                    v-bk-tooltips="{ content: `Warning: ${msgAsWarningNum}`, placement: 'left' }"
-                    @click="handleErrorCountClick('Warning')"
-                  >
-                    <div class="warning-circle"></div>
-                    <span style="color: hsla(36.6, 81.7%, 55.1%, 0.5);">{{ msgAsWarningNum }}</span>
-                  </div>
-                  <div
-                    class="error-count-item" :class="{ 'active': activeCodeMsgType === 'All' }"
-                    v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"
-                    @click="handleErrorCountClick('All')"
-                  >
-                    <span>all</span>
-                    <span>{{ msgAsErrorNum + msgAsWarningNum }}</span>
-                  </div>
+                <aside class="editor-side-bar">
+                  <main class="editor-error-counters">
+                    <div
+                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Error' }"
+                      v-bk-tooltips="{ content: `Error: ${msgAsErrorNum}`, placement: 'left' }"
+                      @click="handleErrorCountClick('Error')"
+                    >
+                      <warn fill="#EA3636" />
+                      <span style="color:#EA3636">{{ msgAsErrorNum }}</span>
+                    </div>
+                    <div
+                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"
+                      v-bk-tooltips="{ content: `Warning: ${msgAsWarningNum}`, placement: 'left' }"
+                      @click="handleErrorCountClick('Warning')"
+                    >
+                      <div class="warning-circle"></div>
+                      <span style="color: hsla(36.6, 81.7%, 55.1%, 0.5);">{{ msgAsWarningNum }}</span>
+                    </div>
+                    <div
+                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'All' }"
+                      v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"
+                      @click="handleErrorCountClick('All')"
+                    >
+                      <span>all</span>
+                      <span>{{ msgAsErrorNum + msgAsWarningNum }}</span>
+                    </div>
+                  </main>
+                  <footer class="editor-error-shifts">
+                    <div class="shift-btn prev" @click="handleErrorShiftClick('prev')">
+                      <collapse-left width="18px" height="18px" fill="#C4C6CC" />
+                    </div>
+                    <div class="shift-btn next" @click="handleErrorShiftClick('next')">
+                      <collapse-left width="18px" height="18px" fill="#C4C6CC" />
+                    </div>
+                  </footer>
                 </aside>
               </main>
               <footer class="editor-footer-bar">
@@ -137,8 +147,11 @@
           <template #aside>
             <div class="editor-messages-wrapper" :class="{ 'has-error-msg': visibleErrorReasons.length > 0 }">
               <article
-                v-for="(reason, index) in visibleErrorReasons" :key="index" class="editor-message"
-                @click="handleErrorMsgClick(reason)"
+                v-for="(reason, index) in visibleErrorReasons"
+                :key="index"
+                class="editor-message"
+                :class="{'active': activeVisibleErrorMsgIndex === index }"
+                @click="handleErrorMsgClick(reason, index)"
               >
                 <span class="msg-part msg-icon"><warn fill="#EA3636" /></span>
                 <span class="msg-part msg-host"></span>
@@ -804,6 +817,7 @@ import {
   PlayShape,
   Success,
   CloseLine,
+  CollapseLeft,
   // FilliscreenLine,
   // Upload,
 } from 'bkui-vue/lib/icon';
@@ -922,6 +936,7 @@ const msgAsWarningNum = computed(() => {
 watch(editorText, () => {
   isCodeValid.value = false;
   isValidMsgVisible.value = false;
+  activeVisibleErrorMsgIndex.value = -1;
 });
 
 // 设置editor的内容
@@ -1050,6 +1065,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     // }
   } finally {
     isDataLoading.value = false;
+    activeVisibleErrorMsgIndex.value = -1;
   }
 };
 
@@ -1154,8 +1170,23 @@ const updateEditorDecorations = () => {
 };
 
 // 处理代码错误消息点击事件，应跳转到编辑器对应行
-const handleErrorMsgClick = (reason: ErrorReasonType) => {
+const handleErrorMsgClick = (reason: ErrorReasonType, index: number) => {
   resourceEditorRef.value.setCursorPos(reason.position);
+  activeVisibleErrorMsgIndex.value = index;
+};
+
+const activeVisibleErrorMsgIndex = ref(-1);
+const handleErrorShiftClick = (action: 'prev' | 'next') => {
+  const index = action === 'prev'
+    ? activeVisibleErrorMsgIndex.value - 1
+    : activeVisibleErrorMsgIndex.value + 1;
+
+  const reason = visibleErrorReasons.value[index];
+
+  if (reason) {
+    resourceEditorRef.value.setCursorPos(reason.position);
+    activeVisibleErrorMsgIndex.value = index;
+  }
 };
 
 // 从把 jsonpath 指向的对象转换成正则
@@ -1187,6 +1218,7 @@ const getFirstQuotedValue = (str: string) => {
 // 处理右侧错误类型计数器点击事件
 const handleErrorCountClick = (type: CodeErrorMsgType) => {
   activeCodeMsgType.value = type;
+  activeVisibleErrorMsgIndex.value = -1;
   updateEditorDecorations();
 };
 
@@ -1532,32 +1564,71 @@ const filterData = (val: string, action: 'add' | 'update') => {
       display: flex;
       height: 100%;
 
-      .editor-error-counters {
+      .editor-side-bar {
         width: 32px;
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: space-between;
         background-color: #1a1a1a;
 
-        .error-count-item {
-          height: 34px;
-          width: 100%;
-          border-bottom: 1px solid #222;
+        .editor-error-counters {
+          width: 32px;
           display: flex;
           flex-direction: column;
-          justify-content: center;
           align-items: center;
-          line-height: 12px;
-          font-size: 12px;
-          cursor: pointer;
 
-          &:last-child {
-            border-bottom: none;
+          .error-count-item {
+            height: 34px;
+            width: 100%;
+            border-bottom: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 12px;
+            font-size: 12px;
+            cursor: pointer;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &:hover, &.active {
+              background-color: #333;
+            }
+          }
+        }
+
+        .editor-error-shifts {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+
+          .shift-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #4D4D4D;
+            border-radius: 2px;
+            cursor: pointer;
+
+            &:active {
+              background: #666;
+            }
           }
 
-          &:hover, &.active {
-            background-color: #333;
+          .shift-btn.prev {
+            transform: rotate(-90deg);
+          }
+
+          .shift-btn.next {
+            transform: rotate(90deg);
           }
         }
       }
@@ -1609,6 +1680,7 @@ const filterData = (val: string, action: 'add' | 'update') => {
         gap: 4px;
         cursor: pointer;
 
+        &.active,
         &:hover {
           background-color: #333;
         }
