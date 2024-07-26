@@ -110,24 +110,26 @@
                 </aside>
               </main>
               <footer class="editor-footer-bar">
-                <footer v-if="isValidMsgVisible" class="editor-message">
+                <article v-if="isValidMsgVisible" class="editor-message">
                   <success class="success-c" width="14px" height="14px" />
                   <span class="msg-part msg-body">校验通过</span>
                   <close-line
                     width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"
                     @click="() => { isValidMsgVisible = false }"
                   ></close-line>
-                </footer>
-                <main v-else class="editor-footer-validate-btn">
+                </article>
+                <article v-else class="editor-footer-validate-btn">
                   <bk-button
                     theme="primary"
                     size="small"
+                    :loading="isDataLoading"
+                    :disabled="isDataLoading"
                     @click="handleCheckData({ changeView: false })"
                   >
                     <play-shape />
                     {{ t('语法校验') }}
                   </bk-button>
-                </main>
+                </article>
               </footer>
             </div>
           </template>
@@ -139,9 +141,9 @@
                 @click="handleErrorMsgClick(reason)"
               >
                 <span class="msg-part msg-icon"><warn fill="#EA3636" /></span>
-                <span class="msg-part msgHost"></span>
+                <span class="msg-part msg-host"></span>
                 <span class="msg-part msg-body">{{ reason.message }}</span>
-                <span class="msg-part msgErrorCode"></span>
+                <span class="msg-part msg-error-code">{{ reason.json_path }}</span>
                 <span v-if="reason.position" class="msg-part msgPos">
                   {{ `(${reason.position.lineNumber}, ${reason.position.column})` }}
                 </span>
@@ -780,7 +782,10 @@ import {
 } from 'vue';
 import { Message } from 'bkui-vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+// 此方法创建的 router 实例为 undefined，改用 import router from 'router/index.ts'
+// import { useRouter } from 'vue-router';
+// const router = useRouter();
+import router from '@/router';
 
 import editorMonaco from '@/components/ag-editor.vue';
 import exampleData from '@/constant/example-data';
@@ -819,7 +824,6 @@ type CodeErrorResponse = {
   message: string,
 };
 
-const router = useRouter();
 const { t } = useI18n();
 const common = useCommon();
 const editorText = ref<string>(exampleData.content);
@@ -914,22 +918,11 @@ const msgAsWarningNum = computed(() => {
   return errorReasons.value.filter(r => r.level === 'Warning').length;
 });
 
-// 防抖的代码校验
-// const debouncedCheckData = _.debounce((args) => {
-//   handleCheckData(args);
-// }, 1000);
-
-// 代码有变化时自动校验
+// 代码有变化时重置校验状态
 watch(editorText, () => {
   isCodeValid.value = false;
   isValidMsgVisible.value = false;
 });
-
-// checkbox hooks
-// const {
-//   selections,
-//   handleSelectionChange,
-// } = useSelection();
 
 // 设置editor的内容
 const setEditValue = () => {
@@ -1050,6 +1043,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
+      // console.log('errorReasons:');
       // console.log(errorReasons.value);
       updateEditorDecorations();
     }
@@ -1170,13 +1164,17 @@ const getRegexFromObj = ({ objKey, objValue }: { objKey?: string, objValue: any 
   if (objKey) {
     exp = `\\b${objKey}\\b:[\\s\\S\\n\\r]*?`;
   }
-  Object.entries(objValue)
-    .forEach((e) => {
-      exp += `\\b${e[0]}\\b[\\s\\S\\n\\r]*?`;
-      if (!_.isObject(e[1])) {
-        exp += `${e[1]}[\\s\\S\\n\\r]*?`;
-      }
-    });
+  if (_.isObject(objValue)) {
+    Object.entries(objValue)
+      .forEach((e) => {
+        exp += `\\b${e[0]}\\b[\\s\\S\\n\\r]*?`;
+        if (!_.isObject(e[1])) {
+          exp += `${e[1]}[\\s\\S\\n\\r]*?`;
+        }
+      });
+  } else {
+    exp += `\\b${objValue}[\\s\\S\\n\\r]*?`
+  }
   return new RegExp(exp, 'gm');
 };
 
