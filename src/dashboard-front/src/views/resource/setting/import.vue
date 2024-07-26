@@ -1162,13 +1162,17 @@ const getRegexFromObj = ({ objKey, objValue }: { objKey?: string, objValue: any 
   if (objKey) {
     exp = `\\b${objKey}\\b:[\\s\\S\\n\\r]*?`;
   }
-  Object.entries(objValue)
-    .forEach((e) => {
-      exp += `\\b${e[0]}\\b[\\s\\S\\n\\r]*?`;
-      if (!_.isObject(e[1])) {
-        exp += `${e[1]}[\\s\\S\\n\\r]*?`;
-      }
-    });
+  if (_.isObject(objValue)) {
+    Object.entries(objValue)
+      .forEach((e) => {
+        exp += `\\b${e[0]}\\b[\\s\\S\\n\\r]*?`;
+        if (!_.isObject(e[1])) {
+          exp += `${e[1]}[\\s\\S\\n\\r]*?`;
+        }
+      });
+  } else {
+    exp += `\\b${objValue}[\\s\\S\\n\\r]*?`
+  }
   return new RegExp(exp, 'gm');
 };
 
