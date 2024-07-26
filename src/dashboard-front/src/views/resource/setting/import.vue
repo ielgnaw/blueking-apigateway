@@ -1531,7 +1531,7 @@ const handleFullScreenClick = () => {
   .monaco-editor {
     width: 100%;
     height: calc(100vh - 240px);
-    margin-bottom: 10px;
+    margin-top: 10px;
     border-radius: 2px;
     overflow: hidden;
 
