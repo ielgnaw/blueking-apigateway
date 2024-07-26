@@ -782,7 +782,10 @@ import {
 } from 'vue';
 import { Message } from 'bkui-vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+// 此方法创建的 router 实例为 undefined，改用 import router from 'router/index.ts'
+// import { useRouter } from 'vue-router';
+// const router = useRouter();
+import router from '@/router';
 
 import editorMonaco from '@/components/ag-editor.vue';
 import exampleData from '@/constant/example-data';
@@ -821,7 +824,6 @@ type CodeErrorResponse = {
   message: string,
 };
 
-const router = useRouter();
 const { t } = useI18n();
 const common = useCommon();
 const editorText = ref<string>(exampleData.content);
