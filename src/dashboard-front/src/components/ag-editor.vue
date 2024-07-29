@@ -13,6 +13,12 @@ let editor = null; // 编辑器实例
 const monacoEditor = ref(null);
 // 编辑器装饰器（高亮效果等）
 let decorations = [];
+// 可切换字号范围
+const fontSizeOptions = [14, 20, 24];
+// 可切换行高范围
+const lineHeight = [24, 30, 34];
+// 当前选中字号的index
+const currentFontSizeIndex = ref(0);
 // 定义从父组件接收的属性
 const props = defineProps({
   modelValue: { type: [String, Object, Array], default: () => 'yaml' },
@@ -167,6 +173,14 @@ const closeFindPanel = () => {
   editor.trigger('', 'closeFindWidget');
 };
 
+const switchFontSize = () => {
+  currentFontSizeIndex.value = (currentFontSizeIndex.value + 1) % fontSizeOptions.length;
+  editor.updateOptions({
+    fontSize: fontSizeOptions[currentFontSizeIndex.value],
+    lineHeight: lineHeight[currentFontSizeIndex.value],
+  });
+};
+
 defineExpose({
   setValue,
   setCursorPos,
@@ -177,6 +191,7 @@ defineExpose({
   getValue,
   showFindPanel,
   closeFindPanel,
+  switchFontSize,
 });
 
 </script>

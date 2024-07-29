@@ -64,6 +64,11 @@
                   <section class="tool-item" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
                     <search width="18px" height="18px" />
                   </section>
+                  <section
+                    class="tool-item svg-icon"
+                    :style="{ backgroundImage: `url(${fontIcon})` }"
+                    @click="handleFontSizeClick()"
+                  ></section>
                   <!--                  <section class="tool-item">-->
                   <!--                    <upload width="18px" height="18px" />-->
                   <!--                  </section>-->
@@ -831,6 +836,8 @@ import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
 
+import fontIcon from '@/images/font.svg';
+
 type CodeErrorResponse = {
   code: string,
   data: { json_path: string, message: string }[],
@@ -1231,6 +1238,11 @@ const toggleFindToolClick = () => {
   }
 };
 
+// 切换字号
+const handleFontSizeClick = () => {
+  resourceEditorRef.value.switchFontSize();
+};
+
 const getAuthConfigText = (authConfig: string | object | null | undefined) => {
   if (!authConfig) return '--';
   let auth;
@@ -1564,6 +1576,17 @@ const handleFullScreenClick = () => {
 
             &.active, &:hover {
               color: #ccc;
+            }
+
+            &.svg-icon {
+              padding: 0 8px;
+              height: 18px;
+              color: red;
+              filter: invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%);
+
+              &.active, &:hover {
+                filter: invert(80%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%);
+              }
             }
           }
         }
