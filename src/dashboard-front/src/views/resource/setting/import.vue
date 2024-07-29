@@ -1612,7 +1612,8 @@ const handleFullScreenClick = () => {
 
       .editor-main-content {
         display: flex;
-        height: 100%;
+        // 100% - 40px(.editor-toolbar高度) - 52px(.editor-footer-bar高度)
+        height: calc(100% - 92px);
 
         .editor-side-bar {
           width: 32px;
