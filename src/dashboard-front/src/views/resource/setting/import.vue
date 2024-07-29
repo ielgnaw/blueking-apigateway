@@ -206,7 +206,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>{{ t('新增的资源（共') }} {{ tableDataToAdd.length }} {{ t('个）') }}</span>
+              <span>{{ t('新增的资源（共{num}个）', { num: tableDataToAdd.length }) }}</span>
               <bk-input
                 clearable
                 :placeholder="t('请输入资源名称/路径，按Enter搜索')"
@@ -376,7 +376,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>{{ t('更新的资源（共') }} {{ tableDataToUpdate.length }} {{ t('个）') }}</span>
+              <span>{{ t('更新的资源（共{num}个）', { num: tableDataToUpdate.length }) }}</span>
               <bk-input
                 clearable
                 :placeholder="t('请输入资源名称/路径，按Enter搜索')"
@@ -555,7 +555,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>{{ t('不导入的资源（共') }} {{ tableDataUnchecked.length }} {{ t('个）') }}</span>
+              <span>{{ t('不导入的资源（共{num}个）', { num: tableDataUnchecked.length }) }}</span>
               <!--              <bk-input-->
               <!--                :clearable="true"-->
               <!--                :placeholder="t('请输入资源名称，按Enter搜索')"-->
