@@ -50,6 +50,7 @@
       <!-- 代码编辑器 -->
       <div class="monaco-editor" ref="editorWrapRef">
         <bk-resize-layout
+          ref="resizeLayoutRef"
           placement="bottom"
           collapsible
           immediate
@@ -796,7 +797,7 @@ import {
   ref,
   nextTick,
   computed,
-  watch,
+  watch, onMounted,
 } from 'vue';
 import { Message } from 'bkui-vue';
 import { useI18n } from 'vue-i18n';
@@ -832,6 +833,7 @@ import _ from 'lodash';
 
 import type { IPosition } from 'monaco-editor';
 import type { ErrorReasonType, CodeErrorMsgType } from '@/types/common';
+import { ResizeLayout } from 'bkui-vue';
 import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
@@ -895,6 +897,9 @@ const editingResource = ref<any>({
 });
 const isSliderShow = ref(false);
 
+// 编辑器所在的 resize-layout
+const resizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
+
 // 展示在“新增的资源”一栏的资源
 const tableDataToAdd = computed(() => {
   return tableData.value.filter(data => {
@@ -944,6 +949,11 @@ watch(editorText, () => {
   isCodeValid.value = false;
   isValidMsgVisible.value = false;
   activeVisibleErrorMsgIndex.value = -1;
+});
+
+// 进入页面默认折叠编辑器错误消息栏
+onMounted(() => {
+  resizeLayoutRef.value.setCollapse(true);
 });
 
 // 设置editor的内容
@@ -1006,8 +1016,13 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     }));
     isCodeValid.value = true;
     isValidMsgVisible.value = true;
-    resourceEditorRef.value.clearDecorations();
+    // 清空编辑器高亮样式
+    resourceEditorRef?.value?.clearDecorations();
     errorReasons.value = [];
+    // 折叠错误消息栏
+    // await nextTick(() => {
+    //   resizeLayoutRef.value.setCollapse(true);
+    // });
     // 判断是否跳转，默认为是
     if (_changeView) {
       curView.value = 'resources';
@@ -1067,7 +1082,10 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       });
       // console.log('errorReasons:');
       // console.log(errorReasons.value);
+      // 更新编辑器高亮样式
       updateEditorDecorations();
+      // 展开错误消息栏
+      // resizeLayoutRef.value.setCollapse(false);
     }
     // }
   } finally {
