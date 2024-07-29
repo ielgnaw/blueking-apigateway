@@ -4,8 +4,8 @@
       <main class="steps-indicator">
         <bk-steps
           :steps="[
-            { title: '校验文件' },
-            { title: '资源信息确认' },
+            { title: t('校验文件') },
+            { title: t('资源信息确认') },
           ]"
           :cur-step="curView === 'import' ? 1 : 2"
           theme="primary"
@@ -59,7 +59,7 @@
             <div class="editor-layout-main">
               <!--  顶部编辑器工具栏-->
               <header class="editor-toolbar">
-                <span class="p10" style="color: #ccc">代码编辑器</span>
+                <span class="p10" style="color: #ccc">{{ t('代码编辑器') }}</span>
                 <aside class="tool-items">
                   <section class="tool-item" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
                     <search width="18px" height="18px" />
@@ -122,7 +122,7 @@
               <footer class="editor-footer-bar">
                 <article v-if="isValidMsgVisible" class="editor-message">
                   <success class="success-c" width="14px" height="14px" />
-                  <span class="msg-part msg-body">校验通过</span>
+                  <span class="msg-part msg-body">{{ t('校验通过') }}</span>
                   <close-line
                     width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"
                     @click="() => { isValidMsgVisible = false }"
@@ -172,13 +172,13 @@
       <header class="res-counter-banner">
         <main>
           <info-line width="14px" height="14px" fill="#3A84FF" class="mr5" />
-          <span>共<span class="ag-strong pl5 pr5">{{ tableData.length }}</span>个资源，新增<span
+          <span>{{ t('共') }}<span class="ag-strong pl5 pr5">{{ tableData.length }}</span>{{ t('个资源，新增') }}<span
             class="ag-strong success pl5 pr5"
-          >{{ tableDataToAdd.length }}</span>个，更新<span
+          >{{ tableDataToAdd.length }}</span>{{ t('个，更新') }}<span
             class="ag-strong warning pl5 pr5"
-          >{{ tableDataToUpdate.length }}</span>个，取消导入<span class="ag-strong danger pl5 pr5">{{
+          >{{ tableDataToUpdate.length }}</span>{{ t('个，取消导入') }}<span class="ag-strong danger pl5 pr5">{{
               tableDataUnchecked.length
-            }}</span>个</span>
+            }}</span>{{ t('个') }}</span>
         </main>
         <aside>
           <bk-button
@@ -200,7 +200,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>新增的资源（共{{ tableDataToAdd.length }}个）</span>
+              <span>{{ t('新增的资源（共') }} {{ tableDataToAdd.length }} {{ t('个）') }}</span>
               <bk-input
                 clearable
                 :placeholder="t('请输入资源名称/路径，按Enter搜索')"
@@ -370,7 +370,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>更新的资源（共{{ tableDataToUpdate.length }}个）</span>
+              <span>{{ t('更新的资源（共') }} {{ tableDataToUpdate.length }} {{ t('个）') }}</span>
               <bk-input
                 clearable
                 :placeholder="t('请输入资源名称/路径，按Enter搜索')"
@@ -389,7 +389,7 @@
                   theme="primary"
                   size="small"
                 />
-                生成新文档：原有的文档将会覆盖更新
+                {{ t('生成新文档：原有的文档将会覆盖更新') }}
               </section>
               <bk-table
                 class="table-layout"
@@ -549,7 +549,7 @@
         >
           <template #title>
             <div class="collapse-panel-title">
-              <span>不导入的资源（共{{ tableDataUnchecked.length }}个）</span>
+              <span>{{ t('不导入的资源（共') }} {{ tableDataUnchecked.length }} {{ t('个）') }}</span>
               <!--              <bk-input-->
               <!--                :clearable="true"-->
               <!--                :placeholder="t('请输入资源名称，按Enter搜索')"-->
@@ -747,13 +747,13 @@
     >
       <template #default>
         <div class="import-confirm-dialog-content-wrap">
-          <header class="mb10">网关：{{ common.apigwName }}</header>
+          <header class="mb10">{{ t('网关：') }}{{ common.apigwName }}</header>
           <main class="content-main">
-            将新增
+            {{ t('将新增') }}
             <span class="ag-strong success-c">{{ tableDataToAdd.length }}</span>
-            条资源，更新覆盖
+            {{ t('条资源，更新覆盖') }}
             <span class="ag-strong warning-c">{{ tableDataToUpdate.length }}</span>
-            条资源
+            {{ t('条资源') }}
           </main>
         </div>
       </template>
