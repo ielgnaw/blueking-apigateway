@@ -1057,7 +1057,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
         let position: IPosition | null = null;
         // 生成用于搜索 jsonpath 所在行的正则
         // 判断 jsonpath 指向的是否为数组成员，是的话传入倒数第二个 path
-        const isInteger = Number.isInteger(Number.parseInt(lastPath, 10));
+        const isInteger = Number.isInteger(Number(lastPath)) && lastPath.trim() !== '';
         const objKey = isInteger ? paths[paths.length - 2] : lastPath;
         regex = getRegexFromObj({ objKey, objValue: pathValue });
 
