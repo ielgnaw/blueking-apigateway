@@ -1056,12 +1056,11 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
         // 匹配项在 editor 中的 Position
         let position: IPosition | null = null;
         // 生成用于搜索 jsonpath 所在行的正则
-        // 判断 jsonpath 指向的是否为数组成员，是的话不传入 key
-        if (Number.isInteger(Number.parseInt(lastPath, 10))) {
-          regex = getRegexFromObj({ objValue: pathValue });
-        } else {
-          regex = getRegexFromObj({ objKey: lastPath, objValue: pathValue });
-        }
+        // 判断 jsonpath 指向的是否为数组成员，是的话传入倒数第二个 path
+        const isInteger = Number.isInteger(Number.parseInt(lastPath, 10));
+        const objKey = isInteger ? paths[paths.length - 2] : lastPath;
+        regex = getRegexFromObj({ objKey, objValue: pathValue });
+
         offset = resourceEditorRef.value.getValue()
           .search(regex);
         // 用 editor 的 api 找到 Position
@@ -1083,8 +1082,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
-      // console.log('errorReasons:');
-      // console.log(errorReasons.value);
+      console.log('errorReasons:');
+      console.log(errorReasons.value);
       // 更新编辑器高亮样式
       updateEditorDecorations();
       // 展开错误消息栏
