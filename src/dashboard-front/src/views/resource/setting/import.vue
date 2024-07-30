@@ -1082,8 +1082,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
-      console.log('errorReasons:');
-      console.log(errorReasons.value);
+      // console.log('errorReasons:');
+      // console.log(errorReasons.value);
       // 更新编辑器高亮样式
       updateEditorDecorations();
       // 展开错误消息栏
