@@ -1,5 +1,5 @@
 <template>
-  <div class="import-wrapper">
+  <div v-if="!isImportResultVisible" class="import-wrapper">
     <header class="steps-indicator-wrap">
       <main class="steps-indicator">
         <bk-steps
@@ -839,6 +839,104 @@
       </template>
     </bk-sideslider>
   </div>
+  <!--  导入结果展示页  -->
+  <div v-else class="import-result-wrapper">
+    <!--  导入中  -->
+    <article v-if="isImportLoading" class="content-wrap loading">
+      <main class="content-main">
+        <bk-loading
+          mode="spin"
+          theme="primary"
+          loading
+        >
+          <div style="width: 100%; height: 48px" />
+        </bk-loading>
+        <section class="title">
+          正在导入
+          <span class="ag-strong">{{ tableDataToAdd.length + tableDataToUpdate.length }}</span>
+          个资源，请稍等...
+        </section>
+      </main>
+      <footer class="content-footer">
+        <span>新增
+          <span
+            class="ag-strong success pl5 pr5"
+          >{{ tableDataToAdd.length }}</span>个，覆盖
+          <span
+            class="ag-strong warning pl5 pr5"
+          >{{ tableDataToUpdate.length }}</span>个
+        </span>
+        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
+      </footer>
+    </article>
+    <!--  导入成功  -->
+    <article v-else-if="isImportSucceeded" class="content-wrap success">
+      <main class="content-main">
+        <success width="64px" height="64px" fill="#2DCB56" />
+        <section class="title">
+          成功导入
+          <span class="ag-strong">{{ tableDataToAdd.length + tableDataToUpdate.length }}</span>
+          个资源
+        </section>
+      </main>
+      <footer class="content-footer">
+        <span>新增
+          <span
+            class="ag-strong success pl5 pr5"
+          >{{ tableDataToAdd.length }}</span>个，覆盖
+          <span
+            class="ag-strong warning pl5 pr5"
+          >{{ tableDataToUpdate.length }}</span>个，为了后续导入方便，请及时下载最新的资源文
+        </span>
+        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
+      </footer>
+      <section class="actions">
+        <bk-button theme="primary" @click="goBack()">
+          {{
+            t('返回查看')
+          }}
+        </bk-button>
+        <bk-button @click="goBack()">
+          {{
+            t('继续导入')
+          }}
+        </bk-button>
+      </section>
+    </article>
+    <!--  导入失败  -->
+    <article v-else class="content-wrap fail">
+      <main class="content-main">
+        <close width="64px" height="64px" fill="#EA3636" />
+        <section class="title">
+          资源导入失败
+        </section>
+      </main>
+      <footer class="content-footer">
+        <span>为了后续导入方便，请及时下载最新的资源文件</span>
+        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
+      </footer>
+      <section class="actions">
+        <bk-button theme="primary" @click="handleImportResource()">
+          {{
+            t('失败重试')
+          }}
+        </bk-button>
+        <bk-button @click="handleReturnClick()">
+          {{
+            t('返回修改配置')
+          }}
+        </bk-button>
+      </section>
+      <section v-if="importErrorMsg" class="error-msg">
+        <bk-alert
+          theme="error"
+          :title="importErrorMsg"
+          closable
+          style="width: 800px;"
+        />
+      </section>
+    </article>
+  </div>
 </template>
 <script setup lang="tsx">
 import {
@@ -873,6 +971,7 @@ import {
   CloseLine,
   CollapseLeft,
   FilliscreenLine,
+  Close,
   // Upload,
 } from 'bkui-vue/lib/icon';
 import yaml from 'js-yaml';
@@ -905,6 +1004,10 @@ const language = ref<string>('zh');
 const isDataLoading = ref<boolean>(false);
 const isCodeValid = ref<boolean>(false);
 const isImportLoading = ref<boolean>(false);
+// 是否展示导入结果页（loading、success、fail）
+const isImportResultVisible = ref(false);
+// 导入是否成功
+const isImportSucceeded = ref(false);
 const curView = ref<string>('import'); // 当前页面
 const tableData = ref<any[]>([]);
 const globalProperties = useGetGlobalProperties();
@@ -948,6 +1051,9 @@ const isSliderShow = ref(false);
 
 // 编辑器所在的 resize-layout
 const resizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
+
+// 导入失败消息
+const importErrorMsg = ref('');
 
 // 展示在“新增的资源”一栏的资源
 const tableDataToAdd = computed(() => {
@@ -1018,7 +1124,7 @@ watch(editorText, () => {
 
 // 进入页面默认折叠编辑器错误消息栏
 onMounted(() => {
-  resizeLayoutRef.value.setCollapse(true);
+  resizeLayoutRef?.value?.setCollapse(true);
 });
 
 // 设置editor的内容
@@ -1088,7 +1194,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     // 折叠错误消息栏
     if (!isEditorMsgCollapsed) {
       await nextTick(() => {
-        resizeLayoutRef.value.setCollapse(true);
+        resizeLayoutRef?.value?.setCollapse(true);
       });
     }
     // 判断是否跳转，默认为是
@@ -1154,7 +1260,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       // 展开错误消息栏
       if (isEditorMsgCollapsed) {
         await nextTick(() => {
-          resizeLayoutRef.value.setCollapse(false);
+          resizeLayoutRef?.value?.setCollapse(false);
         });
       }
     }
@@ -1175,6 +1281,7 @@ const handleImportResource = async () => {
   isImportConfirmDialogVisible.value = false;
   try {
     isImportLoading.value = true;
+    isImportResultVisible.value = true;
     const selected_resources = tableData.value.filter((e: any) => e._unchecked === false)
       .map((e: any) => {
         const { _unchecked, _localId, ...restOfResource } = e;  // 去掉_unchecked 和 _localId 属性，不要发到后端
@@ -1199,13 +1306,11 @@ const handleImportResource = async () => {
       };
       await importResourceDocSwagger(apigwId, paramsDocs);
     }
-    Message({
-      theme: 'success',
-      message: t('资源导入成功'),
-    });
-    goBack();
-  } catch (error) {
-
+    isImportSucceeded.value = true;
+  } catch (err: unknown) {
+    const error = err as { message: string };
+    importErrorMsg.value = error?.message ? `${t('失败原因：')}${error.message}` : '';
+    isImportSucceeded.value = false;
   } finally {
     isImportLoading.value = false;
   }
@@ -1590,6 +1695,12 @@ let isEditorMsgCollapsed: boolean = false;
 const updateIsEditorMsgCollapsed = (collapsed: boolean) => {
   isEditorMsgCollapsed = collapsed;
 };
+
+const handleReturnClick = () => {
+  isImportSucceeded.value = false;
+  isImportResultVisible.value = false;
+  isImportLoading.value = false;
+}
 </script>
 <style scoped lang="scss">
 
@@ -1948,6 +2059,62 @@ const updateIsEditorMsgCollapsed = (collapsed: boolean) => {
 
   .collapse-panel-table-wrap {
     padding-bottom: 24px;
+  }
+}
+
+.import-result-wrapper {
+  height: 400px;
+  margin: 20px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px 0 #1919290d;
+
+  .content-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .content-main {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+
+      .title {
+        color: #313238;
+        font-size: 24px;
+        line-height: 32px;
+      }
+    }
+
+    .content-footer {
+      color: #63656E;
+
+      .download-btn {
+        margin-left: 4px;
+        color: #3A84F6;
+        cursor: pointer;
+
+        .btn-icon {
+          font-size: 18px;
+        }
+      }
+    }
+
+    .actions {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-msg {
+      margin-top: 16px;
+    }
   }
 }
 
