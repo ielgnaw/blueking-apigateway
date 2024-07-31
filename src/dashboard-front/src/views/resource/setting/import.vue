@@ -249,6 +249,7 @@
                 :data="tableDataToAdd"
                 row-key="name"
                 show-overflow-tooltip
+                :pagination="tableToAddPagination"
               >
                 <bk-table-column
                   :label="t('资源名称')"
@@ -427,7 +428,7 @@
                 :data="tableDataToUpdate"
                 show-overflow-tooltip
                 row-key="name"
-                :checked="tableData"
+                :pagination="tableToUpdatePagination"
               >
                 <bk-table-column
                   :label="t('资源名称')"
@@ -597,6 +598,7 @@
                 :data="tableDataUnchecked"
                 show-overflow-tooltip
                 row-key="name"
+                :pagination="tableUncheckedPagination"
               >
                 <bk-table-column
                   :label="t('资源名称')"
@@ -946,6 +948,22 @@ const tableDataToUpdate = computed(() => {
 // 被取消导入的资源
 const tableDataUnchecked = computed(() => {
   return tableData.value.filter(data => data._unchecked);
+});
+
+// 表格翻页
+const tableToAddPagination = ref({
+  count: tableDataToAdd.value.length,
+  limit: 10,
+});
+
+const tableToUpdatePagination = ref({
+  count: tableDataToAdd.value.length,
+  limit: 10,
+});
+
+const tableUncheckedPagination = ref({
+  count: tableDataToAdd.value.length,
+  limit: 10,
 });
 
 // 可视的错误消息，实际要渲染到编辑器视图的数据
