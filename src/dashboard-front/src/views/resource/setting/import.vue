@@ -1580,7 +1580,7 @@ const updateIsEditorMsgCollapsed = (collapsed: boolean) => {
 
   .monaco-editor {
     width: 100%;
-    height: calc(100vh - 240px);
+    height: calc(100vh - 330px);
     margin-top: 10px;
     border-radius: 2px;
     overflow: hidden;
