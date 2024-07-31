@@ -358,7 +358,7 @@
                 >
                   <template #default="{ row }">
                     <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name).join('，') || '无插件'}` }"
+                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
@@ -539,7 +539,7 @@
                 >
                   <template #default="{ row }">
                     <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name).join('，') || '无插件'}` }"
+                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
@@ -709,7 +709,7 @@
                 >
                   <template #default="{ row }">
                     <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name).join('，') || '无插件'}` }"
+                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
