@@ -341,6 +341,7 @@
                 >
                   <template #default="{ row }">
                     <bk-button
+                      v-if="showDoc"
                       text
                       theme="primary"
                       @click="handleShowResourceDoc(row)"
@@ -348,6 +349,7 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
+                    <span v-else>未生成</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
@@ -415,14 +417,14 @@
           </template>
           <template #content>
             <div class="collapse-panel-table-wrap">
-              <section class="pb10">
-                <bk-switcher
-                  v-model="showDoc"
-                  theme="primary"
-                  size="small"
-                />
-                {{ t('生成新文档：原有的文档将会覆盖更新') }}
-              </section>
+              <!--              <section class="pb10">-->
+              <!--                <bk-switcher-->
+              <!--                  v-model="showDoc"-->
+              <!--                  theme="primary"-->
+              <!--                  size="small"-->
+              <!--                />-->
+              <!--                {{ t('生成新文档：原有的文档将会覆盖更新') }}-->
+              <!--              </section>-->
               <bk-table
                 class="table-layout"
                 :data="tableDataToUpdate"
@@ -520,6 +522,7 @@
                 >
                   <template #default="{ row }">
                     <bk-button
+                      v-if="showDoc"
                       text
                       theme="primary"
                       @click="handleShowResourceDoc(row)"
@@ -527,6 +530,7 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
+                    <span v-else>未生成</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
@@ -688,6 +692,7 @@
                 >
                   <template #default="{ row }">
                     <bk-button
+                      v-if="showDoc"
                       text
                       theme="primary"
                       @click="handleShowResourceDoc(row)"
@@ -695,6 +700,7 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
+                    <span v-else>未生成</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
