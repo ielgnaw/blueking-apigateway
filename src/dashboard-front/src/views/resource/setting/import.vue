@@ -262,7 +262,9 @@
                   :label="() => renderAuthConfigColLabel('add')"
                 >
                   <template #default="{ row }">
-                    {{ getAuthConfigText(row?.auth_config) }}
+                    <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
+                      {{ getAuthConfigText(row?.auth_config) }}
+                    </span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
@@ -446,7 +448,9 @@
                   :label="() => renderAuthConfigColLabel('update')"
                 >
                   <template #default="{ row }">
-                    {{ getAuthConfigText(row?.auth_config) }}
+                    <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
+                      {{ getAuthConfigText(row?.auth_config) }}
+                    </span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
@@ -620,7 +624,9 @@
                   :label="t('认证方式')"
                 >
                   <template #default="{ row }">
-                    {{ getAuthConfigText(row?.auth_config) }}
+                    <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
+                      {{ getAuthConfigText(row?.auth_config) }}
+                    </span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
