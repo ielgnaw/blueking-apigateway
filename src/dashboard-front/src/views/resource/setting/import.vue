@@ -14,7 +14,7 @@
     </header>
     <!--  导入前视图，代码编辑器在此页  -->
     <div v-if="curView === 'import'" class="import-container">
-      <div class="import-header flex-row justify-content-between">
+      <div class="import-header flex-row">
         <div class="flex-row align-items-center">
           <bk-upload
             theme="button"
@@ -40,6 +40,30 @@
           </span>
         </div>
         <div class="flex-row align-items-center">
+          <bk-form class="flex-row">
+            <bk-form-item
+              class="mb0"
+              :label-width="20"
+            >
+              <bk-checkbox v-model="showDoc" size="small">
+                {{ t('生成资源文档') }}
+              </bk-checkbox>
+            </bk-form-item>
+            <bk-form-item
+              v-if="showDoc"
+              class="mb0"
+              :label="t('文档语言')"
+              :required="true"
+              :label-width="120"
+            >
+              <bk-radio-group v-model="language" size="small">
+                <bk-radio label="zh">{{ t('中文文档') }}</bk-radio>
+                <bk-radio label="en">{{ t('英文文档') }}</bk-radio>
+              </bk-radio-group>
+            </bk-form-item>
+          </bk-form>
+        </div>
+        <div class="flex-row align-items-center" style="margin-left: auto;">
           <bk-button theme="primary" text style="font-size: 12px;" @click="handleShowExample">
             {{
               t('模板示例')
@@ -1922,4 +1946,15 @@ const updateIsEditorMsgCollapsed = (collapsed: boolean) => {
   }
 }
 
+:deep(.import-container .import-header .bk-form .bk-checkbox-label) {
+  font-size: 12px;
+}
+
+:deep(.import-container .import-header .bk-form .bk-form-label) {
+  font-size: 12px;
+}
+
+:deep(.import-container .import-header .bk-form .bk-form-content) {
+  height: 32px;
+}
 </style>
