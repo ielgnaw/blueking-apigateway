@@ -1082,8 +1082,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
-      // console.log('errorReasons:');
-      // console.log(errorReasons.value);
+      console.log('errorReasons:');
+      console.log(errorReasons.value);
       // 更新编辑器高亮样式
       updateEditorDecorations();
       // 展开错误消息栏
@@ -1222,7 +1222,7 @@ const handleErrorShiftClick = (action: 'prev' | 'next') => {
 
 // 从把 jsonpath 指向的对象转换成正则
 const getRegexFromObj = ({ objKey, objValue }: { objKey: string, objValue: any }): RegExp => {
-  const exp = `\\b${objKey}\\b:${getRegexString(objValue)}`;
+  const exp = `[\\b/]*?${objKey}[\\b/]*?:${getRegexString(objValue)}`;
   return new RegExp(exp, 'gm');
 };
 
@@ -1233,7 +1233,7 @@ const getRegexString = (value: any): string => {
   if (_.isObject(value)) {
     Object.entries(value)
       .forEach(([key, val]) => {
-        expStr += `\\b${key}\\b:`;
+        expStr += `[\\b/]*?${key}[\\b/]*?:`;
         if (_.isObject(val)) {
           expStr += getRegexString(val);
         } else {
