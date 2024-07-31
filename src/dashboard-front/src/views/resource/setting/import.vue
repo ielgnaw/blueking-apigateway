@@ -895,6 +895,7 @@ const editingResource = ref<any>({
   },
   is_public: true,
   allow_apply_permission: true,
+  _localId: -1,
 });
 const isSliderShow = ref(false);
 
@@ -1011,9 +1012,10 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       params.doc_language = language.value;
     }
     const res = await checkResourceImport(apigwId, params);
-    tableData.value = res.map((data: any) => ({
+    tableData.value = res.map((data: any, index: number) => ({
       ...data,
       _unchecked: false, // 标记是否不导入
+      _localId: index, // 给一个本地id以识别修改了哪一条数据
     }));
     isCodeValid.value = true;
     isValidMsgVisible.value = true;
@@ -1112,7 +1114,7 @@ const handleImportResource = async () => {
     isImportLoading.value = true;
     const selected_resources = tableData.value.filter((e: any) => e._unchecked === false)
       .map((e: any) => {
-        const { _unchecked, ...restOfResource } = e;  // 去掉_unchecked属性，不要发到后端
+        const { _unchecked, _localId, ...restOfResource } = e;  // 去掉_unchecked 和 _localId 属性，不要发到后端
         return restOfResource;
       });
     const params = {
@@ -1168,8 +1170,10 @@ const handleEditSliderHidden = () => {
 
 // 确认修改配置后
 const handleEditSubmit = (newResource: any) => {
-  let pos = tableData.value.findIndex(data => data.name === newResource.name);
+  let pos = tableData.value.findIndex(data => data._localId === newResource._localId);
   if (pos > -1) tableData.value[pos] = { ...tableData.value[pos], ...newResource };
+  // console.log('newResource:');
+  // console.log(newResource);
   // console.log('pos');
   // console.log(pos);
   // console.log('tableData.value:');
@@ -1178,14 +1182,14 @@ const handleEditSubmit = (newResource: any) => {
 
 // 点击修改配置时，会唤出 SideSlider
 const handleEdit = (resourceRow: any) => {
-  const _editingResource = tableData.value.find(data => data.name === resourceRow.name);
+  const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
   isSliderShow.value = true;
 };
 
 // 点击查看文档时，会唤出 SideSlider
 const handleShowResourceDoc = (resourceRow: any) => {
-  const _editingResource = tableData.value.find(data => data.name === resourceRow.name);
+  const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
   isResourceDocSliderVisible.value = true;
 };
@@ -1320,7 +1324,7 @@ const getAllowApplyPermissionText = (allow_apply_permission: boolean | null | un
 
 // 切换资源是否导入
 const toggleRowUnchecked = (row: any) => {
-  const data = tableData.value.find(d => d.name === row.name);
+  const data = tableData.value.find(d => d._localId === row._localId);
   if (data) data._unchecked = !data._unchecked;
 };
 

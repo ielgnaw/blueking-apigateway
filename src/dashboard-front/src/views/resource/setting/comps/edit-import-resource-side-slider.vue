@@ -88,6 +88,7 @@ const handleSubmit = async () => {
       ...baseFormData,
       ...frontFormData,
       backend: backFormData,
+      _localId: props.resource._localId,
     };
     emits('submit', payload);
     emits('on-hidden');
