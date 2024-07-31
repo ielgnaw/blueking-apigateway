@@ -254,6 +254,7 @@
                 <bk-table-column
                   :label="t('资源名称')"
                   prop="name"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <!--  认证方式列  -->
@@ -295,6 +296,7 @@
                 <bk-table-column
                   :label="t('前端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -330,6 +332,7 @@
                 <bk-table-column
                   :label="t('后端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                   <template #default="{ row }">
                     {{ row.backend?.path ?? row.path }}
@@ -435,6 +438,7 @@
                 <bk-table-column
                   :label="t('资源名称')"
                   prop="name"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <!--  认证方式列  -->
@@ -476,6 +480,7 @@
                 <bk-table-column
                   :label="t('前端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -511,6 +516,7 @@
                 <bk-table-column
                   :label="t('后端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                   <template #default="{ row }">
                     {{ row.backend?.path ?? row.path }}
@@ -607,6 +613,7 @@
                 <bk-table-column
                   :label="t('资源名称')"
                   prop="name"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -646,6 +653,7 @@
                 <bk-table-column
                   :label="t('前端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -681,6 +689,7 @@
                 <bk-table-column
                   :label="t('后端请求路径')"
                   prop="path"
+                  :min-width="160"
                 >
                   <template #default="{ row }">
                     {{ row.backend?.path ?? row.path }}
