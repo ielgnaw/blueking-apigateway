@@ -89,18 +89,13 @@
                 <span class="p10" style="color: #ccc">{{ t('代码编辑器') }}</span>
                 <aside class="tool-items">
                   <section class="tool-item" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
-                    <search width="18px" height="18px" />
+                    <i class="apigateway-icon icon-ag-search f16"></i>
                   </section>
-                  <section
-                    class="tool-item svg-icon"
-                    :style="{ backgroundImage: `url(${fontIcon})` }"
-                    @click="handleFontSizeClick()"
-                  ></section>
-                  <!--                  <section class="tool-item">-->
-                  <!--                    <upload width="18px" height="18px" />-->
-                  <!--                  </section>-->
-                  <section class="tool-item" @click="handleFullScreenClick">
-                    <filliscreen-line width="18px" height="18px" />
+                  <section class="tool-item" @click="handleFontSizeClick()">
+                    <i class="apigateway-icon icon-ag-font f16"></i>
+                  </section>
+                  <section class="tool-item" @click="handleFullScreenClick()">
+                    <i class="apigateway-icon icon-ag-gongneng-quanping2 f16"></i>
                   </section>
                 </aside>
               </header>
@@ -963,7 +958,6 @@ import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
 import {
   Warn,
-  Search,
   Share,
   InfoLine,
   DocFill,
@@ -972,7 +966,6 @@ import {
   Success,
   CloseLine,
   CollapseLeft,
-  FilliscreenLine,
   Close,
 } from 'bkui-vue/lib/icon';
 import yaml from 'js-yaml';
@@ -985,8 +978,6 @@ import { ResizeLayout } from 'bkui-vue';
 import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
-
-import fontIcon from '@/images/font.svg';
 
 type CodeErrorResponse = {
   code: string,
@@ -1786,11 +1777,12 @@ const handleReturnClick = () => {
 
         .tool-items {
           height: 100%;
+          padding-right: 16px;
           display: flex;
           align-items: center;
+          gap: 16px;
 
           .tool-item {
-            padding: 0 8px;
             display: flex;
             align-items: center;
             color: #999;
@@ -1798,17 +1790,6 @@ const handleReturnClick = () => {
 
             &.active, &:hover {
               color: #ccc;
-            }
-
-            &.svg-icon {
-              padding: 0 8px;
-              height: 18px;
-              color: red;
-              filter: invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%);
-
-              &.active, &:hover {
-                filter: invert(80%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%);
-              }
             }
           }
         }
