@@ -791,15 +791,18 @@
     ></edit-import-resource-side-slider>
     <!--  导入确认弹窗  -->
     <bk-dialog
-      width="480"
-      :mask-close="true"
-      :is-show="isImportConfirmDialogVisible"
-      :title="t('确认导入资源？')"
+      v-model:is-show="isImportConfirmDialogVisible"
+      class="custom-main-dialog"
+      width="400"
+      mask-close
     >
-      <template #default>
-        <div class="import-confirm-dialog-content-wrap">
-          <header class="mb10">{{ t('网关：') }}{{ common.apigwName }}</header>
-          <main class="content-main">
+      <div class="dialog-content">
+        <div class="dialog-title">
+          {{ t('确认导入资源？') }}
+        </div>
+        <div class="dialog-main">
+          <header class="apigateway-name">{{ t('网关：') }}<span class="text">{{ common.apigwName }}</span></header>
+          <main class="import-tips">
             {{ t('将新增') }}
             <span class="ag-strong success-c">{{ tableDataToAdd.length }}</span>
             {{ t('条资源，更新覆盖') }}
@@ -807,16 +810,11 @@
             {{ t('条资源') }}
           </main>
         </div>
-      </template>
-      <template #footer>
-        <bk-button
-          theme="primary"
-          @click="handleImportResource"
-        >
-          {{ t('确定') }}
-        </bk-button>
-        <bk-button @click="isImportConfirmDialogVisible = false"> {{ t('取消') }}</bk-button>
-      </template>
+        <div class="dialog-footer">
+          <bk-button theme="primary" @click="handleImportResource">{{ t('确定导入') }}</bk-button>
+          <bk-button class="ml10" @click="isImportConfirmDialogVisible = false">{{ t('取消') }}</bk-button>
+        </div>
+      </div>
     </bk-dialog>
     <!-- 文档侧边栏 -->
     <bk-sideslider
@@ -2119,17 +2117,63 @@ const handleReturnClick = () => {
   font-size: 12px;
 }
 
-.import-confirm-dialog-content-wrap {
-  .content-wrap {
-    padding: 12px;
-    background-color: #aaa;
-  }
-}
-
 .doc-sides {
   :deep(.bk-modal-content) {
     max-height: calc(100vh - 52px);
     overflow: hidden;
+  }
+}
+
+.custom-main-dialog {
+  :deep(.bk-dialog-title) {
+    display: none;
+  }
+
+  :deep(.bk-modal-footer) {
+    display: none;
+  }
+
+  .dialog-content {
+    .publish-icon {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 42px;
+      line-height: 32px;
+    }
+
+    .dialog-title {
+      font-size: 20px;
+      color: #313238;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .dialog-main {
+
+      .apigateway-name {
+        margin-bottom: 16px;
+
+        .text {
+          font-weight: 700;
+        }
+      }
+
+      .import-tips {
+        background: #F5F6FA;
+        border-radius: 2px;
+        margin-bottom: 25px;
+        padding: 12px 16px;
+        color: #63656E;
+
+        span {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .dialog-footer {
+      text-align: center;
+    }
   }
 }
 
