@@ -762,6 +762,7 @@
           @click="handleCheckData"
           :loading="isDataLoading"
           :disabled="curView === 'import' && !isCodeValid"
+          v-bk-tooltips="{ content: isCodeModified ? '请先进行语法检测' : '请先修复报错信息后再导入', disabled: isCodeValid && !isCodeModified }"
         >
           {{ curView === 'import' ? t('下一步') : t('上一步') }}
         </bk-button>
@@ -1001,7 +1002,10 @@ const resourceEditorRef: any = ref<InstanceType<typeof editorMonaco>>(); // 实�
 const showDoc = ref<boolean>(true);
 const language = ref<string>('zh');
 const isDataLoading = ref<boolean>(false);
+// 代码校验是否通过
 const isCodeValid = ref<boolean>(false);
+// 代码校验后是否修改过代码
+const isCodeModified = ref(true);
 const isImportLoading = ref<boolean>(false);
 // 是否展示导入结果页（loading、success、fail）
 const isImportResultVisible = ref(false);
@@ -1117,6 +1121,7 @@ const msgAsWarningNum = computed(() => {
 // 代码有变化时重置校验状态
 watch(editorText, () => {
   isCodeValid.value = false;
+  isCodeModified.value = true;
   isValidMsgVisible.value = false;
   activeVisibleErrorMsgIndex.value = -1;
 });
@@ -1266,6 +1271,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     // }
   } finally {
     isDataLoading.value = false;
+    isCodeModified.value = false;
     activeVisibleErrorMsgIndex.value = -1;
   }
 };
