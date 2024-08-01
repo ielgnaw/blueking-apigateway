@@ -23,7 +23,7 @@
             accept=".yaml,.json,.yml"
           >
             <div>
-              <i class="icon apigateway-icon icon-ag-add-small"></i>
+              <i class="icon apigateway-icon icon-ag-plus"></i>
               {{ t('上传文件') }}
             </div>
           </bk-upload>
@@ -972,7 +972,6 @@ import {
   CollapseLeft,
   FilliscreenLine,
   Close,
-  // Upload,
 } from 'bkui-vue/lib/icon';
 import yaml from 'js-yaml';
 import { JSONPath } from 'jsonpath-plus';
