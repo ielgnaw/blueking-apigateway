@@ -137,10 +137,10 @@
                     </div>
                   </main>
                   <footer class="editor-error-shifts">
-                    <div class="shift-btn prev" @click="handleErrorShiftClick('prev')">
+                    <div class="shift-btn prev" @click="setEditorCursor('top')">
                       <collapse-left width="18px" height="18px" fill="#C4C6CC" />
                     </div>
-                    <div class="shift-btn next" @click="handleErrorShiftClick('next')">
+                    <div class="shift-btn next" @click="setEditorCursor('bottom')">
                       <collapse-left width="18px" height="18px" fill="#C4C6CC" />
                     </div>
                   </footer>
@@ -1376,17 +1376,11 @@ const handleErrorMsgClick = (reason: ErrorReasonType, index: number) => {
 };
 
 const activeVisibleErrorMsgIndex = ref(-1);
-const handleErrorShiftClick = (action: 'prev' | 'next') => {
-  const index = action === 'prev'
-    ? activeVisibleErrorMsgIndex.value - 1
-    : activeVisibleErrorMsgIndex.value + 1;
 
-  const reason = visibleErrorReasons.value[index];
-
-  if (reason) {
-    resourceEditorRef.value.setCursorPos(reason.position);
-    activeVisibleErrorMsgIndex.value = index;
-  }
+const setEditorCursor = (pos: 'top' | 'bottom') => {
+  pos === 'top'
+    ? resourceEditorRef.value.setCursorPos({ lineNumber: 1 })
+    : resourceEditorRef.value.setCursorPos({ toBottom: true })
 };
 
 // 从把 jsonpath 指向的对象转换成正则

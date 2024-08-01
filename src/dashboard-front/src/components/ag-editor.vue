@@ -125,15 +125,20 @@ const emitChange = (emitValue, event) => {
 };
 
 // 更改光标位置
-const setCursorPos = ({ lineNumber }) => {
+const setCursorPos = ({ lineNumber, toBottom = false }) => {
   const model = editor.getModel();
 
   if (!model) return;
 
-  const lastColumnNumber = model.getLineLastNonWhitespaceColumn(lineNumber);
+  let _lineNumber = lineNumber;
+
+  // 如果直接跳转到底部, 获取最后一行的行号
+  if (toBottom === true) _lineNumber = model.getLineCount();
+
+  const lastColumnNumber = model.getLineLastNonWhitespaceColumn(_lineNumber);
   editor.focus();
-  editor.setPosition(new monaco.Position(lineNumber, lastColumnNumber));
-  editor.revealLineInCenter(lineNumber);
+  editor.setPosition(new monaco.Position(_lineNumber, lastColumnNumber));
+  editor.revealLineInCenter(_lineNumber);
 };
 
 const genLineDecorations = (decorationOptions) => {
