@@ -1724,7 +1724,7 @@ const handleReturnClick = () => {
     border-bottom: 1px solid #DCDEE5;
 
     .steps-indicator {
-      width: 50%;
+      width: 360px;
     }
   }
 
