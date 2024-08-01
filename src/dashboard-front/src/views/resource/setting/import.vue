@@ -78,6 +78,7 @@
           placement="bottom"
           collapsible
           immediate
+          :border="false"
           style="height: 100%"
           @collapse-change="updateIsEditorMsgCollapsed"
         >
