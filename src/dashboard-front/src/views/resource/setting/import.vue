@@ -758,7 +758,7 @@
           @click="handleCheckData"
           :loading="isDataLoading"
           :disabled="curView === 'import' && !isCodeValid"
-          v-bk-tooltips="{ content: isCodeModified ? '请先进行语法检测' : '请先修复报错信息后再导入', disabled: isCodeValid && !isCodeModified }"
+          v-bk-tooltips="{ content: isCodeModified ? t('请先进行语法检测') : t('请先修复报错信息后再导入'), disabled: isCodeValid && !isCodeModified }"
         >
           {{ curView === 'import' ? t('下一步') : t('上一步') }}
         </bk-button>
@@ -1004,7 +1004,7 @@ const isImportLoading = ref<boolean>(false);
 const isImportResultVisible = ref(false);
 // 导入是否成功
 const isImportSucceeded = ref(false);
-const curView = ref<string>('import'); // 当前页面
+const curView = ref<'import' | 'resources'>('import'); // 当前页面
 const tableData = ref<any[]>([]);
 const globalProperties = useGetGlobalProperties();
 const methodsEnum: any = Object.freeze(MethodsEnum);
@@ -1119,6 +1119,16 @@ watch(editorText, () => {
   isCodeModified.value = true;
   isValidMsgVisible.value = false;
   activeVisibleErrorMsgIndex.value = -1;
+});
+
+// 返回编辑器页时自动折叠错误消息
+watch(curView, async (newCurView, oldCurView) => {
+  if (newCurView === 'import' && oldCurView === 'resources') {
+    await nextTick(() => {
+      resizeLayoutRef?.value?.setCollapse(true);
+      isEditorMsgCollapsed = true;
+    });
+  }
 });
 
 // 进入页面默认折叠编辑器错误消息栏
