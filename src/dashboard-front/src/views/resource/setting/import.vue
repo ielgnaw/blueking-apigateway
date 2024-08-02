@@ -99,7 +99,7 @@
                   </section>
                 </aside>
               </header>
-              <main class="editor-main-content" :class="{ 'show-valid-msg': isValidMsgVisible }">
+              <main class="editor-main-content" :class="{ 'show-valid-msg': isValidBannerVisible }">
                 <!--  编辑器本体  -->
                 <editor-monaco
                   v-model="editorText"
@@ -119,14 +119,14 @@
                       <warn fill="#EA3636" />
                       <span style="color:#EA3636">{{ msgAsErrorNum }}</span>
                     </div>
-                    <div
-                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"
-                      v-bk-tooltips="{ content: `Warning: ${msgAsWarningNum}`, placement: 'left' }"
-                      @click="handleErrorCountClick('Warning')"
-                    >
-                      <div class="warning-circle"></div>
-                      <span style="color: hsla(36.6, 81.7%, 55.1%, 0.5);">{{ msgAsWarningNum }}</span>
-                    </div>
+                    <!--                    <div-->
+                    <!--                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"-->
+                    <!--                      v-bk-tooltips="{ content: `Warning: ${msgAsWarningNum}`, placement: 'left' }"-->
+                    <!--                      @click="handleErrorCountClick('Warning')"-->
+                    <!--                    >-->
+                    <!--                      <div class="warning-circle"></div>-->
+                    <!--                      <span style="color: hsla(36.6, 81.7%, 55.1%, 0.5);">{{ msgAsWarningNum }}</span>-->
+                    <!--                    </div>-->
                     <div
                       class="error-count-item" :class="{ 'active': activeCodeMsgType === 'All' }"
                       v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"
@@ -147,12 +147,12 @@
                 </aside>
               </main>
               <footer class="editor-footer-bar">
-                <article v-if="isValidMsgVisible" class="editor-message">
+                <article v-if="isValidBannerVisible" class="editor-message">
                   <success class="success-c" width="14px" height="14px" />
                   <span class="msg-part msg-body">{{ t('校验通过') }}</span>
                   <close-line
                     width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"
-                    @click="() => { isValidMsgVisible = false }"
+                    @click="() => { isValidBannerVisible = false }"
                   ></close-line>
                 </article>
                 <article v-else class="editor-footer-validate-btn">
@@ -1027,7 +1027,7 @@ const collapsePanelListUnchecked = ref([{ name: '不导入资源' }]);
 
 const isImportConfirmDialogVisible = ref(false);
 const isResourceDocSliderVisible = ref(false);
-const isValidMsgVisible = ref(false);
+const isValidBannerVisible = ref(false);
 
 const editingResource = ref<any>({
   name: '',
@@ -1117,7 +1117,7 @@ const msgAsWarningNum = computed(() => {
 watch(editorText, () => {
   isCodeValid.value = false;
   isCodeModified.value = true;
-  isValidMsgVisible.value = false;
+  isValidBannerVisible.value = false;
   activeVisibleErrorMsgIndex.value = -1;
 });
 
@@ -1181,6 +1181,9 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
   }
   try {
     isDataLoading.value = true;
+    // 清空编辑器高亮样式
+    resourceEditorRef?.value?.clearDecorations();
+    errorReasons.value = [];
     const params: any = {
       content: editorText.value,
       allow_overwrite: true,
@@ -1189,17 +1192,16 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     if (showDoc.value) {
       params.doc_language = language.value;
     }
-    const res = await checkResourceImport(apigwId, params);
+    // 配置是否显示错误 Message，只校验代码时不显示，改为展示在编辑器的错误消息栏中
+    const interceptorConfig = _changeView ? {} : { globalError: false };
+    const res = await checkResourceImport(apigwId, params, interceptorConfig);
     tableData.value = res.map((data: any, index: number) => ({
       ...data,
       _unchecked: false, // 标记是否不导入
       _localId: index, // 给一个本地id以识别修改了哪一条数据
     }));
     isCodeValid.value = true;
-    isValidMsgVisible.value = true;
-    // 清空编辑器高亮样式
-    resourceEditorRef?.value?.clearDecorations();
-    errorReasons.value = [];
+    isValidBannerVisible.value = true;
     // 折叠错误消息栏
     if (!isEditorMsgCollapsed) {
       await nextTick(() => {
@@ -1213,6 +1215,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
   } catch (err: unknown) {  // 校验失败会走到这里
     // console.log(error);
     isCodeValid.value = false;
+    isValidBannerVisible.value = false;
     const error = err as CodeErrorResponse;
     // 如果是内容错误
     if (error?.code === 'INVALID' && error?.message === 'validate fail') {
@@ -1262,18 +1265,24 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           level: 'Error',
         };
       });
-      console.log('errorReasons:');
-      console.log(errorReasons.value);
-      // 更新编辑器高亮样式
-      updateEditorDecorations();
-      // 展开错误消息栏
-      if (isEditorMsgCollapsed) {
-        await nextTick(() => {
-          resizeLayoutRef?.value?.setCollapse(false);
-        });
-      }
     }
-    // }
+    // 其他错误会走到这里，包括格式错误等等
+    else {
+      errorReasons.value.push({
+        message: error?.message ?? '未知错误',
+        level: 'Error',
+      });
+    }
+    // console.log('errorReasons:');
+    // console.log(errorReasons.value);
+    // 更新编辑器高亮样式
+    updateEditorDecorations();
+    // 展开错误消息栏
+    if (isEditorMsgCollapsed) {
+      await nextTick(() => {
+        resizeLayoutRef?.value?.setCollapse(false);
+      });
+    }
   } finally {
     isDataLoading.value = false;
     isCodeModified.value = false;
@@ -1389,7 +1398,9 @@ const updateEditorDecorations = () => {
 
 // 处理代码错误消息点击事件，应跳转到编辑器对应行
 const handleErrorMsgClick = (reason: ErrorReasonType, index: number) => {
-  resourceEditorRef.value.setCursorPos(reason.position);
+  if (reason.position) {
+    resourceEditorRef.value.setCursorPos(reason.position);
+  }
   activeVisibleErrorMsgIndex.value = index;
 };
 
