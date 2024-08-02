@@ -1552,6 +1552,8 @@ const lang: ILANG = {
   '下载内容': ['Type'],
   '下载成功：': ['Success'],
   '下载出错，请重试': ['Failed, please retry'],
+  '请先进行语法检测': ['Validate code to proceed'],
+  '请先修复报错信息后再导入': ['Resolve errors to proceed'],
 
   // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
   // // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
