@@ -1945,6 +1945,7 @@ const handleReturnClick = () => {
     // ResizeLayout 的折叠按钮样式
     :deep(.bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse) {
       margin-bottom: 9px;
+      margin-left: -16px;
       background: #1a1a1a;
       box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.1);
     }
