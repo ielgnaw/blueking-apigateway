@@ -847,21 +847,20 @@
           <div style="width: 100%; height: 48px" />
         </bk-loading>
         <section class="title">
-          正在导入
+          {{ t('正在导入') }}
           <span class="ag-strong">{{ tableDataToAdd.length + tableDataToUpdate.length }}</span>
-          个资源，请稍等...
+          {{ t('个资源，请稍等...') }}
         </section>
       </main>
       <footer class="content-footer">
-        <span>新增
+        <span>{{ t('新增了') }}
           <span
             class="ag-strong success pl5 pr5"
-          >{{ tableDataToAdd.length }}</span>个，覆盖
+          >{{ tableDataToAdd.length }}</span>{{ t('个，更新') }}
           <span
             class="ag-strong warning pl5 pr5"
-          >{{ tableDataToUpdate.length }}</span>个
+          >{{ tableDataToUpdate.length }}</span>{{ t('个资源') }}
         </span>
-        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
       </footer>
     </article>
     <!--  导入成功  -->
@@ -869,21 +868,26 @@
       <main class="content-main">
         <success width="64px" height="64px" fill="#2DCB56" />
         <section class="title">
-          成功导入
+          {{ t('成功导入') }}
           <span class="ag-strong">{{ tableDataToAdd.length + tableDataToUpdate.length }}</span>
-          个资源
+          {{ t('个资源') }}
         </section>
       </main>
       <footer class="content-footer">
-        <span>新增
+        <span>{{ t('新增了') }}
           <span
             class="ag-strong success pl5 pr5"
-          >{{ tableDataToAdd.length }}</span>个，覆盖
+          >{{ tableDataToAdd.length }}</span>{{ t('个，更新') }}
           <span
             class="ag-strong warning pl5 pr5"
-          >{{ tableDataToUpdate.length }}</span>个，为了后续导入方便，请及时下载最新的资源文
+          >{{ tableDataToUpdate.length }}</span>{{ t('个资源，为了后续导入方便，请及时下载最新的资源文件') }}
         </span>
-        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
+        <span class="download-btn" @click="isDownloadDialogShow = true"><i
+          class="apigateway-icon icon-ag-download btn-icon"
+        />{{
+            t('下载资源文件')
+          }}</span>
+        <span>{{ t('（包含所有资源）') }}</span>
       </footer>
       <section class="actions">
         <bk-button theme="primary" @click="goBack()">
@@ -903,13 +907,9 @@
       <main class="content-main">
         <close width="64px" height="64px" fill="#EA3636" />
         <section class="title">
-          资源导入失败
+          {{ t('资源导入失败') }}
         </section>
       </main>
-      <footer class="content-footer">
-        <span>为了后续导入方便，请及时下载最新的资源文件</span>
-        <span class="download-btn"><i class="apigateway-icon icon-ag-download btn-icon" />{{ t('下载资源文件') }}</span>
-      </footer>
       <section class="actions">
         <bk-button theme="primary" @click="handleImportResource()">
           {{
@@ -931,6 +931,8 @@
         />
       </section>
     </article>
+    <!--  下载 dialog  -->
+    <DownloadDialog v-model="isDownloadDialogShow" />
   </div>
 </template>
 <script setup lang="tsx">
@@ -975,6 +977,7 @@ import type { ErrorReasonType, CodeErrorMsgType } from '@/types/common';
 import { ResizeLayout } from 'bkui-vue';
 import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
+import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
 
 type CodeErrorResponse = {
@@ -1047,6 +1050,8 @@ const resizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
 
 // 导入失败消息
 const importErrorMsg = ref('');
+// 导入成功后的下载资源 dialog 是否可视
+const isDownloadDialogShow = ref(false);
 
 // 展示在“新增的资源”一栏的资源
 const tableDataToAdd = computed(() => {
@@ -1277,21 +1282,26 @@ const handleImportResource = async () => {
   try {
     isImportLoading.value = true;
     isImportResultVisible.value = true;
-    const selected_resources = tableData.value.filter((e: any) => e._unchecked === false)
+    const import_resources = tableData.value.filter((e: any) => e._unchecked === false)
       .map((e: any) => {
-        const { _unchecked, _localId, ...restOfResource } = e;  // 去掉_unchecked 和 _localId 属性，不要发到后端
-        return restOfResource;
+        const {
+          _unchecked,
+          _localId,
+          backend,
+          ...restOfResource
+        } = e;  // 去掉_unchecked 和 _localId 属性，不要发到后端
+        return { ...restOfResource, backend_config: { ...backend.config }, backend_name: backend.name };
       });
     const params = {
-      selected_resources,
-      content: editorText.value,
+      import_resources,
+      // content: editorText.value,
     };
     await importResource(apigwId, params);
     // 勾选了文档才需要上传swagger文档
     if (showDoc.value) {
       // swagger需要的参数
-      const selected_resource_docs = selected_resources.map((e: any) => ({
-        language: e.doc.language,
+      const selected_resource_docs = import_resources.map((e: any) => ({
+        language: e.doc?.language ?? language.value,
         resource_name: e.name,
       }));
       const paramsDocs = {

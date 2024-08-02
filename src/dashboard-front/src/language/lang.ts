@@ -1515,6 +1515,7 @@ const lang: ILANG = {
   '代码编辑器': ['Code Editor'],
   '网关：': ['Gateway: '],
   '将新增：': ['Creating '],
+  '将新增': ['Creating'],
   '条资源，更新覆盖': [' resource(s), Overwriting '],
   '条资源': [' resource(s)'],
   '个资源，新增': ['resource(s), creating'],
@@ -1527,6 +1528,19 @@ const lang: ILANG = {
   '生成新文档：原有的文档将会覆盖更新': ['Generate New Doc: Will Overwrite Old One'],
   '校验文件': ['Validate File'],
   '资源信息确认': ['Confirm Resources'],
+  '成功导入': ['Imported'],
+  '正在导入': ['Importing'],
+  '资源导入失败': ['Import fail'],
+  '个资源，请稍等...': ['resource(s), please wait...'],
+  '新增了': ['Created'],
+  '个资源，为了后续导入方便，请及时下载最新的资源文件': [', for further usage please download newest resource file'],
+  '下载资源文件': ['Download resources file'],
+  '（包含所有资源）': ['(All resources included)'],
+  '返回查看': ['Back to Resource'],
+  '继续导入': ['Import Another'],
+  '失败重试': ['Try again'],
+  '返回修改配置': ['Back to settings'],
+  '失败原因：': ['Error message: '],
 
   // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
   // // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
