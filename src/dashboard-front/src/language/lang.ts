@@ -1541,6 +1541,11 @@ const lang: ILANG = {
   '失败重试': ['Try again'],
   '返回修改配置': ['Back to settings'],
   '失败原因：': ['Error message: '],
+  '请选择下载的格式': ['Choose format'],
+  '下载格式': ['Format'],
+  '下载内容': ['Type'],
+  '下载成功：': ['Success'],
+  '下载出错，请重试': ['Failed, please retry'],
 
   // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
   // // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
