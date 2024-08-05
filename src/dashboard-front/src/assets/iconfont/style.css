@@ -116,6 +116,9 @@ url("fonts/iconcool.eot?#iefix") format("embedded-opentype");
 .icon-ag-down-shape:before {
 	content: "\e102";
 }
+.icon-ag-exclamation-circle-fill:before {
+	content: "\e185";
+}
 .icon-ag-minus-circle-shape:before {
 	content: "\e10c";
 }

@@ -116,8 +116,8 @@
                       v-bk-tooltips="{ content: `Error: ${msgAsErrorNum}`, placement: 'left' }"
                       @click="handleErrorCountClick('Error')"
                     >
-                      <warn fill="#EA3636" />
-                      <span style="color:#EA3636">{{ msgAsErrorNum }}</span>
+                      <i class="apigateway-icon icon-ag-exclamation-circle-fill icon mb0 f12" style="color:#EA3636"></i>
+                      <span class="num" style="color:#EA3636">{{ msgAsErrorNum }}</span>
                     </div>
                     <!--                    <div-->
                     <!--                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"-->
@@ -132,8 +132,8 @@
                       v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"
                       @click="handleErrorCountClick('All')"
                     >
-                      <span>all</span>
-                      <span>{{ msgAsErrorNum + msgAsWarningNum }}</span>
+                      <span class="icon">all</span>
+                      <span class="num">{{ msgAsErrorNum + msgAsWarningNum }}</span>
                     </div>
                   </main>
                   <footer class="editor-error-shifts">
@@ -146,8 +146,9 @@
                   </footer>
                 </aside>
               </main>
+              <!--  底部“语法校验”按钮栏  -->
               <footer class="editor-footer-bar">
-                <article v-if="isValidBannerVisible" class="editor-message">
+                <article v-if="isValidBannerVisible" class="validation-message">
                   <success class="success-c" width="14px" height="14px" />
                   <span class="msg-part msg-body">{{ t('校验通过') }}</span>
                   <close-line
@@ -180,7 +181,9 @@
                 :class="{'active': activeVisibleErrorMsgIndex === index }"
                 @click="handleErrorMsgClick(reason, index)"
               >
-                <span class="msg-part msg-icon"><warn fill="#EA3636" /></span>
+                <span class="msg-part msg-icon">
+                  <i class="apigateway-icon icon-ag-exclamation-circle-fill f12" style="color:#EA3636"></i>
+                </span>
                 <span class="msg-part msg-host"></span>
                 <span class="msg-part msg-body">{{ reason.message }}</span>
                 <span class="msg-part msg-error-code">{{ reason.json_path }}</span>
@@ -1875,6 +1878,15 @@ const handleReturnClick = () => {
               &:hover, &.active {
                 background-color: #333;
               }
+
+              .icon {
+                margin-bottom: 2px;
+              }
+
+              .num {
+                font-size: 12px;
+                line-height: 14px;
+              }
             }
           }
 
@@ -1923,7 +1935,7 @@ const handleReturnClick = () => {
           align-items: center;
         }
 
-        .editor-message {
+        .validation-message {
           height: 52px;
           padding-left: 24px;
           padding-right: 24px;
@@ -1962,12 +1974,6 @@ const handleReturnClick = () => {
         &.active,
         &:hover {
           background-color: #333;
-        }
-
-        .msg-icon {
-          padding-top: 3px;
-          display: flex;
-          align-items: center;
         }
 
         .msg-body {
