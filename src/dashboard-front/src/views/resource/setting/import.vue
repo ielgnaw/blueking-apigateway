@@ -201,7 +201,7 @@
     <div v-else class="imported-resources-wrap">
       <header class="res-counter-banner">
         <main>
-          <info-line width="14px" height="14px" fill="#3A84FF" class="mr5" />
+          <i class="apigateway-icon icon-ag-info mr5 f16 default-c" />
           <span>{{ t('共') }}<span class="ag-strong pl5 pr5">{{ tableData.length }}</span>{{ t('个资源，新增') }}<span
             class="ag-strong success pl5 pr5"
           >{{ tableDataToAdd.length }}</span>{{ t('个，更新') }}<span
@@ -216,7 +216,7 @@
             theme="primary"
             @click="handleRecoverAllRes()"
           >
-            <left-turn-line fill="#3A84FF" />
+            <i class="apigateway-icon icon-ag-undo-2 mr4 f16 default-c"></i>
             {{ t('恢复取消导入的资源') }}
           </bk-button>
         </aside>
@@ -974,9 +974,7 @@ import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
 import {
   Share,
-  InfoLine,
   DocFill,
-  LeftTurnLine,
   PlayShape,
   Success,
   CloseLine,
@@ -2057,7 +2055,7 @@ const handleReturnClick = () => {
 
   .res-counter-banner {
     height: 40px;
-    padding: 0 12px;
+    padding: 0 24px 0 12px;
     margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
@@ -2075,6 +2073,7 @@ const handleReturnClick = () => {
   }
 
   .collapse-panel-title {
+    padding-right: 10px;
     flex-grow: 1;
     display: inline-flex;
     position: relative;
