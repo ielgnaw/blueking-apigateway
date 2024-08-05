@@ -259,6 +259,7 @@
                 <bk-table-column
                   :label="() => renderAuthConfigColLabel('add')"
                   width="100"
+                  :show-overflow-tooltip="false"
                 >
                   <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
@@ -453,6 +454,7 @@
                 <bk-table-column
                   :label="() => renderAuthConfigColLabel('update')"
                   width="100"
+                  :show-overflow-tooltip="false"
                 >
                   <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
