@@ -182,7 +182,7 @@
                 @click="handleErrorMsgClick(reason, index)"
               >
                 <span class="msg-part msg-icon">
-                  <i class="apigateway-icon icon-ag-exclamation-circle-fill f12" style="color:#EA3636"></i>
+                  <i class="apigateway-icon icon-ag-exclamation-circle-fill f12" style="color:#B34747"></i>
                 </span>
                 <span class="msg-part msg-host"></span>
                 <span class="msg-part msg-body">{{ reason.message }}</span>
@@ -973,7 +973,6 @@ import { useCommon } from '@/store';
 import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
 import {
-  Warn,
   Share,
   InfoLine,
   DocFill,
@@ -2009,23 +2008,13 @@ const handleReturnClick = () => {
   }
 
   // 编辑器错误行高亮样式
-  :deep(.lineHighlightError) {
+  :deep(.line-highlight-error) {
     background-color: #382322;
     opacity: .7;
   }
 
-  :deep(.glyphMarginError) {
-    width: 6px !important;
-    background: #B34747;
-  }
-
-  :deep(.lineHighlightWarning) {
-    background-color: hsla(36.6, 81.7%, 55.1%, 0.1);
-  }
-
-  :deep(.glyphMarginWarning) {
-    width: 6px !important;
-    background: hsla(36.6, 81.7%, 55.1%, 0.5);
+  :deep(.apigateway-icon.icon-ag-exclamation-circle-fill.f14) {
+    color: #b34747;
   }
 
   // 让错误消息台的滚动条模仿 monaco editor 风格

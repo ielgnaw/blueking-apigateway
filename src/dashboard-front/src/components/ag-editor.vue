@@ -176,9 +176,9 @@ const genLineDecorations = (decorationOptions) => {
       options: {
         isWholeLine: true, // 整行高亮
         className:
-          `lineHighlight${o.level}`, // 当前行装饰用类名
+          'line-highlight-error', // 当前行装饰用类名
         glyphMarginClassName:
-          `glyphMargin${o.level}`, // 当前行左侧装饰(glyph)用类名
+          'apigateway-icon icon-ag-exclamation-circle-fill f14', // 当前行左侧装饰(glyph)用类名
       },
     }));
   decorations = editor.createDecorationsCollection(decoOptions);
