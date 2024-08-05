@@ -148,7 +148,7 @@ const emitChange = (emitValue, event) => {
 };
 
 // 更改光标位置
-const setCursorPos = ({ lineNumber, toBottom = false }) => {
+const setCursorPos = ({ lineNumber = null, toBottom = false }) => {
   const model = editor.getModel();
 
   if (!model) return;
