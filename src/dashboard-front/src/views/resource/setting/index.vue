@@ -411,7 +411,13 @@
       :is-loading="exportDialogConfig.loading"
       @confirm="handleExportDownload"
       @closed="exportDialogConfig.isShow = false">
-      <span class="rosource-number">{{ t('选择全部资源') }}</span>
+      <span class="resource-number">
+        {{
+          exportParams.export_type === 'all'
+            ? t('已选择全部资源')
+            : t('已选择{num}个资源', { num: selections.length })
+        }}
+      </span>
       <bk-form>
         <bk-form-item label="导出内容">
           <bk-radio-group v-model="exportDialogConfig.exportFileDocType">
@@ -1549,7 +1555,7 @@ onBeforeMount(() => {
     border-radius: 4px 0 0 4px;
   }
 }
-.rosource-number{
+.resource-number{
   color: #c4c6cc;
 }
 

@@ -688,6 +688,8 @@ const lang: ILANG = {
   '删除资源后，需要生成新的版本，并发布到目标环境才能生效': ['After deletion, a new version needs to be generated and released to the target stage to take effect'],
   '请选择导出的格式': ['Select export format'],
   '选择全部资源': ['Select all resources'],
+  '已选择全部资源': ['Selected all resources'],
+  '已选择{num}个资源': ['Selected {num} resources'],
   '导出内容': ['Export Content'],
   '导出格式': ['Export Format'],
   '资源更新，是否生成新版本后再发布？': ['Resources updated, generate a new version and release?'],
