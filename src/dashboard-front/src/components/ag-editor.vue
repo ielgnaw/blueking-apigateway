@@ -114,6 +114,15 @@ const initEditor = () => {
   editorMounted(); // 编辑器初始化后
   // 初始化编辑器装饰
   decorations = editor.createDecorationsCollection([]);
+  // 定义一个资源导入导出页要用的主题
+  monaco.editor.defineTheme('import-theme', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [],
+    colors: {
+      'editor.background': '#1A1A1A',
+    },
+  });
 };
 
 const editorMounted = () => {
@@ -241,6 +250,10 @@ const handleFullScreen = () => {
   }
 };
 
+const setTheme = (theme) => {
+  monaco.editor.setTheme(theme);
+};
+
 defineExpose({
   setValue,
   setCursorPos,
@@ -252,6 +265,7 @@ defineExpose({
   showFindPanel,
   closeFindPanel,
   switchFontSize,
+  setTheme,
 });
 
 </script>

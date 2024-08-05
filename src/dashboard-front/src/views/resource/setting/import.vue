@@ -86,7 +86,7 @@
             <div class="editor-layout-main">
               <!--  顶部编辑器工具栏-->
               <header class="editor-toolbar">
-                <span class="p10" style="color: #ccc">{{ t('代码编辑器') }}</span>
+                <span class="p10 pl25" style="color: #ccc">{{ t('代码编辑器') }}</span>
                 <aside class="tool-items">
                   <section class="tool-item" :class="{ 'active': isFindPanelVisible }" @click="toggleFindToolClick()">
                     <i class="apigateway-icon icon-ag-search f16"></i>
@@ -991,7 +991,7 @@ const { t } = useI18n();
 const common = useCommon();
 const editorText = ref<string>(exampleData.content);
 const { apigwId } = common; // 网关id
-const resourceEditorRef: any = ref<InstanceType<typeof editorMonaco>>(); // 实例化
+const resourceEditorRef = ref<InstanceType<typeof editorMonaco>>(); // 实例化
 const showDoc = ref<boolean>(true);
 const language = ref<string>('zh');
 const isDataLoading = ref<boolean>(false);
@@ -1134,6 +1134,7 @@ watch(curView, async (newCurView, oldCurView) => {
 // 进入页面默认折叠编辑器错误消息栏
 onMounted(() => {
   resizeLayoutRef?.value?.setCollapse(true);
+  resourceEditorRef?.value?.setTheme('import-theme');
 });
 
 // 设置editor的内容
@@ -1794,7 +1795,7 @@ const handleReturnClick = () => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #1a1a1a;
+        background-color: #2e2e2e;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
         z-index: 6;
 
@@ -1896,6 +1897,7 @@ const handleReturnClick = () => {
       .editor-footer-bar {
         background-color: #1a1a1a;
         box-shadow: 0 -2px 4px 0 #00000029;
+        z-index: 1;
 
         .editor-footer-validate-btn {
           height: 52px;
@@ -1923,7 +1925,7 @@ const handleReturnClick = () => {
       position: relative;
       height: 100%;
       padding-top: 16px;
-      background-color: #1a1a1a;
+      background-color: #212121;
       border-left: 4px solid #1a1a1a;
       font-size: 12px;
 
@@ -1960,7 +1962,7 @@ const handleReturnClick = () => {
     // 变更代码编辑器伸缩线样式
     :deep(.bk-resize-layout-bottom > .bk-resize-layout-aside) {
       border-top: 1px solid black;
-      background: #1a1a1a;
+      background: #212121;
     }
 
     // ResizeLayout 的折叠按钮样式
