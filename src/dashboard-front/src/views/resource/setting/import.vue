@@ -1579,11 +1579,11 @@ const renderAuthConfigColLabel = (action: 'add' | 'update') => {
         <bk-pop-confirm
           width="430"
           trigger="click"
-          title={t('批量修改认证方式')}
+          title={<span class="f16" style="color: #313238;">{t('批量修改认证方式')}</span>}
           content={
-            <div class="multi-edit-popconfirm-wrap auth-config">
-              <bk-form model={tempAuthConfig.value} labelWidth="120" labelPosition="right">
-                <bk-form-item label={t('认证方式')} required={true}>
+            <div class="multi-edit-popconfirm-wrap auth-config" style="margin-bottom: -12px;">
+              <bk-form model={tempAuthConfig.value} labelWidth="110" labelPosition="right">
+                <bk-form-item label={t('认证方式')} required={true} style="margin-bottom: 12px;">
                   <bk-checkbox
                     v-model={tempAuthConfig.value.app_verified_required}
                   >
@@ -1598,7 +1598,7 @@ const renderAuthConfigColLabel = (action: 'add' | 'update') => {
                   </bk-checkbox>
                 </bk-form-item>
                 {tempAuthConfig.value.app_verified_required ?
-                  <bk-form-item label={t('检验应用权限')}>
+                  <bk-form-item label={t('检验应用权限')} style="margin-bottom: 12px;">
                     <bk-switcher
                       v-model={tempAuthConfig.value.resource_perm_required}
                       theme="primary"
@@ -1662,15 +1662,16 @@ const renderIsPublicColLabel = (action: 'add' | 'update') => {
       <div class="public-config-col-label">
         <span>{t('是否公开')}</span>
         <bk-pop-confirm
-          width="320"
+          width="360"
           trigger="click"
-          title={t('批量修改公开设置')}
+          title={<span class="f16" style="color: #313238;">{t('批量修改公开设置')}</span>}
           content={
-            <div class="multi-edit-popconfirm-wrap public-config">
+            <div class="multi-edit-popconfirm-wrap public-config" style="margin-bottom: -12px;">
               <bk-form model={tempPublicConfig.value} labelWidth="100" labelPosition="right">
                 <bk-form-item
                   label={t('是否公开')} required={true}
                   description={t('公开，则用户可查看资源文档、申请资源权限；不公开，则资源对用户隐藏')}
+                  style="margin-bottom: 12px;"
                 >
                   <bk-switcher
                     v-model={tempPublicConfig.value.is_public}
@@ -1679,7 +1680,7 @@ const renderIsPublicColLabel = (action: 'add' | 'update') => {
                   />
                 </bk-form-item>
                 {tempPublicConfig.value.is_public ?
-                  <bk-form-item label="">
+                  <bk-form-item style="margin-bottom: 12px;">
                     <bk-checkbox
                       v-model={tempPublicConfig.value.allow_apply_permission}
                     >
