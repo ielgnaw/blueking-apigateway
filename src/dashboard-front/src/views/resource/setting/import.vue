@@ -615,7 +615,7 @@
               <div class="panel-header">
                 <main class="flex-row align-items-center">
                   <angle-up-fill
-                    :class="[panelNamesList.includes('update') ? 'panel-header-show' : 'panel-header-hide']"
+                    :class="[panelNamesList.includes('uncheck') ? 'panel-header-show' : 'panel-header-hide']"
                   />
                   <div class="title">
                     {{ t('不导入的资源（共') }}
