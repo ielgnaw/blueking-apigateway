@@ -221,549 +221,559 @@
           </bk-button>
         </aside>
       </header>
-      <!--  新增的资源  -->
-      <section class="res-content-wrap add">
+      <section class="res-content-wrap">
         <bk-collapse
-          v-model="activeIndexAdd"
-          :list="collapsePanelListAdd"
-          header-icon="right-shape"
+          class="collapse-cls"
+          v-model="panelNamesList"
+          use-card-theme
         >
-          <template #title>
-            <div class="collapse-panel-title">
-              <span>{{ t('新增的资源（共{num}个）', { num: tableDataToAdd.length }) }}</span>
-              <bk-input
-                clearable
-                :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                :right-icon="'bk-icon icon-search'"
-                style="width: 240px;"
-                @click.stop.prevent
-                @enter="(val: string) => {filterData(val, 'add')}"
-              />
-            </div>
-          </template>
-          <template #content>
-            <div class="collapse-panel-table-wrap">
-              <bk-table
-                class="table-layout"
-                :data="tableDataToAdd"
-                row-key="name"
-                show-overflow-tooltip
-                :pagination="tableToAddPagination"
-              >
-                <bk-table-column
-                  :label="t('资源名称')"
-                  prop="name"
-                  :min-width="160"
-                  width="160"
-                  fixed="left"
+          <!--  新增的资源  -->
+          <bk-collapse-panel name="add">
+            <template #header>
+              <div class="panel-header">
+                <main class="flex-row align-items-center">
+                  <angle-up-fill
+                    :class="[panelNamesList.includes('add') ? 'panel-header-show' : 'panel-header-hide']"
+                  />
+                  <div class="title">
+                    {{ t('新增的资源（共') }}
+                    <span class="success-c">{{ tableDataToAdd.length }}</span>
+                    {{ t('个）') }}
+                  </div>
+                </main>
+                <aside>
+                  <bk-input
+                    clearable
+                    :placeholder="t('请输入资源名称/路径，按Enter搜索')"
+                    :right-icon="'bk-icon icon-search'"
+                    style="width: 240px;"
+                    @click.stop.prevent
+                    @enter="(val: string) => {filterData(val, 'add')}"
+                  />
+                </aside>
+              </div>
+            </template>
+            <template #content>
+              <div>
+                <bk-table
+                  :data="tableDataToAdd"
+                  row-key="name"
+                  show-overflow-tooltip
+                  :pagination="tableToAddPagination"
                 >
-                </bk-table-column>
-                <!--  认证方式列  -->
-                <bk-table-column
-                  :label="() => renderAuthConfigColLabel('add')"
-                  width="100"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
+                  <bk-table-column
+                    :label="t('资源名称')"
+                    prop="name"
+                    :min-width="160"
+                    width="160"
+                    fixed="left"
+                  >
+                  </bk-table-column>
+                  <!--  认证方式列  -->
+                  <bk-table-column
+                    :label="() => renderAuthConfigColLabel('add')"
+                    width="100"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
                       {{ getAuthConfigText(row?.auth_config) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('校验应用权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('校验应用权限')"
+                  >
+                    <template #default="{ row }">
                     <span
                       :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
                     >{{ getPermRequiredText(row?.auth_config) }}</span>
-                  </template>
-                </bk-table-column>
-                <!--  “是否公开”列  -->
-                <bk-table-column
-                  :label="() => renderIsPublicColLabel('add')"
-                  width="100"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <!--  “是否公开”列  -->
+                  <bk-table-column
+                    :label="() => renderIsPublicColLabel('add')"
+                    width="100"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('允许申请权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('允许申请权限')"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                  :width="160"
-                >
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端服务')"
-                  prop="method"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.name ?? 'default' }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag
-                      :theme="methodsEnum[row.backend?.method ?? row.method]"
-                    >
-                      {{ row.backend?.method ?? row.method }}
-                    </bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                  :width="160"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.path ?? row.path }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('资源文档')"
-                  prop="doc"
-                  width="85"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      v-if="showDoc"
-                      text
-                      theme="primary"
-                      @click="handleShowResourceDoc(row)"
-                    >
-                      <doc-fill fill="#3A84FF" />
-                      {{ t('详情') }}
-                    </bk-button>
-                    <span v-else>{{ t('未生成') }}</span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('插件数量')"
-                  prop="plugin_configs"
-                  width="85"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                    :width="160"
+                  >
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端服务')"
+                    prop="method"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.name ?? 'default' }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag
+                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                      >
+                        {{ row.backend?.method ?? row.method }}
+                      </bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                    :width="160"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.path ?? row.path }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('资源文档')"
+                    prop="doc"
+                    width="85"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        v-if="showDoc"
+                        text
+                        theme="primary"
+                        @click="handleShowResourceDoc(row)"
+                      >
+                        <doc-fill fill="#3A84FF" />
+                        {{ t('详情') }}
+                      </bk-button>
+                      <span v-else>{{ t('未生成') }}</span>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('插件数量')"
+                    prop="plugin_configs"
+                    width="85"
+                  >
+                    <template #default="{ row }">
                     <span
                       v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('操作')"
-                  width="150"
-                  fixed="right"
-                  prop="act"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      text
-                      theme="primary"
-                      @click="handleEdit(row)"
-                    >
-                      {{ t('修改配置') }}
-                    </bk-button>
-                    <bk-button
-                      text
-                      theme="primary"
-                      class="pl10 pr10"
-                      @click="() => {
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('操作')"
+                    width="150"
+                    fixed="right"
+                    prop="act"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        text
+                        theme="primary"
+                        @click="handleEdit(row)"
+                      >
+                        {{ t('修改配置') }}
+                      </bk-button>
+                      <bk-button
+                        text
+                        theme="primary"
+                        class="pl10 pr10"
+                        @click="() => {
                         toggleRowUnchecked(row)
                       }"
-                    >
-                      {{ t('不导入') }}
-                    </bk-button>
-                  </template>
-                </bk-table-column>
-              </bk-table>
-            </div>
-          </template>
-        </bk-collapse>
-      </section>
-      <!--  更新的资源  -->
-      <section class="res-content-wrap update">
-        <bk-collapse
-          v-model="activeIndexUpdate"
-          :list="collapsePanelListUpdate"
-          header-icon="right-shape"
-        >
-          <template #title>
-            <div class="collapse-panel-title">
-              <span>{{ t('更新的资源（共{num}个）', { num: tableDataToUpdate.length }) }}</span>
-              <bk-input
-                clearable
-                :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                :right-icon="'bk-icon icon-search'"
-                style="width: 240px;"
-                @click.stop.prevent
-                @enter="(val: string) => {filterData(val, 'update')}"
-              />
-            </div>
-          </template>
-          <template #content>
-            <div class="collapse-panel-table-wrap">
-              <!--              <section class="pb10">-->
-              <!--                <bk-switcher-->
-              <!--                  v-model="showDoc"-->
-              <!--                  theme="primary"-->
-              <!--                  size="small"-->
-              <!--                />-->
-              <!--                {{ t('生成新文档：原有的文档将会覆盖更新') }}-->
-              <!--              </section>-->
-              <bk-table
-                class="table-layout"
-                :data="tableDataToUpdate"
-                show-overflow-tooltip
-                row-key="name"
-                :pagination="tableToUpdatePagination"
-              >
-                <bk-table-column
-                  :label="t('资源名称')"
-                  prop="name"
-                  :min-width="160"
-                  width="160"
-                  fixed="left"
+                      >
+                        {{ t('不导入') }}
+                      </bk-button>
+                    </template>
+                  </bk-table-column>
+                </bk-table>
+              </div>
+            </template>
+          </bk-collapse-panel>
+          <!--  更新的资源  -->
+          <bk-collapse-panel name="update">
+            <template #header>
+              <div class="panel-header">
+                <main class="flex-row align-items-center">
+                  <angle-up-fill
+                    :class="[panelNamesList.includes('update') ? 'panel-header-show' : 'panel-header-hide']"
+                  />
+                  <div class="title">
+                    {{ t('更新的资源（共') }}
+                    <span class="warning-c">{{ tableDataToUpdate.length }}</span>
+                    {{ t('个）') }}
+                  </div>
+                </main>
+                <aside>
+                  <bk-input
+                    clearable
+                    :placeholder="t('请输入资源名称/路径，按Enter搜索')"
+                    :right-icon="'bk-icon icon-search'"
+                    style="width: 240px;"
+                    @click.stop.prevent
+                    @enter="(val: string) => {filterData(val, 'update')}"
+                  />
+                </aside>
+              </div>
+            </template>
+            <template #content>
+              <div>
+                <bk-table
+                  :data="tableDataToUpdate"
+                  show-overflow-tooltip
+                  row-key="name"
+                  :pagination="tableToUpdatePagination"
                 >
-                </bk-table-column>
-                <!--  认证方式列  -->
-                <bk-table-column
-                  :label="() => renderAuthConfigColLabel('update')"
-                  width="100"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
+                  <bk-table-column
+                    :label="t('资源名称')"
+                    prop="name"
+                    :min-width="160"
+                    width="160"
+                    fixed="left"
+                  >
+                  </bk-table-column>
+                  <!--  认证方式列  -->
+                  <bk-table-column
+                    :label="() => renderAuthConfigColLabel('update')"
+                    width="100"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
                       {{ getAuthConfigText(row?.auth_config) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('校验应用权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('校验应用权限')"
+                  >
+                    <template #default="{ row }">
                     <span
                       :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
                     >{{ getPermRequiredText(row?.auth_config) }}</span>
-                  </template>
-                </bk-table-column>
-                <!--  “是否公开”列  -->
-                <bk-table-column
-                  :label="() => renderIsPublicColLabel('update')"
-                  width="100"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <!--  “是否公开”列  -->
+                  <bk-table-column
+                    :label="() => renderIsPublicColLabel('update')"
+                    width="100"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('允许申请权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('允许申请权限')"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                  :width="160"
-                >
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端服务')"
-                  prop="method"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.name ?? 'default' }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag
-                      :theme="methodsEnum[row.backend?.method ?? row.method]"
-                    >
-                      {{ row.backend?.method ?? row.method }}
-                    </bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                  :width="160"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.path ?? row.path }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('资源文档')"
-                  prop="doc"
-                  width="85"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      v-if="showDoc"
-                      text
-                      theme="primary"
-                      @click="handleShowResourceDoc(row)"
-                    >
-                      <doc-fill fill="#3A84FF" />
-                      {{ t('详情') }}
-                    </bk-button>
-                    <span v-else>{{ t('未生成') }}</span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('插件数量')"
-                  prop="plugin_configs"
-                  width="85"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                    :width="160"
+                  >
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端服务')"
+                    prop="method"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.name ?? 'default' }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag
+                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                      >
+                        {{ row.backend?.method ?? row.method }}
+                      </bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                    :width="160"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.path ?? row.path }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('资源文档')"
+                    prop="doc"
+                    width="85"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        v-if="showDoc"
+                        text
+                        theme="primary"
+                        @click="handleShowResourceDoc(row)"
+                      >
+                        <doc-fill fill="#3A84FF" />
+                        {{ t('详情') }}
+                      </bk-button>
+                      <span v-else>{{ t('未生成') }}</span>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('插件数量')"
+                    prop="plugin_configs"
+                    width="85"
+                  >
+                    <template #default="{ row }">
                     <span
                       v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('操作')"
-                  width="150"
-                  fixed="right"
-                  prop="act"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      text
-                      theme="primary"
-                      @click="handleEdit(row)"
-                    >
-                      {{ t('修改配置') }}
-                    </bk-button>
-                    <bk-button
-                      text
-                      theme="primary"
-                      class="pl10 pr10"
-                      @click="() => {
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('操作')"
+                    width="150"
+                    fixed="right"
+                    prop="act"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        text
+                        theme="primary"
+                        @click="handleEdit(row)"
+                      >
+                        {{ t('修改配置') }}
+                      </bk-button>
+                      <bk-button
+                        text
+                        theme="primary"
+                        class="pl10 pr10"
+                        @click="() => {
                         toggleRowUnchecked(row)
                       }"
-                    >
-                      {{ t('不导入') }}
-                    </bk-button>
-                  </template>
-                </bk-table-column>
-              </bk-table>
-            </div>
-          </template>
-        </bk-collapse>
-      </section>
-      <!--  不导入的资源  -->
-      <section class="res-content-wrap unchecked">
-        <bk-collapse
-          v-model="activeIndexUnchecked"
-          :list="collapsePanelListUnchecked"
-          header-icon="right-shape"
-        >
-          <template #title>
-            <div class="collapse-panel-title">
-              <span>{{ t('不导入的资源（共{num}个）', { num: tableDataUnchecked.length }) }}</span>
-            </div>
-          </template>
-          <template #content>
-            <div class="collapse-panel-table-wrap">
-              <bk-table
-                class="table-layout"
-                :data="tableDataUnchecked"
-                show-overflow-tooltip
-                row-key="name"
-                :pagination="tableUncheckedPagination"
-              >
-                <bk-table-column
-                  :label="t('资源名称')"
-                  prop="name"
-                  :min-width="160"
-                  width="160"
-                  fixed="left"
+                      >
+                        {{ t('不导入') }}
+                      </bk-button>
+                    </template>
+                  </bk-table-column>
+                </bk-table>
+              </div>
+            </template>
+          </bk-collapse-panel>
+          <!--  不导入的资源  -->
+          <bk-collapse-panel name="uncheck">
+            <template #header>
+              <div class="panel-header">
+                <main class="flex-row align-items-center">
+                  <angle-up-fill
+                    :class="[panelNamesList.includes('update') ? 'panel-header-show' : 'panel-header-hide']"
+                  />
+                  <div class="title">
+                    {{ t('不导入的资源（共') }}
+                    <span class="danger-c">{{ tableDataUnchecked.length }}</span>
+                    {{ t('个）') }}
+                  </div>
+                </main>
+              </div>
+            </template>
+            <template #content>
+              <div>
+                <bk-table
+                  :data="tableDataUnchecked"
+                  show-overflow-tooltip
+                  row-key="name"
+                  :pagination="tableUncheckedPagination"
                 >
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('认证方式')"
-                >
-                  <template #default="{ row }">
+                  <bk-table-column
+                    :label="t('资源名称')"
+                    prop="name"
+                    :min-width="160"
+                    width="160"
+                    fixed="left"
+                  >
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('认证方式')"
+                  >
+                    <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
                       {{ getAuthConfigText(row?.auth_config) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('校验应用权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('校验应用权限')"
+                  >
+                    <template #default="{ row }">
                     <span
                       :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
                     >{{ getPermRequiredText(row?.auth_config) }}</span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('是否公开')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('是否公开')"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('允许申请权限')"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('允许申请权限')"
+                  >
+                    <template #default="{ row }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                >
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('前端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端服务')"
-                  prop="method"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.name ?? 'default' }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求方法')"
-                  prop="method"
-                  :show-overflow-tooltip="false"
-                >
-                  <template #default="{ row }">
-                    <bk-tag
-                      :theme="methodsEnum[row.backend?.method ?? row.method]"
-                    >
-                      {{ row.backend?.method ?? row.method }}
-                    </bk-tag>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('后端请求路径')"
-                  prop="path"
-                  :min-width="160"
-                >
-                  <template #default="{ row }">
-                    {{ row.backend?.path ?? row.path }}
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('资源文档')"
-                  prop="doc"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      v-if="showDoc"
-                      text
-                      theme="primary"
-                      @click="handleShowResourceDoc(row)"
-                    >
-                      <doc-fill fill="#3A84FF" />
-                      {{ t('详情') }}
-                    </bk-button>
-                    <span v-else>{{ t('未生成') }}</span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('插件数量')"
-                  prop="plugin_configs"
-                  width="85"
-                >
-                  <template #default="{ row }">
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                  >
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('前端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端服务')"
+                    prop="method"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.name ?? 'default' }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求方法')"
+                    prop="method"
+                    :show-overflow-tooltip="false"
+                  >
+                    <template #default="{ row }">
+                      <bk-tag
+                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                      >
+                        {{ row.backend?.method ?? row.method }}
+                      </bk-tag>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('后端请求路径')"
+                    prop="path"
+                    :min-width="160"
+                  >
+                    <template #default="{ row }">
+                      {{ row.backend?.path ?? row.path }}
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('资源文档')"
+                    prop="doc"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        v-if="showDoc"
+                        text
+                        theme="primary"
+                        @click="handleShowResourceDoc(row)"
+                      >
+                        <doc-fill fill="#3A84FF" />
+                        {{ t('详情') }}
+                      </bk-button>
+                      <span v-else>{{ t('未生成') }}</span>
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('插件数量')"
+                    prop="plugin_configs"
+                    width="85"
+                  >
+                    <template #default="{ row }">
                     <span
                       v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
                     >
                       {{ row.plugin_configs?.length ?? 0 }}
                     </span>
-                  </template>
-                </bk-table-column>
-                <bk-table-column
-                  :label="t('操作')"
-                  width="100"
-                  fixed="right"
-                  prop="act"
-                >
-                  <template #default="{ row }">
-                    <bk-button
-                      text
-                      theme="primary"
-                      @click="() => {
+                    </template>
+                  </bk-table-column>
+                  <bk-table-column
+                    :label="t('操作')"
+                    width="100"
+                    fixed="right"
+                    prop="act"
+                  >
+                    <template #default="{ row }">
+                      <bk-button
+                        text
+                        theme="primary"
+                        @click="() => {
                         toggleRowUnchecked(row)
                       }"
-                    >
-                      {{ t('恢复导入') }}
-                    </bk-button>
-                  </template>
-                </bk-table-column>
-              </bk-table>
-            </div>
-          </template>
+                      >
+                        {{ t('恢复导入') }}
+                      </bk-button>
+                    </template>
+                  </bk-table-column>
+                </bk-table>
+              </div>
+            </template>
+          </bk-collapse-panel>
         </bk-collapse>
       </section>
     </div>
@@ -979,7 +989,7 @@ import {
   Success,
   CloseLine,
   CollapseLeft,
-  Close,
+  Close, AngleUpFill,
 } from 'bkui-vue/lib/icon';
 import yaml from 'js-yaml';
 import { JSONPath } from 'jsonpath-plus';
@@ -1028,15 +1038,8 @@ const activeCodeMsgType = ref<CodeErrorMsgType>('All');
 // 记录代码错误消息
 const errorReasons = ref<ErrorReasonType[]>([]);
 const isFindPanelVisible = ref(false);
-
-const activeIndexAdd = ref(0);
-const collapsePanelListAdd = ref([{ name: '新增资源' }]);
-
-const activeIndexUpdate = ref(0);
-const collapsePanelListUpdate = ref([{ name: '更新资源' }]);
-
-const activeIndexUnchecked = ref(0);
-const collapsePanelListUnchecked = ref([{ name: '不导入资源' }]);
+// 资源确认页的 collapse 面板列表
+const panelNamesList = ref(['add', 'update', 'uncheck']);
 
 const isImportConfirmDialogVisible = ref(false);
 const isResourceDocSliderVisible = ref(false);
@@ -2066,23 +2069,45 @@ const handleReturnClick = () => {
   }
 
   .res-content-wrap {
-    //padding: 24px;
-    margin-bottom: 12px;
-    background: #FFFFFF;
-    box-shadow: 0 2px 4px 0 #1919290d;
-  }
+    :deep(.collapse-cls) {
+      margin-bottom: 52px;
 
-  .collapse-panel-title {
-    padding-right: 10px;
-    flex-grow: 1;
-    display: inline-flex;
-    position: relative;
-    justify-content: space-between;
-    align-items: center;
-  }
+      .bk-collapse-item {
+        background: #fff;
+        box-shadow: 0 2px 4px 0 #1919290d;
+        margin-bottom: 16px;
+      }
+    }
 
-  .collapse-panel-table-wrap {
-    padding-bottom: 24px;
+    :deep(.bk-collapse-content) {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 19px 24px;
+      cursor: pointer;
+
+      .title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #313238;
+        margin-left: 8px;
+      }
+
+      .panel-header-show {
+        transition: .2s;
+        transform: rotate(0deg);
+      }
+
+      .panel-header-hide {
+        transition: .2s;
+        transform: rotate(-90deg);
+      }
+    }
   }
 }
 
