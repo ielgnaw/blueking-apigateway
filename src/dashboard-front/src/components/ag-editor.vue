@@ -105,7 +105,7 @@ const initEditor = () => {
     lineNumbersMinChars: 5, // 行号最小字符   number
     readOnly: readOnly.value, // 是否只读  取值 true | false
     lineHeight: 24,
-    glyphMargin: true,  // 是否显示行号左侧装饰，用于显示当前行的错误信息等级：error | warning
+    glyphMargin: false,  // 是否显示行号左侧装饰，用于显示当前行的错误信息等级：error | warning
     minimap: {
       enabled: props.minimap, // 小地图
     },
@@ -254,6 +254,10 @@ const setTheme = (theme) => {
   monaco.editor.setTheme(theme);
 };
 
+const updateOptions = (options) => {
+  editor.updateOptions(options);
+};
+
 defineExpose({
   setValue,
   setCursorPos,
@@ -266,6 +270,7 @@ defineExpose({
   closeFindPanel,
   switchFontSize,
   setTheme,
+  updateOptions,
 });
 
 </script>

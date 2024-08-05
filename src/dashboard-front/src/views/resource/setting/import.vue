@@ -1145,7 +1145,11 @@ watch(curView, async (newCurView, oldCurView) => {
 // 进入页面默认折叠编辑器错误消息栏
 onMounted(() => {
   resizeLayoutRef?.value?.setCollapse(true);
-  resourceEditorRef?.value?.setTheme('import-theme');
+  // 更改编辑器主题和行号左边的提示列(glyph margin)
+  if (resourceEditorRef?.value) {
+    resourceEditorRef.value.setTheme('import-theme');
+    resourceEditorRef.value.updateOptions({ glyphMargin: true });
+  }
 });
 
 // 设置editor的内容
