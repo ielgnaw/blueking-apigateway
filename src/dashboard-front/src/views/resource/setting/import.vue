@@ -369,7 +369,7 @@
                         theme="primary"
                         @click="handleShowResourceDoc(row)"
                       >
-                        <doc-fill fill="#3A84FF" />
+                        <i class="apigateway-icon icon-ag-doc-2 mr4 f14 default-c" />
                         {{ t('详情') }}
                       </bk-button>
                       <span v-else>{{ t('未生成') }}</span>
@@ -560,7 +560,7 @@
                         theme="primary"
                         @click="handleShowResourceDoc(row)"
                       >
-                        <doc-fill fill="#3A84FF" />
+                        <i class="apigateway-icon icon-ag-doc-2 mr4 f14 default-c" />
                         {{ t('详情') }}
                       </bk-button>
                       <span v-else>{{ t('未生成') }}</span>
@@ -733,7 +733,7 @@
                         theme="primary"
                         @click="handleShowResourceDoc(row)"
                       >
-                        <doc-fill fill="#3A84FF" />
+                        <i class="apigateway-icon icon-ag-doc-2 mr4 f14 default-c" />
                         {{ t('详情') }}
                       </bk-button>
                       <span v-else>{{ t('未生成') }}</span>
