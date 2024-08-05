@@ -251,11 +251,14 @@
                   :label="t('资源名称')"
                   prop="name"
                   :min-width="160"
+                  width="160"
+                  fixed="left"
                 >
                 </bk-table-column>
                 <!--  认证方式列  -->
                 <bk-table-column
                   :label="() => renderAuthConfigColLabel('add')"
+                  width="100"
                 >
                   <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
@@ -275,6 +278,7 @@
                 <!--  “是否公开”列  -->
                 <bk-table-column
                   :label="() => renderIsPublicColLabel('add')"
+                  width="100"
                 >
                   <template #default="{ row }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
@@ -295,6 +299,7 @@
                   :label="t('前端请求路径')"
                   prop="path"
                   :min-width="160"
+                  :width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -331,6 +336,7 @@
                   :label="t('后端请求路径')"
                   prop="path"
                   :min-width="160"
+                  :width="160"
                 >
                   <template #default="{ row }">
                     {{ row.backend?.path ?? row.path }}
@@ -339,6 +345,7 @@
                 <bk-table-column
                   :label="t('资源文档')"
                   prop="doc"
+                  width="85"
                 >
                   <template #default="{ row }">
                     <bk-button
@@ -350,12 +357,13 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
-                    <span v-else>未生成</span>
+                    <span v-else>{{ t('未生成') }}</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
                   :label="t('插件数量')"
                   prop="plugin_configs"
+                  width="85"
                 >
                   <template #default="{ row }">
                     <span
@@ -367,7 +375,7 @@
                 </bk-table-column>
                 <bk-table-column
                   :label="t('操作')"
-                  width="200"
+                  width="150"
                   fixed="right"
                   prop="act"
                 >
@@ -437,11 +445,14 @@
                   :label="t('资源名称')"
                   prop="name"
                   :min-width="160"
+                  width="160"
+                  fixed="left"
                 >
                 </bk-table-column>
                 <!--  认证方式列  -->
                 <bk-table-column
                   :label="() => renderAuthConfigColLabel('update')"
+                  width="100"
                 >
                   <template #default="{ row }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
@@ -461,6 +472,7 @@
                 <!--  “是否公开”列  -->
                 <bk-table-column
                   :label="() => renderIsPublicColLabel('update')"
+                  width="100"
                 >
                   <template #default="{ row }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
@@ -481,6 +493,7 @@
                   :label="t('前端请求路径')"
                   prop="path"
                   :min-width="160"
+                  :width="160"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -517,6 +530,7 @@
                   :label="t('后端请求路径')"
                   prop="path"
                   :min-width="160"
+                  :width="160"
                 >
                   <template #default="{ row }">
                     {{ row.backend?.path ?? row.path }}
@@ -525,6 +539,7 @@
                 <bk-table-column
                   :label="t('资源文档')"
                   prop="doc"
+                  width="85"
                 >
                   <template #default="{ row }">
                     <bk-button
@@ -536,12 +551,13 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
-                    <span v-else>未生成</span>
+                    <span v-else>{{ t('未生成') }}</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
                   :label="t('插件数量')"
                   prop="plugin_configs"
+                  width="85"
                 >
                   <template #default="{ row }">
                     <span
@@ -553,7 +569,7 @@
                 </bk-table-column>
                 <bk-table-column
                   :label="t('操作')"
-                  width="200"
+                  width="150"
                   fixed="right"
                   prop="act"
                 >
@@ -592,13 +608,6 @@
           <template #title>
             <div class="collapse-panel-title">
               <span>{{ t('不导入的资源（共{num}个）', { num: tableDataUnchecked.length }) }}</span>
-              <!--              <bk-input-->
-              <!--                :clearable="true"-->
-              <!--                :placeholder="t('请输入资源名称，按Enter搜索')"-->
-              <!--                :right-icon="'bk-icon icon-search'"-->
-              <!--                style="width: 240px;"-->
-              <!--                @click.stop.prevent-->
-              <!--              />-->
             </div>
           </template>
           <template #content>
@@ -614,6 +623,8 @@
                   :label="t('资源名称')"
                   prop="name"
                   :min-width="160"
+                  width="160"
+                  fixed="left"
                 >
                 </bk-table-column>
                 <bk-table-column
@@ -711,12 +722,13 @@
                       <doc-fill fill="#3A84FF" />
                       {{ t('详情') }}
                     </bk-button>
-                    <span v-else>未生成</span>
+                    <span v-else>{{ t('未生成') }}</span>
                   </template>
                 </bk-table-column>
                 <bk-table-column
                   :label="t('插件数量')"
                   prop="plugin_configs"
+                  width="85"
                 >
                   <template #default="{ row }">
                     <span
@@ -728,7 +740,7 @@
                 </bk-table-column>
                 <bk-table-column
                   :label="t('操作')"
-                  width="200"
+                  width="100"
                   fixed="right"
                   prop="act"
                 >
@@ -736,7 +748,6 @@
                     <bk-button
                       text
                       theme="primary"
-                      class="pl10 pr10"
                       @click="() => {
                         toggleRowUnchecked(row)
                       }"
