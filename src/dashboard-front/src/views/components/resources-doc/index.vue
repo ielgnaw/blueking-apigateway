@@ -43,12 +43,11 @@
         </div>
         <!-- eslint-disable vue/no-v-html -->
         <div class="ag-markdown-view" v-html="markdownHtml" v-show="!isEdited"></div>
-        <div class="ag-markdown-editor">
+        <div class="ag-markdown-editor" v-show="isEdited">
           <mavon-editor
             ref="markdownRef"
             :class="{ 'content-editor': !isFullscreen }"
             v-model="markdownDoc"
-            v-show="isEdited"
             :language="language"
             :box-shadow="false"
             :subfield="false"
@@ -386,9 +385,22 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .resources-doc-container {
   overflow-y: auto;
+
+  .content {
+    height: calc(100% - 50px);
+  }
 }
+
+.ag-markdown-editor {
+  height: calc(100vh - 300px);
+}
+
 .content-editor {
-  height: calc(100vh - 420px) !important;
+  height: 100%;
+
+  :deep(.content-input-wrapper) {
+    height: 100%;
+  }
 }
 .doc-btn-wrapper {
   margin-top: 8px;
