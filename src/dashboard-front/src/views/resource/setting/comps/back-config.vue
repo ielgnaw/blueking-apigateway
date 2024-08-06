@@ -107,6 +107,8 @@
           :placeholder="t('斜线(/)开头的合法URL路径，不包含http(s)开头的域名')"
           clearable
           class="w568"
+          @change="isPathValid = false"
+          @input="isPathValid = false"
         />
         <bk-button
           theme="primary"
@@ -126,7 +128,7 @@
         {{ t("后端接口地址的 Path，不包含域名或 IP，支持路径变量、环境变量，变量包含在\{\}中") }}
         <!-- <a :href="GLOBAL_CONFIG.DOC.TEMPLATE_VARS" target="_blank" class="ag-primary">{{ t('更多详情') }}</a> -->
       </div>
-      <div v-if="servicesCheckData.length">
+      <div v-if="servicesCheckData.length && isPathValid">
         <bk-alert
           theme="success"
           class="w700 mt10"
@@ -249,6 +251,9 @@ const rules = {
     },
   ],
 };
+
+// 后端地址是否校验通过
+const isPathValid = ref(false);
 
 // 提示默认超时时间
 const formatDefaultTime = computed(() => {
@@ -442,10 +447,11 @@ const handleCheckPath = async () => {
       backend_id: backConfigData.value.id,
       backend_path: backConfigData.value.config.path,
     };
-    const res = await backendsPathCheck(common.apigwId, params);
-    servicesCheckData.value = res;
+    servicesCheckData.value = await backendsPathCheck(common.apigwId, params);
+    isPathValid.value = true;
   } catch (error) {
-
+    servicesCheckData.value = [];
+    isPathValid.value = false;
   }
 };
 
