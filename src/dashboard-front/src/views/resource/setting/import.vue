@@ -966,9 +966,10 @@ import {
   ref,
   nextTick,
   computed,
-  watch, onMounted,
+  watch,
+  onMounted,
 } from 'vue';
-import { Message } from 'bkui-vue';
+import { InfoBox, Message } from 'bkui-vue';
 import { useI18n } from 'vue-i18n';
 
 // 此组件使用 TSX，通过 import { useRouter } from 'vue-router' 引入的路由api无法正常工作
@@ -1161,6 +1162,26 @@ onMounted(() => {
     resourceEditorRef.value.setTheme('import-theme');
     resourceEditorRef.value.updateOptions({ glyphMargin: true });
   }
+});
+
+// 监听路由离开，提示用户是否要在导入中离开
+onBeforeRouteLeave((to, from, next) => {
+  // 如果正在导入中...
+  if (isImportResultVisible.value && isImportLoading.value) {
+    InfoBox({
+      title: t('确认离开当前页？'),
+      subTitle: t('离开将会导致未保存信息丢失'),
+      confirmText: t('离开'),
+      cancelText: t('取消'),
+      onConfirm() {
+        next();
+      },
+      onClosed() {
+        return false;
+      },
+    });
+  }
+  else next();
 });
 
 // 设置editor的内容
