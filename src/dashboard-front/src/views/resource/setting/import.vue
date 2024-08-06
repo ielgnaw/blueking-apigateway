@@ -1625,7 +1625,11 @@ const renderAuthConfigColLabel = (action: 'add' | 'update') => {
                   </bk-checkbox>
                 </bk-form-item>
                 {tempAuthConfig.value.app_verified_required ?
-                  <bk-form-item label={t('检验应用权限')} style="margin-bottom: 12px;">
+                  <bk-form-item
+                    label={t('检验应用权限')}
+                    description={t('蓝鲸应用需申请资源访问权限')}
+                    style="margin-bottom: 12px;"
+                  >
                     <bk-switcher
                       v-model={tempAuthConfig.value.resource_perm_required}
                       theme="primary"
@@ -1696,7 +1700,8 @@ const renderIsPublicColLabel = (action: 'add' | 'update') => {
             <div class="multi-edit-popconfirm-wrap public-config" style="margin-bottom: -12px;">
               <bk-form model={tempPublicConfig.value} labelWidth="100" labelPosition="right">
                 <bk-form-item
-                  label={t('是否公开')} required={true}
+                  label={t('是否公开')}
+                  required={true}
                   description={t('公开，则用户可查看资源文档、申请资源权限；不公开，则资源对用户隐藏')}
                   style="margin-bottom: 12px;"
                 >
