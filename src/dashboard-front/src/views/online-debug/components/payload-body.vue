@@ -44,8 +44,16 @@
           </div>
         </div> -->
     </div>
-    <edit-table v-show="type === 'data'" ref="dataRef" :list="fromDataList" />
-    <edit-table v-show="type === 'urlencoded'" ref="urlencodedRef" :list="urlencodedList" />
+    <edit-table
+      v-show="type === 'data'"
+      ref="dataRef"
+      @change="handleDataChange"
+      :list="fromDataList" />
+    <edit-table
+      v-show="type === 'urlencoded'"
+      ref="urlencodedRef"
+      @change="handleUrlencodedChange"
+      :list="urlencodedList" />
     <div class="raw-content" v-show="type === 'raw'">
       <editor-monaco
         v-model="editorText"
@@ -79,6 +87,8 @@ const props = defineProps({
     default: {},
   },
 });
+
+const emit = defineEmits(['dataChange', 'urlencodedChange']);
 
 const type = ref<string>('raw');
 const rawType = ref<string>('JSON');
@@ -125,6 +135,14 @@ const getData = () => {
     raw: editorText.value,
     rawType: rawType.value,
   };
+};
+
+const handleDataChange = (list: any) => {
+  emit('dataChange', list);
+};
+
+const handleUrlencodedChange = (list: any) => {
+  emit('urlencodedChange', list);
 };
 
 watch(
@@ -179,29 +197,29 @@ defineExpose({
         color: #FFFFFF;
         background: #3A84FF;
         position: relative;
-        padding-left: 36px;
-        &::before {
-          position: absolute;
-          content: ' ';
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          border: 1px solid #fff;
-          top: 50%;
-          transform: translateY(-50%);
-          left: 12px;
-        }
-        &::after {
-          position: absolute;
-          content: ' ';
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: #FFFFFF;
-          top: 50%;
-          transform: translateY(-50%);
-          left: 16px;
-        }
+        // padding-left: 36px;
+        // &::before {
+        //   position: absolute;
+        //   content: ' ';
+        //   width: 16px;
+        //   height: 16px;
+        //   border-radius: 50%;
+        //   border: 1px solid #fff;
+        //   top: 50%;
+        //   transform: translateY(-50%);
+        //   left: 12px;
+        // }
+        // &::after {
+        //   position: absolute;
+        //   content: ' ';
+        //   width: 10px;
+        //   height: 10px;
+        //   border-radius: 50%;
+        //   background: #FFFFFF;
+        //   top: 50%;
+        //   transform: translateY(-50%);
+        //   left: 16px;
+        // }
       }
     }
   }
