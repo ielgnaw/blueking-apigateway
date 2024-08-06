@@ -1461,7 +1461,7 @@ const setEditorCursor = (pos: 'top' | 'bottom') => {
 
 // 从把 jsonpath 指向的对象转换成正则
 const getRegexFromObj = ({ objKey, objValue }: { objKey: string, objValue: any }): RegExp => {
-  const exp = `[\\b/]*?${objKey}[\\b/]*?:${getRegexString(objValue)}`;
+  const exp = `[\\b/\$'"]*?${removeStarting$(objKey)}[\\b\\s/\$'"]*?:${getRegexString(objValue)}`;
   return new RegExp(exp, 'gm');
 };
 
@@ -1470,21 +1470,39 @@ const getRegexString = (value: any): string => {
   let expStr = `[-"\\s\\n\\r]*?`;
 
   if (_.isObject(value)) {
-    Object.entries(value)
-      .forEach(([key, val]) => {
-        expStr += `[\\b/]*?${key}[\\b/]*?:`;
-        if (_.isObject(val)) {
-          expStr += getRegexString(val);
+    if (Array.isArray(value)) {
+      value.forEach((el) => {
+        if (_.isObject(el)) {
+          expStr += getRegexString(el);
         } else {
-          expStr += `["\\s\\n\\r]*?${val}["\\s\\n\\r]*?`;
+          expStr += `['"\\s\\n\\r]*?${el}['"\\s\\n\\r]*?`;
         }
-      });
+      })
+    } else {
+      Object.entries(value)
+        .forEach(([key, val]) => {
+          expStr += `[\\b/\$'"]*?${removeStarting$(key)}[\\b\\s/\$'"]*?:`;
+          if (_.isObject(val)) {
+            expStr += getRegexString(val);
+          } else {
+            expStr += `['"\\s\\n\\r]*?${val}['"\\s\\n\\r]*?`;
+          }
+        });
+    }
   } else {
-    expStr += `${value || ''}["\\s\\n\\r]*?`
+    expStr += `${value || ''}['"\\s\\n\\r]*?`
   }
 
   // 把 $ 开头的变量转义，并与\b交换位置，否则无法正确匹配，如：\b$var => \$\bvar
-  return expStr.replaceAll('\\b$', '\\$\\b');
+  // return expStr.replaceAll('\\b$', '\\$\\b');
+  return expStr;
+};
+
+const removeStarting$ = (str: string): string => {
+  if (str.startsWith('$')) {
+    return str.substring(1);
+  }
+  return str;
 };
 
 // 获取字符串中第一个被 '' 包裹的值
