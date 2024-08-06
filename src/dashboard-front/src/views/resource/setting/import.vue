@@ -377,7 +377,6 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('插件数量')"
-                    prop="plugin_configs"
                     width="85"
                   >
                     <template #default="{ row }">
@@ -568,7 +567,6 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('插件数量')"
-                    prop="plugin_configs"
                     width="85"
                   >
                     <template #default="{ row }">
@@ -741,7 +739,6 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('插件数量')"
-                    prop="plugin_configs"
                     width="85"
                   >
                     <template #default="{ row }">
