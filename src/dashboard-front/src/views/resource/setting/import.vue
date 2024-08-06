@@ -1269,48 +1269,56 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       const editorJsonObj = yaml.load(editorText.value) as object;
       const errData: { json_path: string, message: string }[] = error.data ?? [];
       errorReasons.value = errData.map((err) => {
-        // 从 jsonpath 提取路径组成数组，去掉开头的 $
-        const paths = JSONPath.toPathArray(err.json_path)
-          .slice(1);
-        // 找到 jsonpath 指向的值
-        const pathValue = JSONPath(err.json_path, editorJsonObj, null, null)[0] ?? [];
-        // 提取后端错误消息中第一个用引号包起来的字符串，它常常就是代码错误所在
-        const quotedValue = getFirstQuotedValue(err.message);
-        const stringToFind = '';
-        // jsonpath 指向的键名
-        const lastPath = paths[paths.length - 1];
-        // 记录正则匹配到的起始位置，从 0 开始，没有匹配项时为 -1
-        let offset = -1;
-        // 用于搜索的正则
-        let regex: RegExp | null = null;
-        // 匹配项在 editor 中的 Position
-        let position: IPosition | null = null;
-        // 生成用于搜索 jsonpath 所在行的正则
-        // 判断 jsonpath 指向的是否为数组成员，是的话传入倒数第二个 path
-        const isInteger = Number.isInteger(Number(lastPath)) && lastPath.trim() !== '';
-        const objKey = isInteger ? paths[paths.length - 2] : lastPath;
-        regex = getRegexFromObj({ objKey, objValue: pathValue });
+        if (err.json_path !== '$') {
+          // 从 jsonpath 提取路径组成数组，去掉开头的 $
+          const paths = JSONPath.toPathArray(err.json_path)
+            .slice(1);
+          // 找到 jsonpath 指向的值
+          const pathValue = JSONPath(err.json_path, editorJsonObj, null, null)[0] ?? [];
+          // 提取后端错误消息中第一个用引号包起来的字符串，它常常就是代码错误所在
+          const quotedValue = getFirstQuotedValue(err.message);
+          const stringToFind = '';
+          // jsonpath 指向的键名
+          const lastPath = paths[paths.length - 1];
+          // 记录正则匹配到的起始位置，从 0 开始，没有匹配项时为 -1
+          let offset = -1;
+          // 用于搜索的正则
+          let regex: RegExp | null = null;
+          // 匹配项在 editor 中的 Position
+          let position: IPosition | null = null;
+          // 生成用于搜索 jsonpath 所在行的正则
+          // 判断 jsonpath 指向的是否为数组成员，是的话传入倒数第二个 path
+          const isInteger = Number.isInteger(Number(lastPath)) && lastPath.trim() !== '';
+          const objKey = isInteger ? paths[paths.length - 2] : lastPath;
+          regex = getRegexFromObj({ objKey, objValue: pathValue });
 
-        offset = resourceEditorRef.value.getValue()
-          .search(regex);
-        // 用 editor 的 api 找到 Position
-        if (offset > -1) {
-          position = resourceEditorRef.value.getModel()
-            .getPositionAt(offset);
+          offset = resourceEditorRef.value.getValue()
+            .search(regex);
+          // 用 editor 的 api 找到 Position
+          if (offset > -1) {
+            position = resourceEditorRef.value.getModel()
+              .getPositionAt(offset);
+          }
+          return {
+            paths,
+            quotedValue,
+            pathValue,
+            stringToFind,
+            offset,
+            regex,
+            position,
+            json_path: err.json_path,
+            message: err.message,
+            isDecorated: false,
+            level: 'Error',
+          };
+        } else {
+          return {
+            json_path: err.json_path,
+            message: err.message ?? '未知错误',
+            level: 'Error',
+          };
         }
-        return {
-          paths,
-          quotedValue,
-          pathValue,
-          stringToFind,
-          offset,
-          regex,
-          position,
-          json_path: err.json_path,
-          message: err.message,
-          isDecorated: false,
-          level: 'Error',
-        };
       });
     }
     // 其他错误会走到这里，包括格式错误等等
