@@ -103,9 +103,11 @@ const formData = ref<any>({});
 
 // 提交
 const handleSubmit = async () => {
-  await baseInfoRef.value?.validate();
-  await frontConfigRef.value?.validate();
-  await backConfigRef.value?.validate();
+  await Promise.all([
+    baseInfoRef.value?.validate(),
+    frontConfigRef.value?.validate(),
+    backConfigRef.value?.validate(),
+  ]);
   const baseFormData = baseInfoRef.value.formData;
   const frontFormData = frontConfigRef.value.frontConfigData;
   const backFormData = backConfigRef.value.backConfigData;
@@ -113,7 +115,7 @@ const handleSubmit = async () => {
     const payload = {
       ...baseFormData,
       ...frontFormData,
-      backend: backFormData,
+      backend: { ...backFormData },
       _localId: props.resource._localId,
     };
     emits('submit', payload);
