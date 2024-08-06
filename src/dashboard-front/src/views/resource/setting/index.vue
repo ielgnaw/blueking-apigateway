@@ -213,7 +213,8 @@
                 filterFn: handleMethodFilter,
                 btnSave: false,
               }"
-              width="180">
+              min-width="180"
+            >
               <template #default="{ row }">
                 <span class="text-warp" v-if="!row?.isEditLabel" @click="handleEditLabel(row)">
                   <span
@@ -239,7 +240,7 @@
                     @click="handleEditLabel(row)"
                     class="icon apigateway-icon icon-ag-edit-small edit-icon"></i>
                 </span>
-                <section style="position: absolute; width: 160px;" v-else>
+                <section style="position: absolute;" v-else>
                   <SelectCheckBox
                     :cur-select-label-ids="curLabelIds"
                     :resource-id="resourceId"
