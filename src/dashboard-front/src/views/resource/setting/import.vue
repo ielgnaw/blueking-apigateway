@@ -970,11 +970,16 @@ import {
 } from 'vue';
 import { Message } from 'bkui-vue';
 import { useI18n } from 'vue-i18n';
-// 此方法创建的 router 实例为 undefined，改用 import router from 'router/index.ts'
-// import { useRouter } from 'vue-router';
-// const router = useRouter();
-import router from '@/router';
 
+// 此组件使用 TSX，通过 import { useRouter } from 'vue-router' 引入的路由api无法正常工作
+// 请改用下面的写法：
+// 引入：
+// import useTsxRouter from './hooks/useTsxRouter';
+// 使用：
+// const { useRouter, onBeforeRouteLeave } = useTsxRouter();
+// const router = useRouter();
+
+import useTsxRouter from './hooks/useTsxRouter';
 import editorMonaco from '@/components/ag-editor.vue';
 import exampleData from '@/constant/example-data';
 import { getStrFromFile } from '@/common/util';
@@ -984,7 +989,6 @@ import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
 import {
   Share,
-  DocFill,
   PlayShape,
   Success,
   CloseLine,
@@ -1010,6 +1014,8 @@ type CodeErrorResponse = {
   message: string,
 };
 
+const { useRouter, onBeforeRouteLeave } = useTsxRouter();
+const router = useRouter();
 const { t } = useI18n();
 const common = useCommon();
 const editorText = ref<string>(exampleData.content);
