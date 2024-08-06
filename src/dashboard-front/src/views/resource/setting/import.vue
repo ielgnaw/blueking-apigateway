@@ -852,6 +852,8 @@
           :cur-resource="editingResource"
           source="side"
           doc-root-class="doc-sideslider"
+          :show-footer="false"
+          :show-create-btn="false"
         >
         </ResourcesDoc>
       </template>
