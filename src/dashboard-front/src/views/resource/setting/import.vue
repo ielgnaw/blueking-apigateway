@@ -1471,30 +1471,36 @@ const getRegexString = (value: any): string => {
 
   if (_.isObject(value)) {
     if (Array.isArray(value)) {
-      value.forEach((el) => {
-        if (_.isObject(el)) {
-          expStr += getRegexString(el);
-        } else {
-          expStr += `['"\\s\\n\\r]*?${el}['"\\s\\n\\r]*?`;
-        }
-      })
-    } else {
-      Object.entries(value)
-        .forEach(([key, val]) => {
-          expStr += `[\\b/\$'"]*?${removeStarting$(key)}[\\b\\s/\$'"]*?:`;
-          if (_.isObject(val)) {
-            expStr += getRegexString(val);
+      if (value.length < 1) {
+        expStr += `['"\\s\\n\\r]*?\\[\\]['"\\s\\n\\r]*?`;
+      } else {
+        value.forEach((el) => {
+          if (_.isObject(el)) {
+            expStr += getRegexString(el);
           } else {
-            expStr += `['"\\s\\n\\r]*?${val}['"\\s\\n\\r]*?`;
+            expStr += `['"\\s\\n\\r]*?${el}['"\\s\\n\\r]*?`;
           }
-        });
+        })
+      }
+    } else {
+      if (Object.keys(value).length < 1) {
+        expStr += `['"\\s\\n\\r]*?{}['"\\s\\n\\r]*?`;
+      } else {
+        Object.entries(value)
+          .forEach(([key, val]) => {
+            expStr += `[\\b/\$'"]*?${removeStarting$(key)}[\\b\\s/\$'"]*?:`;
+            if (_.isObject(val)) {
+              expStr += getRegexString(val);
+            } else {
+              expStr += `['"\\s\\n\\r]*?${val === null ? '' : val}['"\\s\\n\\r]*?`;
+            }
+          });
+      }
     }
   } else {
-    expStr += `${value || ''}['"\\s\\n\\r]*?`
+    expStr += `${value === null ? '' : value}['"\\s\\n\\r]*?`
   }
 
-  // 把 $ 开头的变量转义，并与\b交换位置，否则无法正确匹配，如：\b$var => \$\bvar
-  // return expStr.replaceAll('\\b$', '\\$\\b');
   return expStr;
 };
 
