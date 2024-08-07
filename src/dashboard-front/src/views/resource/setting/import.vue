@@ -372,11 +372,17 @@
                     width="85"
                   >
                     <template #default="{ row }">
-                    <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
-                    >
-                      {{ row.plugin_configs?.length ?? 0 }}
-                    </span>
+                      <bk-button
+                        theme="primary"
+                        text style="font-size: 12px;"
+                        @click="handleShowPluginsSlider(row)"
+                      >
+                        <span
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                        >
+                          {{ row.plugin_configs?.length ?? 0 }}
+                        </span>
+                      </bk-button>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -562,11 +568,17 @@
                     width="85"
                   >
                     <template #default="{ row }">
-                    <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
-                    >
-                      {{ row.plugin_configs?.length ?? 0 }}
-                    </span>
+                      <bk-button
+                        theme="primary"
+                        text style="font-size: 12px;"
+                        @click="handleShowPluginsSlider(row)"
+                      >
+                        <span
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                        >
+                          {{ row.plugin_configs?.length ?? 0 }}
+                        </span>
+                      </bk-button>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -734,11 +746,17 @@
                     width="85"
                   >
                     <template #default="{ row }">
-                    <span
-                      v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
-                    >
-                      {{ row.plugin_configs?.length ?? 0 }}
-                    </span>
+                      <bk-button
+                        theme="primary"
+                        text style="font-size: 12px;"
+                        @click="handleShowPluginsSlider(row)"
+                      >
+                        <span
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                        >
+                          {{ row.plugin_configs?.length ?? 0 }}
+                        </span>
+                      </bk-button>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -851,6 +869,12 @@
         </ResourcesDoc>
       </template>
     </bk-sideslider>
+    <!--  查看插件侧边栏  -->
+    <plugin-preview-side-slider
+      :plugins="editingResource.plugin_configs"
+      :is-slider-show="isPluginsSliderShow"
+      @on-hidden="isPluginsSliderShow = false"
+    ></plugin-preview-side-slider>
   </div>
   <!--  导入结果展示页  -->
   <div v-else class="import-result-wrapper">
@@ -999,6 +1023,7 @@ import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
+import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
 
 type CodeErrorResponse = {
   code: string,
@@ -1059,6 +1084,7 @@ const editingResource = ref<any>({
   _localId: -1,
 });
 const isSliderShow = ref(false);
+const isPluginsSliderShow = ref(false);
 
 // 编辑器所在的 resize-layout
 const resizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
@@ -1431,6 +1457,14 @@ const handleShowResourceDoc = (resourceRow: any) => {
   const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
   isResourceDocSliderVisible.value = true;
+};
+
+// 点击插件数时，会唤出 PluginsSlider
+const handleShowPluginsSlider = (resourceRow: any) => {
+  if (!resourceRow.plugin_configs || resourceRow.plugin_configs?.length < 1) return;
+  const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
+  if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
+  isPluginsSliderShow.value = true;
 };
 
 // 触发编辑器高亮
