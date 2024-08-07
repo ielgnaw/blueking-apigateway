@@ -126,7 +126,13 @@
 </template>
 <script setup lang="ts">
 import { ref, toRefs, onMounted, onUnmounted, onBeforeUnmount, nextTick, onUpdated, computed } from 'vue';
-import { getResourceDocs, updateResourceDocs, saveResourceDocs, deleteResourceDocs } from '@/http';
+import {
+  getResourceDocs,
+  getResourceDocPreview,
+  updateResourceDocs,
+  saveResourceDocs,
+  deleteResourceDocs,
+} from '@/http';
 import { useCommon } from '@/store';
 import { cloneDeep } from 'lodash';
 import { useI18n } from 'vue-i18n';
@@ -143,6 +149,7 @@ const props = defineProps({
   docRootClass: { type: String }, // 自定义类
   showFooter: { type: Boolean, default: true }, // 是否显示底部按钮
   showCreateBtn: { type: Boolean, default: true }, // 是否显示"立即创建"按钮
+  isPreview: { type: Boolean, default: false }, // 是否获取预览文档，决定调用的接口
 });
 
 const {
@@ -234,8 +241,25 @@ const handleFullscreen = (full: Boolean) => {
 
 // 获取文档信息
 const initData = async () => {
+  // console.log('curResource.value:');
+  // console.log(curResource.value);
   try {
-    docData.value = await getResourceDocs(apigwId, curResource.value.id);
+    if (!props.isPreview) {
+      docData.value = await getResourceDocs(apigwId, curResource.value.id);
+    } else {
+      const { backend, doc, _localId, _unchecked, ...restOfCurResource } = curResource.value;
+
+      const params = {
+        review_resource: {
+          ...restOfCurResource,
+          backend_name: backend.name,
+          backend_config: { ...backend.config },
+        },
+        doc_language: language.value,
+      };
+
+      docData.value = await getResourceDocPreview(apigwId, params);
+    }
     // 根据语言找到是否有文档内容
     handleDocDataWithLanguage();
   } catch (error) {

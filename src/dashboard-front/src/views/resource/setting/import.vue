@@ -846,6 +846,7 @@
           doc-root-class="doc-sideslider"
           :show-footer="false"
           :show-create-btn="false"
+          :is-preview="!editingResource.doc || editingResource.doc.length < 1"
         >
         </ResourcesDoc>
       </template>
