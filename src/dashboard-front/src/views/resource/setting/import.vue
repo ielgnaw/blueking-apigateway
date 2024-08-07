@@ -1269,7 +1269,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       const editorJsonObj = yaml.load(editorText.value) as object;
       const errData: { json_path: string, message: string }[] = error.data ?? [];
       errorReasons.value = errData.map((err) => {
-        if (err.json_path !== '$') {
+        if (err.json_path !== '$' && err.json_path !== '') {
           // 从 jsonpath 提取路径组成数组，去掉开头的 $
           const paths = JSONPath.toPathArray(err.json_path)
             .slice(1);
