@@ -1320,9 +1320,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
           };
         }
       });
-    }
-    // 其他错误会走到这里，包括格式错误等等
-    else {
+    } else {
+      // 其他错误会走到这里，包括格式错误等等
       errorReasons.value.push({
         message: error?.message ?? '未知错误',
         level: 'Error',

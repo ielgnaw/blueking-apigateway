@@ -79,7 +79,7 @@ import { useI18n } from 'vue-i18n';
 import BaseInfo from '@/views/resource/setting/comps/base-info.vue';
 import FrontConfig from '@/views/resource/setting/comps/front-config.vue';
 import BackConfig from '@/views/resource/setting/comps/back-config.vue';
-import { AngleUpFill } from "bkui-vue/lib/icon";
+import { AngleUpFill } from 'bkui-vue/lib/icon';
 
 const { t } = useI18n();
 const props = defineProps({
