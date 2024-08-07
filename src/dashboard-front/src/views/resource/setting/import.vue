@@ -119,22 +119,14 @@
                       <i class="apigateway-icon icon-ag-exclamation-circle-fill icon mb0 f12" style="color:#EA3636"></i>
                       <span class="num" style="color:#EA3636">{{ msgAsErrorNum }}</span>
                     </div>
-                    <!--                    <div-->
-                    <!--                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'Warning' }"-->
-                    <!--                      v-bk-tooltips="{ content: `Warning: ${msgAsWarningNum}`, placement: 'left' }"-->
-                    <!--                      @click="handleErrorCountClick('Warning')"-->
-                    <!--                    >-->
-                    <!--                      <div class="warning-circle"></div>-->
-                    <!--                      <span style="color: hsla(36.6, 81.7%, 55.1%, 0.5);">{{ msgAsWarningNum }}</span>-->
-                    <!--                    </div>-->
-                    <div
-                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'All' }"
-                      v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"
-                      @click="handleErrorCountClick('All')"
-                    >
-                      <span class="icon">all</span>
-                      <span class="num">{{ msgAsErrorNum + msgAsWarningNum }}</span>
-                    </div>
+<!--                    <div-->
+<!--                      class="error-count-item" :class="{ 'active': activeCodeMsgType === 'All' }"-->
+<!--                      v-bk-tooltips="{ content: `All: ${errorReasons.length}`, placement: 'left' }"-->
+<!--                      @click="handleErrorCountClick('All')"-->
+<!--                    >-->
+<!--                      <span class="icon">all</span>-->
+<!--                      <span class="num">{{ msgAsErrorNum + msgAsWarningNum }}</span>-->
+<!--                    </div>-->
                   </main>
                   <footer class="editor-error-shifts">
                     <div class="shift-btn prev" @click="setEditorCursor('top')">
