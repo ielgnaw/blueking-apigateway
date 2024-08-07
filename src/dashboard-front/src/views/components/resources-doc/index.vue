@@ -241,8 +241,6 @@ const handleFullscreen = (full: Boolean) => {
 
 // 获取文档信息
 const initData = async () => {
-  // console.log('curResource.value:');
-  // console.log(curResource.value);
   try {
     if (!props.isPreview) {
       docData.value = await getResourceDocs(apigwId, curResource.value.id);
@@ -258,7 +256,12 @@ const initData = async () => {
         doc_language: language.value,
       };
 
-      docData.value = await getResourceDocPreview(apigwId, params);
+      const res = await getResourceDocPreview(apigwId, params);
+      docData.value.push({
+        id: null,
+        language: language.value,
+        content: res.doc,
+      });
     }
     // 根据语言找到是否有文档内容
     handleDocDataWithLanguage();
@@ -337,11 +340,18 @@ const handleSelectLanguage = (payload: string) => {
 
 // 根据语言找到是否有文档内容
 const handleDocDataWithLanguage = () => {
-  const docDataItem =  cloneDeep(docData.value).find((e: any) => e.language === language.value);
-  docId.value = docDataItem.id;
-  isEmpty.value = !docDataItem.id;
-  markdownDoc.value = docDataItem.content;
-  markdownHtml.value = markdownRef.value.markdownIt.render(docDataItem.content);
+  if (!props.isPreview) {
+    const docDataItem =  cloneDeep(docData.value).find((e: any) => e.language === language.value);
+    docId.value = docDataItem.id;
+    isEmpty.value = !docDataItem.id;
+    markdownDoc.value = docDataItem.content;
+    markdownHtml.value = markdownRef.value.markdownIt.render(docDataItem.content);
+  } else {
+    // 预览资源文档会走到这里
+    const content = docData.value[0]?.content ?? '';
+    markdownDoc.value = content;
+    markdownHtml.value = markdownRef.value.markdownIt.render(content);
+  }
 };
 
 // 是否吸附

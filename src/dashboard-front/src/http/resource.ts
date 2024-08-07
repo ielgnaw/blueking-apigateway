@@ -162,7 +162,7 @@ export const getResourceDocs = (apigwId: number, resourceId: number) => fetch.ge
  * @param apigwId 网关id
  * @param data 资源参数
  */
-export const getResourceDocPreview = (apigwId: number, data: any) => fetch.post(`${BK_DASHBOARD_URL}/gateways/${apigwId}/resources/import/doc/preview`, data);
+export const getResourceDocPreview = (apigwId: number, data: any) => fetch.post(`${BK_DASHBOARD_URL}/gateways/${apigwId}/resources/import/doc/preview/`, data);
 
 /**
  * 保存资源文档数据
