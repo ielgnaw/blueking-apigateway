@@ -106,7 +106,8 @@ const bkuiLocale = computed(() => {
 
 // t()方法的 | 符号有特殊含义，需要用插值才能正确显示
 const sideTitle = computed(() => {
-  return t("蓝鲸 {pipe} API 网关", { pipe: '|'});
+  // return t("蓝鲸 {pipe} API 网关", { pipe: '|'});
+  return t('蓝鲸 API 网关');
 });
 
 const websiteConfig = ref<any>({});
