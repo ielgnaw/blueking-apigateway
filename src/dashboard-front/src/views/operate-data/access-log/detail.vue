@@ -14,7 +14,12 @@
             <div class="item" v-for="({ label, field }, index) in details.fields" :key="index">
               <dt class="label">{{label}}</dt>
               <dd class="value">
-                {{field === 'timestamp' ? transformTime(details.result[field]) : details.result[field]}}
+                {{ field === 'timestamp'
+                  ? transformTime(details.result[field])
+                  : details.result[field] === false
+                    ? false
+                    : details.result[field] || '--'
+                }}
               </dd>
             </div>
           </dl>
@@ -77,20 +82,19 @@ const routeParams = computed(() => route.params);
 
 const currentApigwName = computed(() => {
   const current = apigwDataList.value.find(item => String(item.id) === String(routeParams.value.id)) || {};
-  const name = current.name || '';
-  return name;
+  return current.name || '--';
 });
 
 const titleInfo = computed(() => t(
   '蓝鲸应用ID [{detailsAppCode}] 访问API网关 [{currentApigwName}] 资源的请求详情',
-  { detailsAppCode: details.value.result.app_code, currentApigwName: currentApigwName.value },
+  { detailsAppCode: details.value?.result?.app_code || '--', currentApigwName: currentApigwName.value },
 ));
 
 const transformTime = (time: number) => dayjs.unix(time).format('YYYY-MM-DD HH:mm:ss');
 
 onMounted(async () => {
-  // console.error('routeParams', routeParams.value);
-  // console.error('routeQuery', routeQuery.value);
+  // console.log('routeParams', routeParams.value);
+  // console.log('routeQuery', routeQuery.value);
   // console.error('apigwDataList.valueapigwDataList.value', apigwDataList.value);
   await initData();
   apigwDataList.value = useGetApiList({}).dataList.value;
@@ -107,11 +111,12 @@ onMounted(async () => {
 
 .detail-panel {
   margin-top: 24px;
+  margin-bottom: 24px;
   border: 1px solid #EBEDF1;
   background: #fff;
 
   .panel-bd {
-    padding: 16px 0 32px 0;
+    padding: 16px 0;
   }
 
   .panel-hd {
