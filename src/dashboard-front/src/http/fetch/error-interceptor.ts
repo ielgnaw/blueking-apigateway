@@ -3,7 +3,16 @@ import { Message } from 'bkui-vue';
 // import mitt from '@/common/event-bus';
 import { showLoginModal } from '@blueking/login-modal';
 // import { showLoginModal } from '@/common/auth';
+import { useCommon } from '@/store';
+import { nextTick } from 'vue';
+
 const { BK_LOGIN_URL } = window;
+let common: ReturnType<typeof useCommon> | null = null;
+
+// 用 nextTick 包裹避免在根 app 装载 pinia 前调用 store 发生的错误
+nextTick(() => {
+  common = useCommon();
+});
 
 // 请求执行失败拦截器
 export default (errorData: any, config: IFetchConfig) => {
@@ -51,7 +60,7 @@ export default (errorData: any, config: IFetchConfig) => {
   }
   // 全局捕获错误给出提示
   if (config.globalError) {
-    if (error.code !== 'UNAUTHENTICATED') {
+    if (error.code !== 'UNAUTHENTICATED' && !common?.noGlobalError) {
       Message({ theme: 'error', message: error.message });
     }
   }
