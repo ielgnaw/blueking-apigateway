@@ -30,8 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import {
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+} from 'vue';
+import { useRoute, onBeforeRouteLeave } from 'vue-router';
 import dayjs from 'dayjs';
 
 import { useGetApiList } from '@/hooks';
@@ -39,9 +44,14 @@ import { useGetApiList } from '@/hooks';
 import i18n from '@/language/i18n';
 import { fetchApigwAccessLogDetail } from '@/http';
 import { LogDetailInterface } from './common/type';
+import { useCommon } from '@/store';
 
 const { t } = i18n.global;
 const route = useRoute();
+const common = useCommon();
+
+// 组件默认不展示任何请求的错误 Message
+common.setNoGlobalError(true);
 
 const isDataLoading = ref(false);
 const hasError = ref(false);
@@ -98,6 +108,15 @@ onMounted(async () => {
   // console.error('apigwDataList.valueapigwDataList.value', apigwDataList.value);
   await initData();
   apigwDataList.value = useGetApiList({}).dataList.value;
+});
+
+// 离开组件前重置 noGlobalError 状态，避免其他页面也不展示错误 Message
+onBeforeRouteLeave(() => {
+  common.setNoGlobalError(false);
+});
+
+onBeforeUnmount(() => {
+  common.setNoGlobalError(false);
 });
 </script>
 
