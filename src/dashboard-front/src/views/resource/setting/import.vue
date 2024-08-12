@@ -77,7 +77,6 @@
           ref="resizeLayoutRef"
           placement="bottom"
           collapsible
-          immediate
           :border="false"
           :max="resizeLayoutAsideMax"
           :min="resizeLayoutAsideMin"
@@ -2129,6 +2128,7 @@ const handleReturnClick = () => {
     opacity: .7;
   }
 
+  // 行号左侧图标样式
   :deep(.apigateway-icon.icon-ag-exclamation-circle-fill.f14) {
     color: #b34747;
   }
@@ -2157,13 +2157,6 @@ const handleReturnClick = () => {
   /* 鼠标按住时的滚动条滑块 */
   ::-webkit-scrollbar-thumb:active {
     background: #5e5e5e;
-  }
-
-  .warning-circle {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: hsla(36.6, 81.7%, 55.1%, 0.5);
   }
 }
 
