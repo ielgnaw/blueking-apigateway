@@ -79,6 +79,8 @@
           collapsible
           immediate
           :border="false"
+          :max="resizeLayoutAsideMax"
+          :min="resizeLayoutAsideMin"
           style="height: 100%"
           @collapse-change="updateIsEditorMsgCollapsed"
         >
@@ -1088,6 +1090,9 @@ const isPluginsSliderShow = ref(false);
 
 // 编辑器所在的 resize-layout
 const resizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
+// resizeLayout 拉伸区高度范围
+const resizeLayoutAsideMax = ref(100);
+const resizeLayoutAsideMin = ref(50);
 
 // 导入失败消息
 const importErrorMsg = ref('');
@@ -1174,7 +1179,11 @@ watch(curView, async (newCurView, oldCurView) => {
 
 // 进入页面默认折叠编辑器错误消息栏
 onMounted(() => {
-  resizeLayoutRef?.value?.setCollapse(true);
+  resizeLayoutRef.value?.setCollapse(true);
+  // 设置拉伸区高度范围
+  const editorViewportHeight = resizeLayoutRef.value?.$el.clientHeight - 92;
+  resizeLayoutAsideMax.value = Math.floor(editorViewportHeight * 0.8);
+  resizeLayoutAsideMin.value = Math.ceil(editorViewportHeight * 0.2);
   // 更改编辑器主题和行号左边的提示列(glyph margin)
   if (resourceEditorRef?.value) {
     resourceEditorRef.value.setTheme('import-theme');
