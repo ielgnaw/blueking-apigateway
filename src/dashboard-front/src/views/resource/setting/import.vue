@@ -72,7 +72,7 @@
         </div>
       </div>
       <!-- 代码编辑器 -->
-      <div class="monaco-editor" ref="editorWrapRef">
+      <div class="monaco-editor" :class="{ 'hide-collapse-btn': visibleErrorReasons.length < 1 }" ref="editorWrapRef">
         <bk-resize-layout
           ref="resizeLayoutRef"
           placement="bottom"
@@ -143,10 +143,10 @@
                 <article v-if="isValidBannerVisible" class="validation-message">
                   <success class="success-c" width="14px" height="14px" />
                   <span class="msg-part msg-body">{{ t('校验通过') }}</span>
-                  <close-line
-                    width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"
-                    @click="() => { isValidBannerVisible = false }"
-                  ></close-line>
+<!--                  <close-line-->
+<!--                    width="14px" height="14px" fill="#DCDEE5" style="margin-left: auto; cursor: pointer;"-->
+<!--                    @click="() => { isValidBannerVisible = false }"-->
+<!--                  ></close-line>-->
                 </article>
                 <article v-else class="editor-footer-validate-btn">
                   <bk-button
@@ -1250,6 +1250,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     // 清空编辑器高亮样式
     resourceEditorRef?.value?.clearDecorations();
     errorReasons.value = [];
+    // 重置可视错误消息类型
+    activeCodeMsgType.value = 'All';
     const params: any = {
       content: editorText.value,
       allow_overwrite: true,
@@ -1553,9 +1555,16 @@ const getFirstQuotedValue = (str: string) => {
 
 // 处理右侧错误类型计数器点击事件
 const handleErrorCountClick = (type: CodeErrorMsgType) => {
-  activeCodeMsgType.value = type;
+  // 重复点击同一个类型，则重置选中态
+  activeCodeMsgType.value = (type === activeCodeMsgType.value) ? 'All' : type;
   activeVisibleErrorMsgIndex.value = -1;
   updateEditorDecorations();
+  // 如果有错误消息，点击后可以展开错误消息栏
+  if (isEditorMsgCollapsed && visibleErrorReasons.value.length > 0) {
+    nextTick(() => {
+      resizeLayoutRef?.value?.setCollapse(false);
+    });
+  }
 };
 
 // 切换搜索面板
@@ -1941,7 +1950,7 @@ const handleReturnClick = () => {
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          background-color: #1a1a1a;
+          background-color: #212121;
 
           .editor-error-counters {
             width: 32px;
@@ -1966,7 +1975,7 @@ const handleReturnClick = () => {
               }
 
               &:hover, &.active {
-                background-color: #333;
+                background-color: #3e3e3e;
               }
 
               .icon {
@@ -2079,11 +2088,18 @@ const handleReturnClick = () => {
     }
 
     // ResizeLayout 的折叠按钮样式
-    :deep(.bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse) {
+    :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
       margin-bottom: 9px;
       margin-left: -16px;
       background: #1a1a1a;
       box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    &.hide-collapse-btn {
+      // 隐藏 ResizeLayout 的折叠按钮
+      :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
+        display: none !important;
+      }
     }
 
     // ResizeLayout 的折叠区应允许滚动
