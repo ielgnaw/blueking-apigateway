@@ -1009,7 +1009,6 @@ import {
   Share,
   PlayShape,
   Success,
-  CloseLine,
   CollapseLeft,
   Close, AngleUpFill,
 } from 'bkui-vue/lib/icon';
@@ -1154,9 +1153,9 @@ const msgAsErrorNum = computed(() => {
   return errorReasons.value.filter(r => r.level === 'Error').length;
 });
 
-const msgAsWarningNum = computed(() => {
-  return errorReasons.value.filter(r => r.level === 'Warning').length;
-});
+// const msgAsWarningNum = computed(() => {
+//   return errorReasons.value.filter(r => r.level === 'Warning').length;
+// });
 
 // 代码有变化时重置校验状态
 watch(editorText, () => {
@@ -1300,10 +1299,21 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
       errorReasons.value = errData.map((err) => {
         if (err.json_path !== '$' && err.json_path !== '') {
           // 从 jsonpath 提取路径组成数组，去掉开头的 $
-          const paths = JSONPath.toPathArray(err.json_path)
+          let paths = JSONPath.toPathArray(err.json_path)
             .slice(1);
           // 找到 jsonpath 指向的值
-          const pathValue = JSONPath(err.json_path, editorJsonObj, null, null)[0] ?? [];
+          let pathValue = JSONPath(err.json_path, editorJsonObj, null, null)[0] ?? null;
+          // 当获取 json_path 指向的值失败时，检查是不是因为 json_path 中有大写的 http method
+          if (pathValue === null) {
+            const httpMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
+            // 把 json_path 中的大写 method 规范化为小写的
+            if (paths.some(item => httpMethods.includes(item))) {
+              paths = paths.map(item =>
+                httpMethods.includes(item) ? item.toLowerCase() : item
+              );
+              pathValue = JSONPath(`$.${paths.join('.')}`, editorJsonObj, null, null)[0] ?? null;
+            }
+          }
           // 提取后端错误消息中第一个用引号包起来的字符串，它常常就是代码错误所在
           const quotedValue = getFirstQuotedValue(err.message);
           const stringToFind = '';
