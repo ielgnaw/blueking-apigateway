@@ -23,7 +23,7 @@
             accept=".yaml,.json,.yml"
           >
             <div>
-              <i class="icon apigateway-icon icon-ag-plus"></i>
+              <i class="icon apigateway-icon icon-ag-upload"></i>
               {{ t('上传文件') }}
             </div>
           </bk-upload>
