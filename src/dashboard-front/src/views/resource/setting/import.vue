@@ -269,9 +269,9 @@
                     :show-overflow-tooltip="false"
                   >
                     <template #default="{ row }">
-                    <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
-                      {{ getAuthConfigText(row?.auth_config) }}
-                    </span>
+                      <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
+                        {{ getAuthConfigText(row?.auth_config) }}
+                      </span>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -315,8 +315,8 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
-                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    <template #default="{ row }: { row: IImportedResource }">
+                      <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -332,11 +332,11 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: IImportedResource }">
                       <bk-tag
-                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                        :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
-                        {{ row.backend?.method ?? row.method }}
+                        {{ row.backend?.config.method ?? row.method }}
                       </bk-tag>
                     </template>
                   </bk-table-column>
@@ -511,8 +511,8 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
-                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    <template #default="{ row }: { row: IImportedResource }">
+                      <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -528,11 +528,11 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: IImportedResource }">
                       <bk-tag
-                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                        :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
-                        {{ row.backend?.method ?? row.method }}
+                        {{ row.backend?.config.method ?? row.method }}
                       </bk-tag>
                     </template>
                   </bk-table-column>
@@ -691,8 +691,8 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
-                      <bk-tag :theme="methodsEnum[row?.method]">{{ row?.method }}</bk-tag>
+                    <template #default="{ row }: { row: IImportedResource }">
+                      <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -708,11 +708,11 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: IImportedResource }">
                       <bk-tag
-                        :theme="methodsEnum[row.backend?.method ?? row.method]"
+                        :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
-                        {{ row.backend?.method ?? row.method }}
+                        {{ row.backend?.config.method ?? row.method }}
                       </bk-tag>
                     </template>
                   </bk-table-column>
@@ -1009,7 +1009,6 @@ import {
   Share,
   PlayShape,
   Success,
-  CloseLine,
   CollapseLeft,
   Close, AngleUpFill,
 } from 'bkui-vue/lib/icon';
@@ -1025,6 +1024,7 @@ import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-im
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import ResourcesDoc from "@/views/components/resources-doc/index.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
+import { IImportedResource, ILocalImportedResource } from '@/views/resource/setting/types';
 
 type CodeErrorResponse = {
   code: string,
@@ -1040,22 +1040,22 @@ const common = useCommon();
 const editorText = ref<string>(exampleData.content);
 const { apigwId } = common; // 网关id
 const resourceEditorRef = ref<InstanceType<typeof editorMonaco>>(); // 实例化
-const showDoc = ref<boolean>(true);
-const language = ref<string>('zh');
-const isDataLoading = ref<boolean>(false);
+const showDoc = ref(true);
+const language = ref<'zh' | 'en'>('zh');
+const isDataLoading = ref(false);
 // 代码校验是否通过
-const isCodeValid = ref<boolean>(false);
+const isCodeValid = ref(false);
 // 代码校验后是否修改过代码
 const isCodeModified = ref(true);
-const isImportLoading = ref<boolean>(false);
+const isImportLoading = ref(false);
 // 是否展示导入结果页（loading、success、fail）
 const isImportResultVisible = ref(false);
 // 导入是否成功
 const isImportSucceeded = ref(false);
 const curView = ref<'import' | 'resources'>('import'); // 当前页面
-const tableData = ref<any[]>([]);
+const tableData = ref<ILocalImportedResource[]>([]);
 const globalProperties = useGetGlobalProperties();
-const methodsEnum: any = Object.freeze(MethodsEnum);
+const methodsEnum = Object.freeze(MethodsEnum);
 const { GLOBAL_CONFIG } = globalProperties;
 
 // 选中的代码错误提示 Tab，默认展示 all 即全部类型的错误提示
@@ -1070,7 +1070,7 @@ const isImportConfirmDialogVisible = ref(false);
 const isResourceDocSliderVisible = ref(false);
 const isValidBannerVisible = ref(false);
 
-const editingResource = ref<any>({
+const editingResource = ref<ILocalImportedResource>({
   name: '',
   description: '',
   label_ids: [],
@@ -1083,6 +1083,7 @@ const editingResource = ref<any>({
   is_public: true,
   allow_apply_permission: true,
   _localId: -1,
+  _unchecked: false,
 });
 const isSliderShow = ref(false);
 const isPluginsSliderShow = ref(false);
