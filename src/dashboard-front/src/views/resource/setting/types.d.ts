@@ -16,6 +16,18 @@ interface IBackendConfig {
 interface IBackend {
   name: string;
   config: IBackendConfig;
+  path?: string;
+}
+
+interface IPluginConfig {
+  name?: string;
+  type: string;
+  yaml: string;
+}
+
+interface IDoc {
+  id?: number;
+  language?: 'zh' | 'en';
 }
 
 interface IImportedResource {
@@ -24,7 +36,7 @@ interface IImportedResource {
   backend?: IBackend;
   description?: string | null;
   description_en?: string | null;
-  doc: any[] | null;
+  doc: IDoc[] | null;
   id: number | null;
   is_public: boolean;
   label_ids?: number[];
@@ -34,7 +46,7 @@ interface IImportedResource {
   name: string;
   openapi_schema: Record<string, any>;
   path: string;
-  plugin_configs?: any | null;
+  plugin_configs?: IPluginConfig[] | null;
 }
 
 interface ILocalImportedResource extends Partial<IImportedResource> {
@@ -42,4 +54,4 @@ interface ILocalImportedResource extends Partial<IImportedResource> {
   _unchecked: boolean;
 }
 
-export { IBackend, IBackendConfig, IAuthConfig, IImportedResource, ILocalImportedResource };
+export { IBackend, IBackendConfig, IAuthConfig, IPluginConfig, IImportedResource, ILocalImportedResource };

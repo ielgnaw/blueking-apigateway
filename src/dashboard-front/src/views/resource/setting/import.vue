@@ -268,7 +268,7 @@
                     width="100"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
                         {{ getAuthConfigText(row?.auth_config) }}
                       </span>
@@ -277,10 +277,10 @@
                   <bk-table-column
                     :label="t('校验应用权限')"
                   >
-                    <template #default="{ row }">
-                    <span
-                      :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
-                    >{{ getPermRequiredText(row?.auth_config) }}</span>
+                    <template #default="{ row }: { row: ILocalImportedResource }">
+                      <span
+                        :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
+                      >{{ getPermRequiredText(row?.auth_config) }}</span>
                     </template>
                   </bk-table-column>
                   <!--  “是否公开”列  -->
@@ -288,7 +288,7 @@
                     :label="() => renderIsPublicColLabel('add')"
                     width="100"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
@@ -297,7 +297,7 @@
                   <bk-table-column
                     :label="t('允许申请权限')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
@@ -315,7 +315,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
@@ -323,7 +323,7 @@
                     :label="t('后端服务')"
                     prop="method"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.name ?? 'default' }}
                     </template>
                   </bk-table-column>
@@ -332,7 +332,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag
                         :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
@@ -346,7 +346,7 @@
                     :min-width="160"
                     :width="160"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
@@ -355,7 +355,7 @@
                     prop="doc"
                     width="85"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         v-if="showDoc"
                         text
@@ -372,14 +372,14 @@
                     :label="t('插件数量')"
                     width="85"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         theme="primary"
                         text style="font-size: 12px;"
                         @click="handleShowPluginsSlider(row)"
                       >
                         <span
-                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c)=>c.name || c.type).join('，') || '无插件'}` }"
                         >
                           {{ row.plugin_configs?.length ?? 0 }}
                         </span>
@@ -392,7 +392,7 @@
                     fixed="right"
                     prop="act"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         text
                         theme="primary"
@@ -464,7 +464,7 @@
                     width="100"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
                       {{ getAuthConfigText(row?.auth_config) }}
                     </span>
@@ -473,7 +473,7 @@
                   <bk-table-column
                     :label="t('校验应用权限')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span
                       :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
                     >{{ getPermRequiredText(row?.auth_config) }}</span>
@@ -484,7 +484,7 @@
                     :label="() => renderIsPublicColLabel('update')"
                     width="100"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
@@ -493,7 +493,7 @@
                   <bk-table-column
                     :label="t('允许申请权限')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
@@ -511,7 +511,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
@@ -519,7 +519,7 @@
                     :label="t('后端服务')"
                     prop="method"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.name ?? 'default' }}
                     </template>
                   </bk-table-column>
@@ -528,7 +528,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag
                         :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
@@ -542,7 +542,7 @@
                     :min-width="160"
                     :width="160"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
@@ -551,7 +551,7 @@
                     prop="doc"
                     width="85"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         v-if="showDoc"
                         text
@@ -568,14 +568,14 @@
                     :label="t('插件数量')"
                     width="85"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         theme="primary"
                         text style="font-size: 12px;"
                         @click="handleShowPluginsSlider(row)"
                       >
                         <span
-                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c)=>c.name || c.type).join('，') || '无插件'}` }"
                         >
                           {{ row.plugin_configs?.length ?? 0 }}
                         </span>
@@ -588,7 +588,7 @@
                     fixed="right"
                     prop="act"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         text
                         theme="primary"
@@ -647,16 +647,16 @@
                   <bk-table-column
                     :label="t('认证方式')"
                   >
-                    <template #default="{ row }">
-                    <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
-                      {{ getAuthConfigText(row?.auth_config) }}
-                    </span>
+                    <template #default="{ row }: { row: ILocalImportedResource }">
+                      <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
+                        {{ getAuthConfigText(row?.auth_config) }}
+                      </span>
                     </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('校验应用权限')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span
                       :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
                     >{{ getPermRequiredText(row?.auth_config) }}</span>
@@ -665,7 +665,7 @@
                   <bk-table-column
                     :label="t('是否公开')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
                       {{ getPublicSettingText(row.is_public) }}
                     </span>
@@ -674,7 +674,7 @@
                   <bk-table-column
                     :label="t('允许申请权限')"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                     <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
                       {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
                     </span>
@@ -691,7 +691,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
                     </template>
                   </bk-table-column>
@@ -699,7 +699,7 @@
                     :label="t('后端服务')"
                     prop="method"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.name ?? 'default' }}
                     </template>
                   </bk-table-column>
@@ -708,7 +708,7 @@
                     prop="method"
                     :show-overflow-tooltip="false"
                   >
-                    <template #default="{ row }: { row: IImportedResource }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-tag
                         :theme="methodsEnum[row.backend?.config.method ?? row.method]"
                       >
@@ -721,7 +721,7 @@
                     prop="path"
                     :min-width="160"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       {{ row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
@@ -729,7 +729,7 @@
                     :label="t('资源文档')"
                     prop="doc"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         v-if="showDoc"
                         text
@@ -746,14 +746,14 @@
                     :label="t('插件数量')"
                     width="85"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         theme="primary"
                         text style="font-size: 12px;"
                         @click="handleShowPluginsSlider(row)"
                       >
                         <span
-                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c: any)=>c.name || c.type).join('，') || '无插件'}` }"
+                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c)=>c.name || c.type).join('，') || '无插件'}` }"
                         >
                           {{ row.plugin_configs?.length ?? 0 }}
                         </span>
@@ -766,7 +766,7 @@
                     fixed="right"
                     prop="act"
                   >
-                    <template #default="{ row }">
+                    <template #default="{ row }: { row: ILocalImportedResource }">
                       <bk-button
                         text
                         theme="primary"
@@ -1271,8 +1271,8 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     }
     // 配置是否显示错误 Message，只校验代码时不显示，改为展示在编辑器的错误消息栏中
     const interceptorConfig = _changeView ? {} : { globalError: false };
-    const res = await checkResourceImport(apigwId, params, interceptorConfig);
-    tableData.value = res.map((data: any, index: number) => ({
+    const res = await checkResourceImport(apigwId, params, interceptorConfig) as IImportedResource[];
+    tableData.value = res.map((data, index: number) => ({
       ...data,
       _unchecked: false, // 标记是否不导入
       _localId: index, // 给一个本地id以识别修改了哪一条数据
@@ -1396,8 +1396,8 @@ const handleImportResource = async () => {
   try {
     isImportLoading.value = true;
     isImportResultVisible.value = true;
-    const import_resources = tableData.value.filter((e: any) => e._unchecked === false)
-      .map((e: any) => {
+    const import_resources = tableData.value.filter((e) => e._unchecked === false)
+      .map((e) => {
         const {
           _unchecked,
           _localId,
@@ -1414,8 +1414,8 @@ const handleImportResource = async () => {
     // 勾选了文档才需要上传swagger文档
     if (showDoc.value) {
       // swagger需要的参数
-      const selected_resource_docs = import_resources.map((e: any) => ({
-        language: e.doc?.language ?? language.value,
+      const selected_resource_docs = import_resources.map((e) => ({
+        language: e.doc[0]?.language ?? language.value,
         resource_name: e.name,
       }));
       const paramsDocs = {
@@ -1456,7 +1456,7 @@ const handleEditSliderHidden = () => {
 };
 
 // 确认修改配置后
-const handleEditSubmit = (newResource: any) => {
+const handleEditSubmit = (newResource: ILocalImportedResource) => {
   let pos = tableData.value.findIndex(data => data._localId === newResource._localId);
   if (pos > -1) tableData.value[pos] = { ...tableData.value[pos], ...newResource };
   // console.log('newResource:');
@@ -1468,21 +1468,21 @@ const handleEditSubmit = (newResource: any) => {
 };
 
 // 点击修改配置时，会唤出 SideSlider
-const handleEdit = (resourceRow: any) => {
+const handleEdit = (resourceRow: ILocalImportedResource) => {
   const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
   isSliderShow.value = true;
 };
 
 // 点击查看文档时，会唤出 SideSlider
-const handleShowResourceDoc = (resourceRow: any) => {
+const handleShowResourceDoc = (resourceRow: ILocalImportedResource) => {
   const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
   isResourceDocSliderVisible.value = true;
 };
 
 // 点击插件数时，会唤出 PluginsSlider
-const handleShowPluginsSlider = (resourceRow: any) => {
+const handleShowPluginsSlider = (resourceRow: ILocalImportedResource) => {
   if (!resourceRow.plugin_configs || resourceRow.plugin_configs?.length < 1) return;
   const _editingResource = tableData.value.find(data => data._localId === resourceRow._localId);
   if (_editingResource) editingResource.value = { ...editingResource.value, ..._editingResource };
@@ -1645,7 +1645,7 @@ const getAllowApplyPermissionText = (allow_apply_permission: boolean | null | un
 };
 
 // 切换资源是否导入
-const toggleRowUnchecked = (row: any) => {
+const toggleRowUnchecked = (row: ILocalImportedResource) => {
   const data = tableData.value.find(d => d._localId === row._localId);
   if (data) data._unchecked = !data._unchecked;
 };

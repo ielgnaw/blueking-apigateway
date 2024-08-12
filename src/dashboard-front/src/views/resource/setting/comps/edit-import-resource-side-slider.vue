@@ -80,11 +80,18 @@ import BaseInfo from '@/views/resource/setting/comps/base-info.vue';
 import FrontConfig from '@/views/resource/setting/comps/front-config.vue';
 import BackConfig from '@/views/resource/setting/comps/back-config.vue';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
+import { ILocalImportedResource } from '@/views/resource/setting/types';
 
 const { t } = useI18n();
-const props = defineProps({
-  isSliderShow: { type: Boolean, default: false },
-  resource: { type: Object, default: () => ({}) },
+
+interface IProps {
+  isSliderShow: boolean;
+  resource: ILocalImportedResource | null;
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  isSliderShow: false,
+  resource: () => null,
 });
 
 const emits = defineEmits<{
