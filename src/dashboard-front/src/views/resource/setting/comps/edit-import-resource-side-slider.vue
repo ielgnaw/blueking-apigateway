@@ -106,8 +106,6 @@ const frontConfigRef = ref(null);
 const backConfigRef = ref(null);
 const renderShow = ref(props.isSliderShow);
 
-const formData = ref<any>({});
-
 // 提交
 const handleSubmit = async () => {
   await Promise.all([
@@ -134,7 +132,6 @@ const handleSubmit = async () => {
 
 const handleHidden = () => {
   renderShow.value = false;
-  formData.value = {};
   emits('on-hidden');
 };
 
