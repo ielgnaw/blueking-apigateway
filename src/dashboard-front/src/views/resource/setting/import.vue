@@ -1354,7 +1354,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
         } else {
           return {
             json_path: err.json_path,
-            message: err.message ?? '未知错误',
+            message: err.message ?? t('未知错误'),
             level: 'Error',
           };
         }
@@ -1362,7 +1362,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     } else {
       // 其他错误会走到这里，包括格式错误等等
       errorReasons.value.push({
-        message: error?.message ?? '未知错误',
+        message: error?.message ?? t('未知错误'),
         level: 'Error',
       });
     }
