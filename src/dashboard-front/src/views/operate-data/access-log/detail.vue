@@ -14,12 +14,7 @@
             <div class="item" v-for="({ label, field }, index) in details.fields" :key="index">
               <dt class="label">{{label}}</dt>
               <dd class="value">
-                {{ field === 'timestamp'
-                  ? transformTime(details.result[field])
-                  : details.result[field] === false
-                    ? false
-                    : details.result[field] || '--'
-                }}
+                {{ getFieldText(field) }}
               </dd>
             </div>
           </dl>
@@ -101,6 +96,14 @@ const titleInfo = computed(() => t(
 ));
 
 const transformTime = (time: number) => dayjs.unix(time).format('YYYY-MM-DD HH:mm:ss');
+
+const getFieldText = (field: string) => {
+  if (field === 'timestamp') return transformTime(details.value.result[field]);
+
+  if (details.value.result[field] === false) return false;
+
+  return details.value.result[field] || '--';
+};
 
 onMounted(async () => {
   // console.log('routeParams', routeParams.value);
