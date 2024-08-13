@@ -644,7 +644,7 @@ defineExpose({
 
       .apigateway-icon {
         font-size: 42px;
-        color: #FFE8C3;
+        color: #ff9c01;
       }
     }
 
