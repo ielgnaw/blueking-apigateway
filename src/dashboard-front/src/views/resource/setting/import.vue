@@ -817,12 +817,12 @@
       </main>
     </footer>
     <!--  编辑资源侧栏  -->
-    <edit-import-resource-side-slider
+    <EditImportResourceSideSlider
       :resource="editingResource"
       :isSliderShow="isSliderShow"
       @on-hidden="handleEditSliderHidden"
       @submit="handleEditSubmit"
-    ></edit-import-resource-side-slider>
+    ></EditImportResourceSideSlider>
     <!--  导入确认弹窗  -->
     <bk-dialog
       v-model:is-show="isImportConfirmDialogVisible"
@@ -871,11 +871,11 @@
       </template>
     </bk-sideslider>
     <!--  查看插件侧边栏  -->
-    <plugin-preview-side-slider
+    <PluginPreviewSideSlider
       :plugins="editingResource.plugin_configs"
       :is-slider-show="isPluginsSliderShow"
       @on-hidden="isPluginsSliderShow = false"
-    ></plugin-preview-side-slider>
+    ></PluginPreviewSideSlider>
   </div>
   <!--  导入结果展示页  -->
   <div v-else class="import-result-wrapper">

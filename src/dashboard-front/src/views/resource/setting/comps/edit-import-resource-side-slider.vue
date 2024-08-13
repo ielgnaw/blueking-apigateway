@@ -96,7 +96,7 @@ const props = withDefaults(defineProps<IProps>(), {
 
 const emits = defineEmits<{
   'on-hidden': [],
-  'submit': [resConfig: any]
+  submit: [resConfig: ILocalImportedResource]
 }>();
 
 // 默认展开
