@@ -1576,10 +1576,14 @@ const handleErrorCountClick = (type: CodeErrorMsgType) => {
   activeCodeMsgType.value = (type === activeCodeMsgType.value) ? 'All' : type;
   activeVisibleErrorMsgIndex.value = -1;
   updateEditorDecorations();
-  // 如果有错误消息，点击后可以展开错误消息栏
-  if (isEditorMsgCollapsed && visibleErrorReasons.value.length > 0) {
+  // 如果有错误消息，点击后可以展开/收起错误消息栏
+  if (visibleErrorReasons.value.length > 0) {
     nextTick(() => {
-      resizeLayoutRef?.value?.setCollapse(false);
+      if (isEditorMsgCollapsed) {
+        resizeLayoutRef.value?.setCollapse(false);
+      } else {
+        resizeLayoutRef.value?.setCollapse(true);
+      }
     });
   }
 };
@@ -2114,8 +2118,11 @@ const handleReturnClick = () => {
     :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
       margin-bottom: 9px;
       margin-left: -16px;
-      background: #1a1a1a;
-      box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.1);
+      background: #313238;
+
+      &:hover {
+        background-color: #63656E;
+      }
     }
 
     &.hide-collapse-btn {
