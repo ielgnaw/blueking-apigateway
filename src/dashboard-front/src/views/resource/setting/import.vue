@@ -238,11 +238,16 @@
                   <bk-input
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                    :right-icon="'bk-icon icon-search'"
-                    style="width: 240px;"
+                    style="width: 578px;"
                     @click.stop.prevent
                     @enter="(val: string) => {filterData(val, 'add')}"
-                  />
+                  >
+                    <template #suffix>
+                      <aside class="flex-row align-items-center mr10" @click.stop.prevent>
+                        <i class="apigateway-icon icon-ag-search f14"></i>
+                      </aside>
+                    </template>
+                  </bk-input>
                 </aside>
               </div>
             </template>
@@ -434,11 +439,16 @@
                   <bk-input
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                    :right-icon="'bk-icon icon-search'"
-                    style="width: 240px;"
+                    style="width: 578px;"
                     @click.stop.prevent
                     @enter="(val: string) => {filterData(val, 'update')}"
-                  />
+                  >
+                    <template #suffix>
+                      <aside class="flex-row align-items-center mr10" @click.stop.prevent>
+                        <i class="apigateway-icon icon-ag-search f14"></i>
+                      </aside>
+                    </template>
+                  </bk-input>
                 </aside>
               </div>
             </template>
