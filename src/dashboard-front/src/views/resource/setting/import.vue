@@ -801,7 +801,6 @@
           v-if="curView === 'resources'"
         >
           <bk-button
-            class="mr10"
             theme="primary"
             type="button"
             :disabled="(tableDataToAdd.length < 1) && (tableDataToUpdate.length < 1)"
@@ -1893,6 +1892,12 @@ const handleReturnClick = () => {
     bottom: 0;
     padding-left: 48px;
     border-top: 1px solid #DCDEE5;
+
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 }
 
@@ -2177,7 +2182,7 @@ const handleReturnClick = () => {
   .res-counter-banner {
     height: 40px;
     padding: 0 24px 0 12px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
