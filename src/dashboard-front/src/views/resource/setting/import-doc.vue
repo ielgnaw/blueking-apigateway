@@ -163,7 +163,7 @@
           prop="path"
         >
           <template #default="{ data }">
-            <span class="danger-c" v-if="data?.id">{{ t('覆盖') }}</span>
+            <span class="danger-c" v-if="!!data?.resource_doc">{{ t('覆盖') }}</span>
             <span class="success-c" v-else>{{ t('新建') }}</span>
           </template>
         </bk-table-column>
@@ -285,7 +285,7 @@ const handleUploadDone = async (response: any) => {
   const res = response[0].response.data;
   const data = res.map((e: any) => ({ ...e, ...e.resource, ...e.resource_doc }));
   tableData.value = data;
-  checkData.value = data.filter((e: any) => !!e.resource_doc); // 有资源文档的才默认选中
+  checkData.value = data.filter((e: any) => !!e.resource); // 有资源文档的才默认选中
   curView.value = 'resources';
   nextTick(() => {
     selections.value = JSON.parse(JSON.stringify(checkData.value));
@@ -362,7 +362,7 @@ const handleImportDoc = async () => {
 const isRowSelectEnable = (data: any) => {
   console.log('row', data);
   if (docType.value === 'swagger') return true; // 如果是swagger 则可以选择
-  return data?.row.resource_doc;
+  return !!data?.row.resource;
 };
 
 // 取消返回到资源列表
