@@ -314,10 +314,12 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
@@ -518,10 +520,12 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
@@ -698,9 +702,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
