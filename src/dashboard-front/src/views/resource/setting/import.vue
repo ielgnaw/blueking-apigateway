@@ -857,25 +857,10 @@
       </div>
     </bk-dialog>
     <!-- 文档侧边栏 -->
-    <bk-sideslider
-      v-model:isShow="isResourceDocSliderVisible"
-      quick-close
-      :title="editingResource.name"
-      width="780"
-      ext-cls="doc-sideslider-cls doc-sides"
-    >
-      <template #default>
-        <ResourcesDoc
-          :cur-resource="editingResource"
-          source="side"
-          doc-root-class="doc-sideslider"
-          :show-footer="false"
-          :show-create-btn="false"
-          :is-preview="!editingResource.doc || editingResource.doc.length < 1"
-        >
-        </ResourcesDoc>
-      </template>
-    </bk-sideslider>
+    <DocPreviewSideSlider
+      v-model="isResourceDocSliderVisible"
+      :resource="editingResource"
+    ></DocPreviewSideSlider>
     <!--  查看插件侧边栏  -->
     <plugin-preview-side-slider
       :plugins="editingResource.plugin_configs"
@@ -1028,8 +1013,8 @@ import { ResizeLayout } from 'bkui-vue';
 import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
-import ResourcesDoc from "@/views/components/resources-doc/index.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
+import DocPreviewSideSlider from '@/views/resource/setting/comps/doc-preview-side-slider.vue';
 
 type CodeErrorResponse = {
   code: string,
@@ -2322,13 +2307,6 @@ const handleReturnClick = () => {
 
 :deep(.multi-edit-popconfirm-wrap .auth-config) {
   font-size: 12px;
-}
-
-.doc-sides {
-  :deep(.bk-modal-content) {
-    max-height: calc(100vh - 52px);
-    overflow: hidden;
-  }
 }
 
 .custom-main-dialog {
