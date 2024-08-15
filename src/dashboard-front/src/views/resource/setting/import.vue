@@ -1527,7 +1527,7 @@ const getRegexString = (value: any): string => {
           if (_.isObject(el)) {
             expStr += getRegexString(el);
           } else {
-            expStr += `['"\\s\\n\\r]*?${el}['"\\s\\n\\r]*?`;
+            expStr += `['"\\s\\n\\r]*?${escapeAsteroid(el)}['"\\s\\n\\r]*?`;
           }
         })
       }
@@ -1541,13 +1541,13 @@ const getRegexString = (value: any): string => {
             if (_.isObject(val)) {
               expStr += getRegexString(val);
             } else {
-              expStr += `['"\\s\\n\\r]*?${val === null ? '' : val}['"\\s\\n\\r]*?`;
+              expStr += `['"\\s\\n\\r]*?${val === null ? '' : escapeAsteroid(val)}['"\\s\\n\\r]*?`;
             }
           });
       }
     }
   } else {
-    expStr += `${value === null ? '' : value}['"\\s\\n\\r]*?`
+    expStr += `${value === null ? '' : escapeAsteroid(value)}['"\\s\\n\\r]*?`
   }
 
   return expStr;
@@ -1556,6 +1556,14 @@ const getRegexString = (value: any): string => {
 const removeStarting$ = (str: string): string => {
   if (str.startsWith('$')) {
     return str.substring(1);
+  }
+  return str;
+};
+
+// 转义*号符
+const escapeAsteroid = (str: string): string => {
+  if (typeof str === 'string') {
+    return str.replaceAll('*', '\\*');
   }
   return str;
 };
