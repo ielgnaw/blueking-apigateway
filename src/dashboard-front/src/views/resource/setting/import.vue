@@ -347,12 +347,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
                     <template #default="{ row }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -548,12 +547,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
                     <template #default="{ row }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -728,11 +726,10 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                   >
                     <template #default="{ row }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
