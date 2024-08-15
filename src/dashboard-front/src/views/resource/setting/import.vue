@@ -857,10 +857,14 @@
       </div>
     </bk-dialog>
     <!-- 文档侧边栏 -->
-    <DocPreviewSideSlider
+    <ResourceDocSideSlider
       v-model="isResourceDocSliderVisible"
       :resource="editingResource"
-    ></DocPreviewSideSlider>
+      :show-footer="false"
+      :show-create-btn="false"
+      :is-preview="!editingResource.id"
+      :preview-lang="language"
+    ></ResourceDocSideSlider>
     <!--  查看插件侧边栏  -->
     <plugin-preview-side-slider
       :plugins="editingResource.plugin_configs"
@@ -1014,7 +1018,7 @@ import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
-import DocPreviewSideSlider from '@/views/resource/setting/comps/doc-preview-side-slider.vue';
+import ResourceDocSideSlider from '@/views/components/resource-doc-slider/index.vue';
 
 type CodeErrorResponse = {
   code: string,
@@ -1397,23 +1401,9 @@ const handleImportResource = async () => {
       });
     const params = {
       import_resources,
-      // content: editorText.value,
+      doc_language: language.value,
     };
     await importResource(apigwId, params);
-    // 勾选了文档才需要上传swagger文档
-    if (showDoc.value) {
-      // swagger需要的参数
-      const selected_resource_docs = import_resources.map((e: any) => ({
-        language: e.doc?.language ?? language.value,
-        resource_name: e.name,
-      }));
-      const paramsDocs = {
-        selected_resource_docs,
-        swagger: editorText.value,
-        language: language.value,
-      };
-      await importResourceDocSwagger(apigwId, paramsDocs);
-    }
     isImportSucceeded.value = true;
   } catch (err: unknown) {
     const error = err as { message: string };
