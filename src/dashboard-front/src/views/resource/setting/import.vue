@@ -234,7 +234,7 @@
                     {{ t('个）') }}
                   </div>
                 </main>
-                <aside>
+                <aside @click.stop.prevent>
                   <bk-input
                     v-model="filterInputAddClone"
                     clearable
@@ -242,12 +242,11 @@
                     style="width: 578px;"
                     @enter="filterData('add')"
                     @clear="filterData('add')"
-                    @click.stop.prevent
                   >
                     <template #prefix>
                       <aside
                         class="flex-row align-items-center ml10"
-                        @click.stop.prevent="filterData('add')"
+                        @click="filterData('add')"
                       >
                         <i class="apigateway-icon icon-ag-search f14"></i>
                       </aside>
@@ -439,7 +438,7 @@
                     {{ t('个）') }}
                   </div>
                 </main>
-                <aside>
+                <aside @click.stop.prevent>
                   <bk-input
                     v-model="filterInputUpdateClone"
                     clearable
@@ -447,12 +446,11 @@
                     style="width: 578px;"
                     @enter="filterData('update')"
                     @clear="filterData('update')"
-                    @click.stop.prevent
                   >
                     <template #prefix>
                       <aside
                         class="flex-row align-items-center ml10"
-                        @click.stop.prevent="filterData('update')"
+                        @click="filterData('update')"
                       >
                         <i class="apigateway-icon icon-ag-search f14"></i>
                       </aside>
@@ -1006,7 +1004,7 @@ import useTsxRouter from './hooks/useTsxRouter';
 import editorMonaco from '@/components/ag-editor.vue';
 import exampleData from '@/constant/example-data';
 import { getStrFromFile } from '@/common/util';
-import { checkResourceImport, importResource, importResourceDocSwagger } from '@/http';
+import { checkResourceImport, importResource } from '@/http';
 import { useCommon } from '@/store';
 import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
