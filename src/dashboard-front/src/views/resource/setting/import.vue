@@ -236,14 +236,19 @@
                 </main>
                 <aside>
                   <bk-input
+                    v-model="filterInputAddClone"
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
                     style="width: 578px;"
+                    @enter="filterData('add')"
+                    @clear="filterData('add')"
                     @click.stop.prevent
-                    @enter="(val: string) => {filterData(val, 'add')}"
                   >
-                    <template #suffix>
-                      <aside class="flex-row align-items-center mr10" @click.stop.prevent>
+                    <template #prefix>
+                      <aside
+                        class="flex-row align-items-center ml10"
+                        @click.stop.prevent="filterData('add')"
+                      >
                         <i class="apigateway-icon icon-ag-search f14"></i>
                       </aside>
                     </template>
@@ -436,14 +441,19 @@
                 </main>
                 <aside>
                   <bk-input
+                    v-model="filterInputUpdateClone"
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
                     style="width: 578px;"
+                    @enter="filterData('update')"
+                    @clear="filterData('update')"
                     @click.stop.prevent
-                    @enter="(val: string) => {filterData(val, 'update')}"
                   >
-                    <template #suffix>
-                      <aside class="flex-row align-items-center mr10" @click.stop.prevent>
+                    <template #prefix>
+                      <aside
+                        class="flex-row align-items-center ml10"
+                        @click.stop.prevent="filterData('update')"
+                      >
                         <i class="apigateway-icon icon-ag-search f14"></i>
                       </aside>
                     </template>
@@ -1814,14 +1824,16 @@ const renderIsPublicColLabel = (action: 'add' | 'update') => {
 };
 
 const filterInputAdd = ref('')
+const filterInputAddClone = ref('')
 const filterInputUpdate = ref('')
-const filterData = (val: string, action: 'add' | 'update') => {
+const filterInputUpdateClone = ref('')
+const filterData = (action: 'add' | 'update') => {
   if (action === 'add') {
-    filterInputAdd.value = val;
+    filterInputAdd.value = filterInputAddClone.value;
   }
 
   if (action === 'update') {
-    filterInputUpdate.value = val;
+    filterInputUpdate.value = filterInputUpdateClone.value;
   }
 }
 
