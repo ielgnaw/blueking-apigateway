@@ -39,7 +39,7 @@
       </div>
       <div v-show="!isEmpty">
         <div class="ag-markdown-view">
-          <h3> {{ $t('请求方法/请求路径') }} </h3>
+          <h3> {{ language === 'zh' ? $t('请求方法/请求路径') : 'Method/Path' }} </h3>
           <p class="pb15">
             <span class="ag-tag" :class="curResource.method.toLowerCase()">{{curResource.method}}</span>
             {{curResource.path}}
