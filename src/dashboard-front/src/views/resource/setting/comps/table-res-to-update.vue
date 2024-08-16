@@ -16,7 +16,7 @@
     </bk-table-column>
     <!--  认证方式列  -->
     <bk-table-column
-      :label="() => renderAuthConfigColLabel('add')"
+      :label="() => renderAuthConfigColLabel('update')"
       :show-overflow-tooltip="false"
       width="100"
     >
@@ -37,7 +37,7 @@
     </bk-table-column>
     <!--  “是否公开”列  -->
     <bk-table-column
-      :label="() => renderIsPublicColLabel('add')"
+      :label="() => renderIsPublicColLabel('update')"
       width="100"
     >
       <template #default="{ row }: { row: ILocalImportedResource }">
@@ -284,12 +284,12 @@ const renderAuthConfigColLabel = (action: ActionType) => {
                     v-model={tempAuthConfig.value.app_verified_required}
                   >
                     <span class="bottom-line" v-bk-tooltips={{ content: t('请求方需提供蓝鲸应用身份信息') }}>
-                    {t('蓝鲸应用认证')}
+                      {t('蓝鲸应用认证')}
                     </span>
                   </bk-checkbox>
                   <bk-checkbox class="ml40" v-model={tempAuthConfig.value.auth_verified_required}>
                     <span class="bottom-line" v-bk-tooltips={{ content: t('请求方需提供蓝鲸用户身份信息') }}>
-                    {t('用户认证')}
+                      {t('用户认证')}
                     </span>
                   </bk-checkbox>
                 </bk-form-item>
