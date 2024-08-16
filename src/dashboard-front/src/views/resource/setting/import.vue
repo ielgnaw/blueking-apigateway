@@ -234,15 +234,24 @@
                     {{ t('个）') }}
                   </div>
                 </main>
-                <aside>
+                <aside @click.stop.prevent>
                   <bk-input
+                    v-model="filterInputAddClone"
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                    :right-icon="'bk-icon icon-search'"
-                    style="width: 240px;"
-                    @click.stop.prevent
-                    @enter="(val: string) => {filterData(val, 'add')}"
-                  />
+                    style="width: 578px;"
+                    @enter="filterData('add')"
+                    @clear="filterData('add')"
+                  >
+                    <template #prefix>
+                      <aside
+                        class="flex-row align-items-center ml10"
+                        @click="filterData('add')"
+                      >
+                        <i class="apigateway-icon icon-ag-search f14"></i>
+                      </aside>
+                    </template>
+                  </bk-input>
                 </aside>
               </div>
             </template>
@@ -305,10 +314,12 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
@@ -342,12 +353,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
                     <template #default="{ row }: { row: ILocalImportedResource }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -430,15 +440,24 @@
                     {{ t('个）') }}
                   </div>
                 </main>
-                <aside>
+                <aside @click.stop.prevent>
                   <bk-input
+                    v-model="filterInputUpdateClone"
                     clearable
                     :placeholder="t('请输入资源名称/路径，按Enter搜索')"
-                    :right-icon="'bk-icon icon-search'"
-                    style="width: 240px;"
-                    @click.stop.prevent
-                    @enter="(val: string) => {filterData(val, 'update')}"
-                  />
+                    style="width: 578px;"
+                    @enter="filterData('update')"
+                    @clear="filterData('update')"
+                  >
+                    <template #prefix>
+                      <aside
+                        class="flex-row align-items-center ml10"
+                        @click="filterData('update')"
+                      >
+                        <i class="apigateway-icon icon-ag-search f14"></i>
+                      </aside>
+                    </template>
+                  </bk-input>
                 </aside>
               </div>
             </template>
@@ -501,10 +520,12 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
@@ -538,12 +559,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                     :width="160"
                   >
                     <template #default="{ row }: { row: ILocalImportedResource }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -682,9 +702,11 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求路径')"
-                    prop="path"
                     :min-width="160"
                   >
+                    <template #default="{ row }">
+                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
+                    </template>
                   </bk-table-column>
                   <bk-table-column
                     :label="t('前端请求方法')"
@@ -718,11 +740,10 @@
                   </bk-table-column>
                   <bk-table-column
                     :label="t('后端请求路径')"
-                    prop="path"
                     :min-width="160"
                   >
                     <template #default="{ row }: { row: ILocalImportedResource }">
-                      {{ row.backend?.path ?? row.path }}
+                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
                     </template>
                   </bk-table-column>
                   <bk-table-column
@@ -801,7 +822,6 @@
           v-if="curView === 'resources'"
         >
           <bk-button
-            class="mr10"
             theme="primary"
             type="button"
             :disabled="(tableDataToAdd.length < 1) && (tableDataToUpdate.length < 1)"
@@ -851,25 +871,14 @@
       </div>
     </bk-dialog>
     <!-- 文档侧边栏 -->
-    <bk-sideslider
-      v-model:isShow="isResourceDocSliderVisible"
-      quick-close
-      :title="editingResource.name"
-      width="780"
-      ext-cls="doc-sideslider-cls doc-sides"
-    >
-      <template #default>
-        <ResourcesDoc
-          :cur-resource="editingResource"
-          source="side"
-          doc-root-class="doc-sideslider"
-          :show-footer="false"
-          :show-create-btn="false"
-          :is-preview="!editingResource.doc || editingResource.doc.length < 1"
-        >
-        </ResourcesDoc>
-      </template>
-    </bk-sideslider>
+    <ResourceDocSideSlider
+      v-model="isResourceDocSliderVisible"
+      :resource="editingResource"
+      :show-footer="false"
+      :show-create-btn="false"
+      :is-preview="!editingResource.id"
+      :preview-lang="language"
+    ></ResourceDocSideSlider>
     <!--  查看插件侧边栏  -->
     <PluginPreviewSideSlider
       :plugins="editingResource.plugin_configs"
@@ -1001,7 +1010,7 @@ import useTsxRouter from './hooks/useTsxRouter';
 import editorMonaco from '@/components/ag-editor.vue';
 import exampleData from '@/constant/example-data';
 import { getStrFromFile } from '@/common/util';
-import { checkResourceImport, importResource, importResourceDocSwagger } from '@/http';
+import { checkResourceImport, importResource } from '@/http';
 import { useCommon } from '@/store';
 import { useGetGlobalProperties } from '@/hooks';
 import TmplExampleSideslider from '@/views/resource/setting/comps/tmpl-example-sideslider.vue';
@@ -1022,8 +1031,8 @@ import { ResizeLayout } from 'bkui-vue';
 import { MethodsEnum } from '@/types';
 import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-import-resource-side-slider.vue";
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
-import ResourcesDoc from "@/views/components/resources-doc/index.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
+import ResourceDocSideSlider from '@/views/components/resource-doc-slider/index.vue';
 import { IImportedResource, ILocalImportedResource } from '@/views/resource/setting/types';
 
 type CodeErrorResponse = {
@@ -1356,7 +1365,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
         } else {
           return {
             json_path: err.json_path,
-            message: err.message ?? '未知错误',
+            message: err.message ?? t('未知错误'),
             level: 'Error',
           };
         }
@@ -1364,7 +1373,7 @@ const handleCheckData = async ({ changeView }: { changeView: boolean }) => {
     } else {
       // 其他错误会走到这里，包括格式错误等等
       errorReasons.value.push({
-        message: error?.message ?? '未知错误',
+        message: error?.message ?? t('未知错误'),
         level: 'Error',
       });
     }
@@ -1408,23 +1417,9 @@ const handleImportResource = async () => {
       });
     const params = {
       import_resources,
-      // content: editorText.value,
+      doc_language: language.value,
     };
     await importResource(apigwId, params);
-    // 勾选了文档才需要上传swagger文档
-    if (showDoc.value) {
-      // swagger需要的参数
-      const selected_resource_docs = import_resources.map((e) => ({
-        language: e.doc[0]?.language ?? language.value,
-        resource_name: e.name,
-      }));
-      const paramsDocs = {
-        selected_resource_docs,
-        swagger: editorText.value,
-        language: language.value,
-      };
-      await importResourceDocSwagger(apigwId, paramsDocs);
-    }
     isImportSucceeded.value = true;
   } catch (err: unknown) {
     const error = err as { message: string };
@@ -1534,7 +1529,7 @@ const getRegexString = (value: any): string => {
           if (_.isObject(el)) {
             expStr += getRegexString(el);
           } else {
-            expStr += `['"\\s\\n\\r]*?${el}['"\\s\\n\\r]*?`;
+            expStr += `['"\\s\\n\\r]*?${escapeAsteroid(el)}['"\\s\\n\\r]*?`;
           }
         })
       }
@@ -1548,13 +1543,13 @@ const getRegexString = (value: any): string => {
             if (_.isObject(val)) {
               expStr += getRegexString(val);
             } else {
-              expStr += `['"\\s\\n\\r]*?${val === null ? '' : val}['"\\s\\n\\r]*?`;
+              expStr += `['"\\s\\n\\r]*?${val === null ? '' : escapeAsteroid(val)}['"\\s\\n\\r]*?`;
             }
           });
       }
     }
   } else {
-    expStr += `${value === null ? '' : value}['"\\s\\n\\r]*?`
+    expStr += `${value === null ? '' : escapeAsteroid(value)}['"\\s\\n\\r]*?`
   }
 
   return expStr;
@@ -1563,6 +1558,14 @@ const getRegexString = (value: any): string => {
 const removeStarting$ = (str: string): string => {
   if (str.startsWith('$')) {
     return str.substring(1);
+  }
+  return str;
+};
+
+// 转义*号符
+const escapeAsteroid = (str: string): string => {
+  if (typeof str === 'string') {
+    return str.replaceAll('*', '\\*');
   }
   return str;
 };
@@ -1579,10 +1582,14 @@ const handleErrorCountClick = (type: CodeErrorMsgType) => {
   activeCodeMsgType.value = (type === activeCodeMsgType.value) ? 'All' : type;
   activeVisibleErrorMsgIndex.value = -1;
   updateEditorDecorations();
-  // 如果有错误消息，点击后可以展开错误消息栏
-  if (isEditorMsgCollapsed && visibleErrorReasons.value.length > 0) {
+  // 如果有错误消息，点击后可以展开/收起错误消息栏
+  if (visibleErrorReasons.value.length > 0) {
     nextTick(() => {
-      resizeLayoutRef?.value?.setCollapse(false);
+      if (isEditorMsgCollapsed) {
+        resizeLayoutRef.value?.setCollapse(false);
+      } else {
+        resizeLayoutRef.value?.setCollapse(true);
+      }
     });
   }
 };
@@ -1831,14 +1838,16 @@ const renderIsPublicColLabel = (action: 'add' | 'update') => {
 };
 
 const filterInputAdd = ref('')
+const filterInputAddClone = ref('')
 const filterInputUpdate = ref('')
-const filterData = (val: string, action: 'add' | 'update') => {
+const filterInputUpdateClone = ref('')
+const filterData = (action: 'add' | 'update') => {
   if (action === 'add') {
-    filterInputAdd.value = val;
+    filterInputAdd.value = filterInputAddClone.value;
   }
 
   if (action === 'update') {
-    filterInputUpdate.value = val;
+    filterInputUpdate.value = filterInputUpdateClone.value;
   }
 }
 
@@ -1895,6 +1904,12 @@ const handleReturnClick = () => {
     bottom: 0;
     padding-left: 48px;
     border-top: 1px solid #DCDEE5;
+
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 }
 
@@ -2111,8 +2126,11 @@ const handleReturnClick = () => {
     :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
       margin-bottom: 9px;
       margin-left: -16px;
-      background: #1a1a1a;
-      box-shadow: 0 0 2px 0 rgba(255, 255, 255, 0.1);
+      background: #313238;
+
+      &:hover {
+        background-color: #63656E;
+      }
     }
 
     &.hide-collapse-btn {
@@ -2179,7 +2197,7 @@ const handleReturnClick = () => {
   .res-counter-banner {
     height: 40px;
     padding: 0 24px 0 12px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2305,13 +2323,6 @@ const handleReturnClick = () => {
 
 :deep(.multi-edit-popconfirm-wrap .auth-config) {
   font-size: 12px;
-}
-
-.doc-sides {
-  :deep(.bk-modal-content) {
-    max-height: calc(100vh - 52px);
-    overflow: hidden;
-  }
 }
 
 .custom-main-dialog {
