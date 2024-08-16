@@ -245,6 +245,7 @@
                     :cur-select-label-ids="curLabelIds"
                     :resource-id="resourceId"
                     :labels-data="labelsData"
+                    force-focus
                     @close="handleCloseSelect"
                     @update-success="handleUpdateLabelSuccess"
                     @label-add-success="getLabelsData"></SelectCheckBox>
