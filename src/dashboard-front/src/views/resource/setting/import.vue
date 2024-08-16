@@ -257,172 +257,18 @@
             </template>
             <template #content>
               <div>
-                <bk-table
-                  :data="tableDataToAdd"
-                  row-key="name"
-                  show-overflow-tooltip
-                  :pagination="tableToAddPagination"
-                >
-                  <bk-table-column
-                    :label="t('资源名称')"
-                    prop="name"
-                    :min-width="160"
-                    width="160"
-                    fixed="left"
-                  >
-                  </bk-table-column>
-                  <!--  认证方式列  -->
-                  <bk-table-column
-                    :label="() => renderAuthConfigColLabel('add')"
-                    width="100"
-                    :show-overflow-tooltip="false"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <span v-bk-tooltips="{ content: `${getAuthConfigText(row?.auth_config)}`, placement: 'top' }">
-                        {{ getAuthConfigText(row?.auth_config) }}
-                      </span>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('校验应用权限')"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <span
-                        :class="{ 'warning-c': getPermRequiredText(row?.auth_config) === '是' }"
-                      >{{ getPermRequiredText(row?.auth_config) }}</span>
-                    </template>
-                  </bk-table-column>
-                  <!--  “是否公开”列  -->
-                  <bk-table-column
-                    :label="() => renderIsPublicColLabel('add')"
-                    width="100"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                    <span :class="{ 'warning-c': getPublicSettingText(row.is_public) === '是' }">
-                      {{ getPublicSettingText(row.is_public) }}
-                    </span>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('允许申请权限')"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                    <span :class="{ 'warning-c': getAllowApplyPermissionText(row.allow_apply_permission) === '是' }">
-                      {{ getAllowApplyPermissionText(row.allow_apply_permission) }}
-                    </span>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('前端请求路径')"
-                    :min-width="160"
-                    :width="160"
-                  >
-                    <template #default="{ row }">
-                      <span>{{ row.match_subpath ? row.path_display : row.path }}</span>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('前端请求方法')"
-                    prop="method"
-                    :show-overflow-tooltip="false"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <bk-tag :theme="methodsEnum[row.method]">{{ row.method }}</bk-tag>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('后端服务')"
-                    prop="method"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      {{ row.backend?.name ?? 'default' }}
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('后端请求方法')"
-                    prop="method"
-                    :show-overflow-tooltip="false"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <bk-tag
-                        :theme="methodsEnum[row.backend?.config.method ?? row.method]"
-                      >
-                        {{ row.backend?.config.method ?? row.method }}
-                      </bk-tag>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('后端请求路径')"
-                    :min-width="160"
-                    :width="160"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      {{ row.backend?.config?.path ?? row.backend?.path ?? row.path }}
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('资源文档')"
-                    prop="doc"
-                    width="85"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <bk-button
-                        v-if="showDoc"
-                        text
-                        theme="primary"
-                        @click="handleShowResourceDoc(row)"
-                      >
-                        <i class="apigateway-icon icon-ag-doc-2 mr4 f14 default-c" />
-                        {{ t('详情') }}
-                      </bk-button>
-                      <span v-else>{{ t('未生成') }}</span>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('插件数量')"
-                    width="85"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <bk-button
-                        theme="primary"
-                        text style="font-size: 12px;"
-                        @click="handleShowPluginsSlider(row)"
-                      >
-                        <span
-                          v-bk-tooltips="{ content: `${row.plugin_configs?.map((c)=>c.name || c.type).join('，') || '无插件'}` }"
-                        >
-                          {{ row.plugin_configs?.length ?? 0 }}
-                        </span>
-                      </bk-button>
-                    </template>
-                  </bk-table-column>
-                  <bk-table-column
-                    :label="t('操作')"
-                    width="150"
-                    fixed="right"
-                    prop="act"
-                  >
-                    <template #default="{ row }: { row: ILocalImportedResource }">
-                      <bk-button
-                        text
-                        theme="primary"
-                        @click="handleEdit(row)"
-                      >
-                        {{ t('修改配置') }}
-                      </bk-button>
-                      <bk-button
-                        text
-                        theme="primary"
-                        class="pl10 pr10"
-                        @click="() => {
-                        toggleRowUnchecked(row)
-                      }"
-                      >
-                        {{ t('不导入') }}
-                      </bk-button>
-                    </template>
-                  </bk-table-column>
-                </bk-table>
+                <TableResToAdd
+                  :table-data="tableDataToAdd"
+                  :show-doc="showDoc"
+                  v-model:tempAuthConfig="tempAuthConfig"
+                  v-model:tempPublicConfig="tempPublicConfig"
+                  @show-row-doc="handleShowResourceDoc"
+                  @show-row-plugin="handleShowPluginsSlider"
+                  @show-row-edit="handleEdit"
+                  @toggle-row-unchecked="toggleRowUnchecked"
+                  @confirm-auth-config="handleConfirmAuthConfigPopConfirm"
+                  @confirm-pub-config="handleConfirmPublicConfigPopConfirm"
+                ></TableResToAdd>
               </div>
             </template>
           </bk-collapse-panel>
@@ -1034,6 +880,7 @@ import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
 import ResourceDocSideSlider from '@/views/components/resource-doc-slider/index.vue';
 import { IImportedResource, ILocalImportedResource } from '@/views/resource/setting/types';
+import TableResToAdd from '@/views/resource/setting/comps/table-res-to-add.vue';
 
 type CodeErrorResponse = {
   code: string,

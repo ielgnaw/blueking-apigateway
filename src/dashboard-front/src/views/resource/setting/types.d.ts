@@ -25,6 +25,11 @@ interface IPluginConfig {
   yaml: string;
 }
 
+interface IPublicConfig {
+  is_public: boolean;
+  allow_apply_permission: boolean;
+}
+
 interface IDoc {
   id?: number;
   language?: 'zh' | 'en';
@@ -54,4 +59,12 @@ interface ILocalImportedResource extends Partial<IImportedResource> {
   _unchecked: boolean;
 }
 
-export { IBackend, IBackendConfig, IAuthConfig, IPluginConfig, IImportedResource, ILocalImportedResource };
+export {
+  IBackend,
+  IBackendConfig,
+  IAuthConfig,
+  IPluginConfig,
+  IPublicConfig,
+  IImportedResource,
+  ILocalImportedResource,
+};
