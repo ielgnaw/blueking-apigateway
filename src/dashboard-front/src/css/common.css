@@ -226,6 +226,9 @@
 .ml20 {
   margin-left: 20px !important;
 }
+.ml24 {
+  margin-left: 24px !important;
+}
 .ml25 {
   margin-left: 25px !important;
 }
@@ -264,6 +267,9 @@
 }
 .mr20 {
   margin-right: 20px !important;
+}
+.mr24 {
+  margin-right: 24px !important;
 }
 .mr25 {
   margin-right: 25px !important;

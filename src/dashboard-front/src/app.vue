@@ -184,7 +184,7 @@ const headerList = computed(() => ([
     link: '',
   },
   {
-    name: t('网关API文档'),
+    name: t('API 文档'),
     id: 3,
     url: 'apigwDoc',
     enabled: true,
