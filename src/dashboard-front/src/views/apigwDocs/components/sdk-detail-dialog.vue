@@ -7,35 +7,34 @@
     width="640"
     mask-close
   >
-    <div class="dialog-content">
+    <main class="dialog-content">
       <div class="dialog-main">
-        <div class="bk-button-group mb15">
-          <bk-button class="is-selected">Python</bk-button>
-          <!-- <bk-button disabled>GO</bk-button> -->
+        <div class="bk-button-group mb24">
+          <bk-button class="is-selected" style="width: 150px">Python</bk-button>
+          <!-- <bk-button disabled style="width: 150px">GO</bk-button> -->
         </div>
-        <div class="data-box wrapper">
-          <div class="row-item mb10">
-            <div class="key">
+        <div class="data-box">
+          <article class="row-item">
+            <aside class="key">
               <span class="column-key"> {{ t('SDK包名称') }}: </span>
-            </div>
-            <div class="value">
+            </aside>
+            <main class="value">
               <span class="column-value" v-bk-overflow-tips>{{ curParams.sdk_name || '--' }}</span>
-            </div>
-          </div>
-          <div class="row-item mb10">
-            <div class="key">
+            </main>
+          </article>
+          <article class="row-item">
+            <aside class="key">
               <span class="column-key"> {{ t('SDK版本') }}: </span>
-            </div>
-            <div class="value">
+            </aside>
+            <main class="value">
               <span class="column-value" v-bk-overflow-tips>{{ curParams.sdk_version_number || '--' }}</span>
-            </div>
-          </div>
-
-          <div class="row-item mb10">
-            <div class="key">
+            </main>
+          </article>
+          <article class="row-item">
+            <aside class="key">
               <span class="column-key"> {{ t('SDK地址') }}: </span>
-            </div>
-            <div class="value flex-row align-items-center">
+            </aside>
+            <main class="value flex-row align-items-center">
               <bk-popover placement="top" width="600" theme="dark" :disabled="curParams.sdk_download_url === ''">
                 <span class="column-value vm">{{ curParams.sdk_download_url || '--' }}</span>
                 <template #content>
@@ -48,18 +47,19 @@
                 @click="copy(curParams.sdk_download_url)"
                 class="doc-copy vm icon-hover apigateway-icon icon-ag-copy ag-doc-icon"
                 v-if="curParams.sdk_download_url" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curParams.sdk_download_url"></i>
+                :data-clipboard-text="curParams.sdk_download_url"
+              ></i>
               <i
                 class="ag-doc-icon doc-download-line vm icon-hover apigateway-icon icon-ag-download-line"
-                v-if="curParams.sdk_download_url" v-bk-tooltips="t('下载')" @click="handleDownload"></i>
-            </div>
-          </div>
-
-          <div class="row-item mb10">
-            <div class="key">
+                v-if="curParams.sdk_download_url" v-bk-tooltips="t('下载')" @click="handleDownload"
+              ></i>
+            </main>
+          </article>
+          <article class="row-item">
+            <aside class="key">
               <span class="column-key"> {{ t('安装') }}: </span>
-            </div>
-            <div class="value  flex-row align-items-center">
+            </aside>
+            <main class="value flex-row align-items-center">
               <bk-popover placement="top" width="600" theme="dark" :disabled="curParams.sdk_install_command === ''">
                 <span class="column-value vm">{{ curParams.sdk_install_command || '--' }}</span>
                 <template #content>
@@ -72,14 +72,15 @@
                 @click="copy(curParams.sdk_install_command)"
                 class="ag-doc-icon doc-copy vm icon-hover apigateway-icon icon-ag-copy"
                 v-if="curParams.sdk_install_command" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curParams.sdk_install_command">
+                :data-clipboard-text="curParams.sdk_install_command"
+              >
               </i>
-            </div>
-          </div>
+            </main>
+          </article>
 
           <template v-if="type === 'apigateway'">
-            <div class="row-item mb10">
-              <div class="key">
+            <article class="row-item">
+              <aside class="key">
                 <span class="column-key">
                   {{ t('资源版本') }}
                   <span v-bk-tooltips="t('该SDK关联的API资源版本')">
@@ -87,30 +88,30 @@
                   </span>
                   :
                 </span>
-              </div>
-              <div class="value">
+              </aside>
+              <main class="value">
                 <span
                   class="column-value"
-                  v-bk-tooltips.top="{ content: curParams.resource_version_display, allowHTML: false }">
+                  v-bk-tooltips.top="{ content: curParams.resource_version_display, allowHTML: false }"
+                >
                   {{ curParams.resource_version_display || '--' }}
                 </span>
-              </div>
-            </div>
-
-            <div class="row-item mb10" v-if="stageText">
-              <div class="key">
+              </main>
+            </article>
+            <article class="row-item" v-if="stageText">
+              <aside class="key">
                 <span class="column-key">
                   {{ t('版本已发环境') }}:
                 </span>
-              </div>
-              <div class="value">
+              </aside>
+              <main class="value">
                 <span class="column-value" v-bk-tooltips.top="stageText">{{ stageText || '--' }}</span>
-              </div>
-            </div>
+              </main>
+            </article>
           </template>
         </div>
       </div>
-    </div>
+    </main>
   </bk-dialog>
 </template>
 
@@ -153,6 +154,15 @@ const handleDownload = () => {
 
 <style scoped lang="scss">
 .custom-main-dialog {
+  :deep(.bk-dialog-title) {
+    line-height: 28px;
+  }
+
+  :deep(.bk-dialog-content) {
+    margin-top: 20px;
+    padding-right: 8px;
+  }
+
   :deep(.bk-modal-footer) {
     display: none;
   }
@@ -160,40 +170,28 @@ const handleDownload = () => {
   .dialog-content {
 
     .dialog-main {
-      .import-tips {
-        background: #F5F6FA;
-        border-radius: 2px;
-        margin-bottom: 25px;
-        padding: 12px 16px;
-        color: #63656E;
 
-        span {
-          font-weight: 700;
+      .data-box {
+        padding: 24px 12px;
+        background: #f5f7fa;
+
+        .row-item {
+          display: flex;
+          line-height: 40px;
+
+          .key {
+            width: 100px;
+            text-align: right;
+            padding-right: 10px;
+          }
+
+          .value {
+            flex: 1;
+            white-space: nowrap;
+            color: #313238;
+          }
         }
       }
-    }
-  }
-}
-
-.wrapper {
-  margin-top: 10px;
-  padding: 10px 5px;
-  background: #fafbfd;
-}
-
-.data-box {
-  .row-item {
-    display: flex;
-
-    .key {
-      width: 120px;
-      text-align: right;
-      padding-right: 10px;
-    }
-
-    .value {
-      flex: 1;
-      white-space: nowrap;
     }
   }
 }
