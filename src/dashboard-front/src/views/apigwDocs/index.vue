@@ -6,119 +6,171 @@
           class="page-tab"
           :class="{ 'active': curTab === 'apigw' }"
           @click="curTab = 'apigw'"
-        >{{ t('网关 API 文档') }}</nav>
+        >{{ t('网关 API 文档') }}
+        </nav>
         <nav
           class="page-tab"
           :class="{ 'active': curTab === 'component' }"
           @click="curTab = 'component'"
-        >{{ t('组件 API 文档') }}</nav>
+        >{{ t('组件 API 文档') }}
+        </nav>
       </div>
     </header>
     <main class="docs-main-content">
-      <div class="top-bar">
-        <bk-input
-          type="search"
-          :placeholder="t('请输入网关名称或描述')"
-          v-model="filterData.keyword"
-          clearable
-          style="width: 400px"
-        />
-        <bk-link theme="primary" class="f12 ml24" @click.prevent="isSdkInstructionSliderShow = true">
-          <i class="apigateway-icon icon-ag-document f14"></i>
-          {{ t('SDK 使用说明')}}
-        </bk-link>
-        <!-- <bk-button
-          theme="primary"
-          @click="handleGoApigw"
-        >
-          {{ t('网关管理') }}
-        </bk-button> -->
-      </div>
-      <div class="docs-list">
-        <bk-loading :loading="isLoading">
-          <bk-table
-            :data="tableData"
-            remote-pagination
-            :pagination="pagination"
-            show-overflow-tooltip
-            @page-limit-change="handlePageSizeChange"
-            @page-value-change="handlePageChange"
-            :border="['outer']"
+      <!--  当选中 网关API文档 时  -->
+      <div v-if="curTab === 'apigw'" class="content-of-apigw">
+        <div class="top-bar">
+          <bk-input
+            type="search"
+            :placeholder="t('请输入网关名称或描述')"
+            v-model="filterData.keyword"
+            clearable
+            style="width: 400px"
+          />
+          <bk-link theme="primary" class="f12 ml24" @click.prevent="isSdkInstructionSliderShow = true">
+            <i class="apigateway-icon icon-ag-document f14"></i>
+            {{ t('SDK 使用说明') }}
+          </bk-link>
+          <!-- <bk-button
+            theme="primary"
+            @click="handleGoApigw"
           >
-            <bk-table-column
-              :label="t('网关名称')"
-              field="name"
+            {{ t('网关管理') }}
+          </bk-button> -->
+        </div>
+        <div class="docs-list">
+          <bk-loading :loading="isLoading">
+            <bk-table
+              :data="tableData"
+              remote-pagination
+              :pagination="pagination"
+              show-overflow-tooltip
+              @page-limit-change="handlePageSizeChange"
+              @page-value-change="handlePageChange"
+              :border="['outer']"
             >
-              <template #default="{ data }">
-                <span class="link-name" @click="gotoDetails(data)">{{data?.name || '--'}}</span>
-                <bk-tag theme="success" v-if="data?.is_official">
-                  {{ t('官方') }}
-                </bk-tag>
+              <bk-table-column
+                :label="t('网关名称')"
+                field="name"
+              >
+                <template #default="{ data }">
+                  <span class="link-name" @click="gotoDetails(data)">{{ data?.name || '--' }}</span>
+                  <bk-tag theme="success" v-if="data?.is_official">
+                    {{ t('官方') }}
+                  </bk-tag>
+                </template>
+              </bk-table-column>
+              <bk-table-column
+                :label="t('网关描述')"
+                field="description"
+              >
+                <template #default="{ data }">
+                  {{ data?.description || '--' }}
+                </template>
+              </bk-table-column>
+              <bk-table-column
+                :label="t('网关负责人')"
+                field="maintainers"
+              >
+                <template #default="{ data }">
+                  {{ data?.maintainers?.join(', ') || '--' }}
+                </template>
+              </bk-table-column>
+              <bk-table-column
+                :label="t('SDK 包名称')"
+                field="maintainers"
+              >
+                <template #default="{ data }">
+                  --
+                </template>
+              </bk-table-column>
+              <bk-table-column
+                :label="t('SDK 最新版本')"
+                field="maintainers"
+              >
+                <template #default="{ data }">
+                  --
+                </template>
+              </bk-table-column>
+              <bk-table-column
+                :label="t('操作')"
+                width="180"
+                fixed="right"
+              >
+                <template #default="{ row }">
+                  <bk-button
+                    text
+                    theme="primary"
+                    @click="isSdkDetailDialogShow = true"
+                  >
+                    {{ t('查看 SDK') }}
+                  </bk-button>
+                  <a
+                    class="ag-link pl10 pr10"
+                    :href="curTab === 'apigw' ? row?.sdk?.url || '' : row?.sdk_download_url || ''"
+                  >
+                    {{ t('下载 SDK') }}
+                  </a>
+                </template>
+              </bk-table-column>
+              <template #empty>
+                <TableEmpty
+                  :keyword="tableEmptyConf.keyword"
+                  :abnormal="tableEmptyConf.isAbnormal"
+                  @reacquire="getList"
+                  @clear-filter="handleClearFilterKey"
+                />
               </template>
-            </bk-table-column>
-            <bk-table-column
-              :label="t('网关描述')"
-              field="description"
-            >
-              <template #default="{ data }">
-                {{ data?.description || '--' }}
-              </template>
-            </bk-table-column>
-            <bk-table-column
-              :label="t('网关负责人')"
-              field="maintainers"
-            >
-              <template #default="{ data }">
-                {{ data?.maintainers?.join(', ') || '--' }}
-              </template>
-            </bk-table-column>
-            <bk-table-column
-              :label="t('SDK 包名称')"
-              field="maintainers"
-            >
-              <template #default="{ data }">
-                --
-              </template>
-            </bk-table-column>
-            <bk-table-column
-              :label="t('SDK 最新版本')"
-              field="maintainers"
-            >
-              <template #default="{ data }">
-                --
-              </template>
-            </bk-table-column>
-            <bk-table-column
-              :label="t('操作')"
-              width="180"
-              fixed="right"
-            >
-              <template #default="{ row }">
-                <bk-button
-                  text
-                  theme="primary"
-                  @click="isSdkDetailDialogShow = true"
-                >
-                  {{ t('查看 SDK') }}
-                </bk-button>
-                <a
-                  class="ag-link pl10 pr10"
-                  :href="curTab === 'apigw' ? row?.sdk?.url || '' : row?.sdk_download_url || ''"
-                >
-                  {{ t('下载 SDK') }}
-                </a>
-              </template>
-            </bk-table-column>
-            <template #empty>
-              <TableEmpty
-                :keyword="tableEmptyConf.keyword"
-                :abnormal="tableEmptyConf.isAbnormal"
-                @reacquire="getList"
-                @clear-filter="handleClearFilterKey"
+            </bk-table>
+          </bk-loading>
+        </div>
+      </div>
+      <!--  当选中 组件API文档 时  -->
+      <div v-else-if="curTab === 'component'" class="content-of-component">
+        <main class="component-list">
+          <header class="top-bar">
+            <main class="bar-title">
+              <span class="title">内部版</span>
+              <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
+                <i class="apigateway-icon icon-ag-document f14"></i>
+                {{ t('查看 SDK') }}
+              </bk-link>
+              <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
+                <i class="apigateway-icon icon-ag-download f14"></i>
+                {{ t('下载 SDK') }}
+              </bk-link>
+            </main>
+            <aside>
+              <bk-input
+                type="search"
+                :placeholder="t('搜索内部版组件')"
+                v-model="filterData.keyword"
+                clearable
+                style="width: 320px"
               />
-            </template>
-          </bk-table>
-        </bk-loading>
+            </aside>
+          </header>
+          <main class="components-wrap">
+            <article class="component-group" v-for="cat in componentCatsList" :key="cat.id">
+              <header class="group-title">
+                <span class="name">{{ cat.name }}</span>
+                <span class="count">{{ `(${cat.systems.length })`}}</span>
+              </header>
+              <main class="group-items">
+                <article class="item" v-for="component in cat.systems" :key="component.name">
+                  <main class="title">
+                    <div class="name">{{ component.description }}</div>
+                    <div class="name-en">{{ component.name }}</div>
+                  </main>
+                  <aside class="background-image">
+                    <i class="apigateway-icon icon-ag-component-intro"></i>
+                  </aside>
+                </article>
+              </main>
+            </article>
+          </main>
+        </main>
+        <aside class="component-nav-list">indexes</aside>
       </div>
     </main>
     <!--  SDK使用说明 Slider  -->
@@ -129,19 +181,27 @@
 
 <script lang="ts" setup>
 import {
+  onMounted,
   provide,
   ref,
   watch,
 } from 'vue';
 import { useQueryList } from '@/hooks';
 import { useI18n } from 'vue-i18n';
-import { getGatewaysDocs } from '@/http';
+import {
+  getComponentSystemList,
+  getGatewaysDocs,
+} from '@/http';
 import { useRouter } from 'vue-router';
 import TableEmpty from '@/components/table-empty.vue';
 import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
-import { TabType } from '@/views/apigwDocs/types';
+import {
+  ICategory,
+  IDefaultSystemRes,
+  TabType,
+} from '@/views/apigwDocs/types';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -171,7 +231,7 @@ pagination.value.limit = maxTableLimit.value;
 // const handleGoApigw = () => {
 //   window.open(window.BK_DASHBOARD_URL);
 // };
-const tableEmptyConf = ref<{keyword: string, isAbnormal: boolean}>({
+const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
   keyword: '',
   isAbnormal: false,
 });
@@ -218,6 +278,17 @@ const updateTableEmptyConfig = () => {
   tableEmptyConf.value.keyword = '';
 };
 
+const componentCatsList = ref<ICategory[]>([]);
+
+const fetchComponentList = async () => {
+  try {
+    const res = await getComponentSystemList('default');
+    componentCatsList.value = res[0]?.categories ?? [];
+  } catch {
+    componentCatsList.value = [];
+  }
+};
+
 watch(
   () => tableData.value, () => {
     updateTableEmptyConfig();
@@ -227,9 +298,15 @@ watch(
   },
 );
 
+onMounted(async () => {
+  await fetchComponentList();
+});
+
 </script>
 
 <style lang="scss" scoped>
+$primary-color: #3a84ff;
+
 .docs-main {
 
   .page-tabs {
@@ -238,7 +315,7 @@ watch(
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #FFFFFF;
+    background: #fff;
     box-shadow: 0 3px 4px 0 #0000000a;
 
     .tabs-group {
@@ -254,13 +331,13 @@ watch(
         cursor: pointer;
 
         &:hover {
-          color: #3A84FF;
+          color: #3a84ff;
         }
 
         &.active {
-          background-color: #F0F5FF;
-          border-top: 3px solid #3A84FF;
-          color: #3A84FF;
+          background-color: #f0f5ff;
+          border-top: 3px solid #3a84ff;
+          color: #3a84ff;
         }
       }
     }
@@ -270,17 +347,140 @@ watch(
     width: 1280px;
     margin: auto;
 
-    .top-bar {
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
+    .content-of-apigw {
+      .top-bar {
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      .link-name {
+        color: #3a84ff;
+        cursor: pointer;
+      }
     }
 
-    .link-name {
-      color: #3A84FF;
-      cursor: pointer;
+    .content-of-component {
+      padding-bottom: 24px;
+      display: flex;
+
+      .component-list {
+        width: 1000px;
+
+        .top-bar {
+          margin-bottom: 16px;
+          height: 32px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .bar-title {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+
+            .title {
+              font-weight: 700;
+              font-size: 16px;
+              color: #313238;
+              letter-spacing: 0;
+              line-height: 24px;
+            }
+          }
+        }
+
+        .components-wrap {
+          .component-group {
+            margin-bottom: 16px;
+
+            .group-title {
+              padding-inline: 16px;
+              margin-bottom: 16px;
+              height: 32px;
+              display: flex;
+              align-items: center;
+              border-radius: 2px;
+              background: #eaebf0;
+
+              .name {
+                margin-right: 8px;
+                font-size: 14px;
+                color: #313238;
+              }
+
+              .count {
+                color: #979ba5;
+              }
+            }
+
+            .group-items {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 16px;
+
+              .item {
+                position: relative;
+                padding: 16px;
+                width: 238px;
+                height: 80px;
+                background: #fff;
+                box-shadow: 0 2px 4px 0 #1919290d;
+                border-radius: 2px;
+                transition: box-shadow .2s ease-in-out;
+
+                .title {
+                  .name, .name-en {
+                    font-size: 14px;
+                    letter-spacing: 0;
+                    line-height: 22px;
+                  }
+
+                  .name {
+                    margin-bottom: 5px;
+                    color: #313238;
+                    transition: color .2s ease-in-out;
+                  }
+
+                  .name-en {
+                    color: #c4c6cc;
+                  }
+                }
+
+                .background-image {
+                  position: absolute;
+                  top: 20px;
+                  right: 16px;
+                  width: 40px;
+                  height: 40px;
+                  display: flex;
+                  align-items: center;
+                  font-size: 40px;
+                  color: #f0f5ff;
+                }
+
+                &:hover {
+                  box-shadow: 0 2px 4px 0 #0000001a, 0 2px 4px 0 #1919290d;
+                  cursor: pointer;
+
+                  .title {
+                    .name {
+                      color: $primary-color;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+
+      .component-nav-list {
+        width: 187px;
+      }
     }
+
   }
 }
 </style>

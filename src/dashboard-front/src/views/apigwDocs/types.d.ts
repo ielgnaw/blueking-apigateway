@@ -27,6 +27,24 @@ interface ISdkObject {
   released_stages: any[];
 }
 
+interface IDefaultSystemRes {
+  board: string;
+  board_label: string;
+  categories: ICategory[];
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+  systems: IComponent[];
+}
+
+interface IComponent {
+  name: string;
+  description: string;
+}
+
+
 export {
   TabType,
   // SdkType,
@@ -34,4 +52,7 @@ export {
   ISdk,
   IResourceVersion,
   ISdkObject,
+  IDefaultSystemRes,
+  ICategory,
+  IComponent,
 };
