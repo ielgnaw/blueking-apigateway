@@ -9,7 +9,7 @@
     >
       <template #default>
         <div class="content-wrap">
-          <SdkInstructionContent cur-type="apigateway"></SdkInstructionContent>
+          <SdkInstructionContent></SdkInstructionContent>
         </div>
       </template>
     </bk-sideslider>

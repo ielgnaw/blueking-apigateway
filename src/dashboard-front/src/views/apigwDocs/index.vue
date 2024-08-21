@@ -129,7 +129,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import {
+  provide,
+  ref,
+  watch,
+} from 'vue';
 import { useQueryList } from '@/hooks';
 import { useI18n } from 'vue-i18n';
 import { getGatewaysDocs } from '@/http';
@@ -138,6 +142,7 @@ import TableEmpty from '@/components/table-empty.vue';
 import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
+import { TabType } from '@/views/apigwDocs/types';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -172,8 +177,13 @@ const tableEmptyConf = ref<{keyword: string, isAbnormal: boolean}>({
   isAbnormal: false,
 });
 
-type TabType = 'apigw' | 'component';
+// 当前展示的是 网关 | 组件 相关内容
 const curTab = ref<TabType>('apigw');
+
+// 提供当前 tab 的值
+// 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
+provide('curTab', curTab);
+
 const isSdkInstructionSliderShow = ref(false);
 const isSdkDetailDialogShow = ref(false);
 

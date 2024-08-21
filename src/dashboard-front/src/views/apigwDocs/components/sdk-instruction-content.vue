@@ -10,7 +10,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
+import {
+  ref,
+  watch,
+  nextTick,
+  inject,
+  Ref,
+} from 'vue';
 import { useRoute } from 'vue-router';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
@@ -24,17 +30,14 @@ import {
   getGatewaySDKDoc,
   getESBSDKDoc,
 } from '@/http';
+import { TabType } from '@/views/apigwDocs/types';
 
-const props = defineProps({
-  curType: {
-    type: String,
-    default: 'apigateway',
-  },
-});
+const curType = inject<Ref<TabType>>('curTab');
+
 const route = useRoute();
 
 const board = ref<string>('-');
-const type = ref<string | any>('');
+const type = ref<TabType>('apigw');
 const sdkDoc = ref<string>('');
 const markdownHtml = ref<string>('');
 const active = ref<string>('sdk');
@@ -125,7 +128,7 @@ const getSDKlist = async (keyword: any | string = null) => {
   };
   isLoading.value = true;
   try {
-    if (type.value === 'apigateway') {
+    if (type.value === 'apigw') {
       const res = await getGatewaySDKlist(pageParams);
       curPageData.value = res.results;
       pagination.value.count = res.count;
@@ -145,7 +148,7 @@ const getSDKDoc = async () => {
   const params = { language: 'python' };
   isLoading.value = true;
   try {
-    if (type.value === 'apigateway') {
+    if (type.value === 'apigw') {
       const res = await getGatewaySDKDoc(params);
       sdkDoc.value = res.content;
     } else {
@@ -160,16 +163,16 @@ const getSDKDoc = async () => {
 };
 
 const init = () => {
-  const curTab: any = route.query.tab;
-  active.value = curTab ? curTab : 'sdk';
-  type.value = props.curType;
+  const tab: any = route.query.tab;
+  active.value = tab ? tab : 'sdk';
+  type.value = curType.value;
   getSDKlist();
   getSDKDoc();
 };
 
 // 监听type的变化
 watch(
-  () => props.curType,
+  () => curType.value,
   () => {
     active.value = 'sdk';
     curPageData.value = [];

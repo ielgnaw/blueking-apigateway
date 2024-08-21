@@ -1,10 +1,13 @@
+type TabType = 'apigw' | 'component';
+// type SdkType = 'apigateway' | 'esb';
+
 interface IGateway {
   id: number;
   name: string;
   description: string;
 }
 
-interface ISDK {
+interface ISdk {
   language: string;
   version: string;
   url: string;
@@ -17,16 +20,18 @@ interface IResourceVersion {
   version: string;
 }
 
-interface ISDKObject {
+interface ISdkObject {
   gateway: IGateway;
-  sdk: ISDK;
+  sdk: ISdk;
   resource_version: IResourceVersion;
   released_stages: any[];
 }
 
 export {
+  TabType,
+  // SdkType,
   IGateway,
-  ISDK,
+  ISdk,
   IResourceVersion,
-  ISDKObject,
+  ISdkObject,
 };
