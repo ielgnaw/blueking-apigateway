@@ -121,7 +121,7 @@
         </bk-loading>
       </div>
     </main>
-    <!--  SDK使用说明抽屉  -->
+    <!--  SDK使用说明 Slider  -->
     <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
   </div>
 </template>

@@ -1,4 +1,5 @@
 <template>
+  <!--  SDK使用说明 Slider  -->
   <div class="sdk-instruction-slider">
     <bk-sideslider
       v-model:isShow="isShow"

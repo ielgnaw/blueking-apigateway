@@ -1,4 +1,5 @@
 <template>
+  <!--  SDK使用说明 Slider 的内容  -->
   <div class="sdk-wrapper">
     <div class="bk-button-group ">
       <bk-button class="is-selected">Python</bk-button>
@@ -65,7 +66,8 @@ const md = new MarkdownIt({
     if (lang && hljs.getLanguage(lang)) {
       try {
         return hljs.highlight(lang, str, true).value;
-      } catch (__) { }
+      } catch (__) {
+      }
     }
 
     return '';
@@ -80,25 +82,27 @@ const initMarkdownHtml = (content: string) => {
     const markdownDom = document.getElementById('markdown');
 
     // 复制代码
-    markdownDom.querySelectorAll('a').forEach((item: any) => {
-      item.target = '_blank';
-    });
-    markdownDom?.querySelectorAll('pre')?.forEach((item) => {
-      const parentDiv = document.createElement('div');
-      const btn = document.createElement('button');
-      const codeBox = document.createElement('div');
-      const code = item?.querySelector('code')?.innerText;
-      parentDiv.className = 'pre-wrapper';
-      btn.className = 'ag-copy-btn';
-      codeBox.className = 'code-box';
-      btn.innerHTML = '<span title="复制"><i class="apigateway-icon icon-ag-copy-info"></i></span>';
-      btn.setAttribute('data-copy', code);
-      parentDiv?.appendChild(btn);
-      codeBox?.appendChild(item?.querySelector('code'));
-      item?.appendChild(codeBox);
-      item?.parentNode?.replaceChild(parentDiv, item);
-      parentDiv?.appendChild(item);
-    });
+    markdownDom.querySelectorAll('a')
+      .forEach((item: any) => {
+        item.target = '_blank';
+      });
+    markdownDom?.querySelectorAll('pre')
+      ?.forEach((item) => {
+        const parentDiv = document.createElement('div');
+        const btn = document.createElement('button');
+        const codeBox = document.createElement('div');
+        const code = item?.querySelector('code')?.innerText;
+        parentDiv.className = 'pre-wrapper';
+        btn.className = 'ag-copy-btn';
+        codeBox.className = 'code-box';
+        btn.innerHTML = '<span title="复制"><i class="apigateway-icon icon-ag-copy-info"></i></span>';
+        btn.setAttribute('data-copy', code);
+        parentDiv?.appendChild(btn);
+        codeBox?.appendChild(item?.querySelector('code'));
+        item?.appendChild(codeBox);
+        item?.parentNode?.replaceChild(parentDiv, item);
+        parentDiv?.appendChild(item);
+      });
     setTimeout(() => {
       const copyDoms = Array.from(document.getElementsByClassName('ag-copy-btn'));
       const handleCopy = function (this: any) {
@@ -179,6 +183,9 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+$primary-color: #3a84ff;
+$code-bc: #f5f7fa;
+$code-color: #63656e;
 
 .sdk-wrapper {
   padding: 24px 40px;
@@ -186,16 +193,25 @@ watch(
 
 :deep(.bk-button-group) {
   .is-selected {
-    background-color: #F6F9FF !important;
+    background-color: #f6f9ff !important;
   }
 }
 
 :deep(.ag-markdown-view) {
   font-size: 14px;
   text-align: left;
-  color: #63656e;
+  color: $code-color;
   line-height: 19px;
   font-style: normal;
+
+  .pre-wrapper {
+    .ag-copy-btn {
+      right: 12px;
+      top: 12px;
+      background-color: $code-bc;
+      color: $primary-color;
+    }
+  }
 
   h1,
   h2,
@@ -237,7 +253,7 @@ watch(
 
   p {
     font-size: 14px;
-    color: #63656E;
+    color: $code-color;
     line-height: 22px;
     white-space: normal;
     word-break: break-all;
@@ -273,7 +289,7 @@ watch(
   }
 
   a {
-    color: #3A84FF;
+    color: #3a84ff;
   }
 
   tt {
@@ -288,12 +304,12 @@ watch(
 
   table {
     font-size: 14px;
-    color: #63656E;
+    color: $code-color;
     width: 100%;
     text-align: left;
     margin: 10px 0;
     font-style: normal;
-    border: 1px solid #DCDEE5;
+    border: 1px solid #dcdee5;
 
     &.field-list {
       th {
@@ -306,11 +322,11 @@ watch(
     }
 
     th {
-      background: #F0F1F5;
+      background: #f0f1f5;
       font-size: 13px;
       font-weight: bold;
-      color: #63656E;
-      border-bottom: 1px solid #DCDEE5;
+      color: $code-color;
+      border-bottom: 1px solid #dcdee5;
       padding: 10px;
       min-width: 70px;
 
@@ -323,8 +339,8 @@ watch(
     td {
       padding: 10px;
       font-size: 13px;
-      color: #63656E;
-      border-bottom: 1px solid #DCDEE5;
+      color: $code-color;
+      border-bottom: 1px solid #dcdee5;
       max-width: 250px;
       font-style: normal;
       word-break: break-all;
@@ -333,23 +349,39 @@ watch(
 
   pre {
     border-radius: 2px;
-    background: #23241f;
+    background: $code-bc;
     padding: 10px;
     font-size: 14px;
     text-align: left;
-    color: #FFF;
+    color: $code-color;
     line-height: 24px;
     position: relative;
     overflow: auto;
     margin: 14px 0;
 
     code {
-      color: #FFF;
+      font-family: "Lucida Console", "Courier New", "Monaco", monospace;
+      color: $code-color;
     }
 
     .hljs {
       margin: -10px;
     }
+  }
+}
+
+:deep(.code-box) {
+  // 代码块高亮字体颜色
+  .hljs-string {
+    color: #ff9c01;
+  }
+
+  .hljs-keyword {
+    color: #ea3636;
+  }
+
+  .hljs-comment {
+    color: #c4c6cc;
   }
 }
 </style>
