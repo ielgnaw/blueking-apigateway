@@ -97,6 +97,7 @@
                 <bk-button
                   text
                   theme="primary"
+                  @click="isSdkDetailDialogShow = true"
                 >
                   {{ t('查看 SDK') }}
                 </bk-button>
@@ -123,6 +124,7 @@
     </main>
     <!--  SDK使用说明 Slider  -->
     <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
+    <SdkDetailDialog v-model="isSdkDetailDialogShow"></SdkDetailDialog>
   </div>
 </template>
 
@@ -135,6 +137,7 @@ import { useRouter } from 'vue-router';
 import TableEmpty from '@/components/table-empty.vue';
 import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
+import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -172,6 +175,7 @@ const tableEmptyConf = ref<{keyword: string, isAbnormal: boolean}>({
 type TabType = 'apigw' | 'component';
 const curTab = ref<TabType>('apigw');
 const isSdkInstructionSliderShow = ref(false);
+const isSdkDetailDialogShow = ref(false);
 
 const gotoDetails = (data: any) => {
   router.push({
