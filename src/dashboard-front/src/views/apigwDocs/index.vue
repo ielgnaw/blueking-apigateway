@@ -101,13 +101,12 @@
                 >
                   {{ t('查看 SDK') }}
                 </bk-button>
-                <bk-button
-                  text
-                  theme="primary"
-                  class="pl10 pr10"
+                <a
+                  class="ag-link pl10 pr10"
+                  :href="curTab === 'apigw' ? row?.sdk?.url || '' : row?.sdk_download_url || ''"
                 >
                   {{ t('下载 SDK') }}
-                </bk-button>
+                </a>
               </template>
             </bk-table-column>
             <template #empty>
@@ -156,7 +155,7 @@ const {
   handlePageChange,
   handlePageSizeChange,
   getList,
-} = useQueryList(getGatewaysDocs, filterData);
+} = useQueryList(getGatewaysDocs, filterData, null, true);
 
 
 // 当前视口高度能展示最多多少条表格数据
