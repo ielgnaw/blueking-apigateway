@@ -170,7 +170,8 @@
             </article>
           </main>
         </main>
-        <aside class="component-nav-list">
+        <bk-affix :offset-top="128">
+          <aside class="component-nav-list">
           <bk-collapse
             class="collapse-cls"
             v-model="navPanelNamesList"
@@ -202,6 +203,7 @@
             </bk-collapse-panel>
           </bk-collapse>
         </aside>
+        </bk-affix>
       </div>
     </main>
     <!--  SDK使用说明 Slider  -->
