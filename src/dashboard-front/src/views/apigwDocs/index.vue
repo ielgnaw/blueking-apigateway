@@ -1,20 +1,20 @@
 <template>
   <div class="docs-main">
     <header class="page-tabs">
-      <div class="tabs-group">
-        <nav
+      <nav class="tabs-group">
+        <section
           class="page-tab"
           :class="{ 'active': curTab === 'apigw' }"
           @click="curTab = 'apigw'"
         >{{ t('网关 API 文档') }}
-        </nav>
-        <nav
+        </section>
+        <section
           class="page-tab"
           :class="{ 'active': curTab === 'component' }"
           @click="curTab = 'component'"
         >{{ t('组件 API 文档') }}
-        </nav>
-      </div>
+        </section>
+      </nav>
     </header>
     <main class="docs-main-content">
       <!--  当选中 网关API文档 时  -->
@@ -80,16 +80,16 @@
                 :label="t('SDK 包名称')"
                 field="maintainers"
               >
-                <template #default="{ data }">
-                  --
+                <template #default="{ row }">
+                  {{ row?.sdk?.name || '--' }}
                 </template>
               </bk-table-column>
               <bk-table-column
                 :label="t('SDK 最新版本')"
                 field="maintainers"
               >
-                <template #default="{ data }">
-                  --
+                <template #default="{ row }">
+                  {{ row?.sdk?.version || '--' }}
                 </template>
               </bk-table-column>
               <bk-table-column
@@ -154,7 +154,7 @@
             <article class="component-group" v-for="cat in componentCatsList" :key="cat.id">
               <header class="group-title">
                 <span class="name">{{ cat.name }}</span>
-                <span class="count">{{ `(${cat.systems.length })`}}</span>
+                <span class="count">{{ `(${cat.systems.length})` }}</span>
               </header>
               <main class="group-items">
                 <article class="item" v-for="component in cat.systems" :key="component.name">
@@ -170,7 +170,38 @@
             </article>
           </main>
         </main>
-        <aside class="component-nav-list">indexes</aside>
+        <aside class="component-nav-list">
+          <bk-collapse
+            class="collapse-cls"
+            v-model="navPanelNamesList"
+            use-card-theme
+          >
+            <bk-collapse-panel name="internal">
+              <template #header>
+                <div class="panel-header">
+                  <main class="flex-row align-items-center">
+                    <angle-up-fill
+                      :class="[navPanelNamesList.includes('internal') ? 'panel-header-show' : 'panel-header-hide']"
+                    />
+                    <div class="title ml4">
+                      {{ t('内部版') }}
+                    </div>
+                  </main>
+                </div>
+              </template>
+              <template #content>
+                <div class="panel-content">
+                  <article
+                    v-for="cat in componentCatsList"
+                    :key="cat.id"
+                    class="panel-content-cat-item"
+                  >{{ cat.name }}
+                  </article>
+                </div>
+              </template>
+            </bk-collapse-panel>
+          </bk-collapse>
+        </aside>
       </div>
     </main>
     <!--  SDK使用说明 Slider  -->
@@ -199,9 +230,9 @@ import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
 import {
   ICategory,
-  IDefaultSystemRes,
   TabType,
 } from '@/views/apigwDocs/types';
+import { AngleUpFill } from 'bkui-vue/lib/icon';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -238,6 +269,13 @@ const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
 
 // 当前展示的是 网关 | 组件 相关内容
 const curTab = ref<TabType>('apigw');
+const curCategoryId = ref(-1);
+const navPanelNamesList = ref([
+  'internal',
+  'cloud',
+  'IEG-external',
+  'IEG-cloud',
+]);
 
 // 提供当前 tab 的值
 // 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
@@ -362,7 +400,7 @@ $primary-color: #3a84ff;
     }
 
     .content-of-component {
-      padding-bottom: 24px;
+      padding-bottom: 12px;
       display: flex;
 
       .component-list {
@@ -473,11 +511,64 @@ $primary-color: #3a84ff;
             }
           }
         }
-
       }
 
       .component-nav-list {
+        padding-left: 24px;
         width: 187px;
+
+        :deep(.collapse-cls) {
+          .bk-collapse-item {
+            box-shadow: none;
+          }
+        }
+
+        :deep(.bk-collapse-content) {
+          padding: 0 !important;
+          font-size: 14px;
+        }
+
+        .panel-header {
+          padding-left: 9px;
+          padding-bottom: 7px;
+          display: flex;
+          align-items: center;
+          border-left: 1px solid #dcdee5;
+          cursor: pointer;
+
+          .title {
+            height: 22px;
+          }
+
+          .panel-header-show {
+            transition: .2s;
+            transform: rotate(0deg);
+          }
+
+          .panel-header-hide {
+            transition: .2s;
+            transform: rotate(-90deg);
+          }
+        }
+
+        .panel-content {
+
+          .panel-content-cat-item {
+            padding-left: 40px;
+            padding-block: 7px;
+            line-height: 22px;
+            border-left: 1px solid #dcdee5;
+            cursor: pointer;
+
+            &:hover {
+              color: $primary-color;
+            }
+
+            &.active {
+              border-color: $primary-color;
+            }
+          }
+        }
       }
     }
 
