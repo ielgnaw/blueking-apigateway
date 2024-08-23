@@ -1,111 +1,127 @@
 <template>
-  <div class="ag-container">
-    <div class="left">
-      <div class="simple-side-nav">
-        <div class="metedata p0" style="min-height: 60px;">
-          <bk-select
-            class="ag-apigw-select"
-            size="large"
-            v-model="curApigw.name"
-            filterable
-            :input-search="false"
-            :clearable="false"
-            :placeholder="t('请输入关键字')"
-            @change="handleApigwChange">
-            <bk-option
-              v-for="option in apigwList"
-              :key="option.id"
-              :value="option.name"
-              :label="option.name">
-              <div>
-                <span>{{option.name}}</span>
-                <bk-tag theme="success" v-if="option.is_official">
-                  {{ $t('官方') }}
-                </bk-tag>
-              </div>
-            </bk-option>
-          </bk-select>
-        </div>
-        <div class="component-list-box">
-          <p
-            :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
-            @click="handleShowIntro"
-            style="cursor: pointer;">
-            {{ $t('简介') }}
-          </p>
-          <div class="list-data" style="color: #979BA5;">
-            {{ $t('环境') }}:
+  <div class="page-wrap">
+    <header class="page-header">
+      <!-- 默认头部 -->
+      <div class="flex-row align-items-center content-header">
+        <i
+          class="icon apigateway-icon icon-ag-return-small"
+          @click="router.back()"
+        ></i>
+        测试
+<!--        <div class="title-name">-->
+<!--          <span></span>-->
+<!--          <div class="name">测试</div>-->
+<!--        </div>-->
+      </div>
+    </header>
+    <main class="ag-container page-content">
+      <div class="left">
+        <div class="simple-side-nav">
+          <div class="metedata p0" style="min-height: 60px;">
+            <bk-select
+              class="ag-apigw-select"
+              size="large"
+              v-model="curApigw.name"
+              filterable
+              :input-search="false"
+              :clearable="false"
+              :placeholder="t('请输入关键字')"
+              @change="handleApigwChange">
+              <bk-option
+                v-for="option in apigwList"
+                :key="option.id"
+                :value="option.name"
+                :label="option.name">
+                <div>
+                  <span>{{option.name}}</span>
+                  <bk-tag theme="success" v-if="option.is_official">
+                    {{ $t('官方') }}
+                  </bk-tag>
+                </div>
+              </bk-option>
+            </bk-select>
           </div>
-          <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
-          <bk-select
-            v-model="curStageId"
-            style="width: 228px; margin: auto;"
-            class="select-custom"
-            :clearable="false"
-            filterable
-            behavior="simplicity"
-            :input-search="false"
-            @change="handleStageChange">
-            <bk-option
-              v-for="option in stageList"
-              :key="option.id"
-              :value="option.name"
-              :label="option.name">
-            </bk-option>
-          </bk-select>
-          <div class="search">
-            <bk-input
-              :placeholder="searchPlaceholder"
-              type="search"
-              clearable
-              v-model="keyword">
-            </bk-input>
-          </div>
-          <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
-            <template v-for="group of resourceGroup">
-              <bk-collapse-panel
-                v-if="group?.resources?.length"
-                :name="group.labelName"
-                :key="group.labelId">
-                {{group.labelName}}
-                <template #content>
-                  <div>
-                    <ul class="component-list list">
-                      <li
-                        v-for="component of group.resources"
-                        :key="component.name"
-                        :title="component.name"
-                        :class="{ 'active': curComponentName === component.name }"
-                        @click="handleShowDoc(component)">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <p class="label" v-html="hightlight(component.description) || $t('暂无描述')" v-bk-overflow-tips>
-                        </p>
-                      </li>
-                    </ul>
-                  </div>
-                </template>
-              </bk-collapse-panel>
+          <div class="component-list-box">
+            <p
+              :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
+              @click="handleShowIntro"
+              style="cursor: pointer;">
+              {{ $t('简介') }}
+            </p>
+            <div class="list-data" style="color: #979BA5;">
+              {{ $t('环境') }}:
+            </div>
+            <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
+            <bk-select
+              v-model="curStageId"
+              style="width: 228px; margin: auto;"
+              class="select-custom"
+              :clearable="false"
+              filterable
+              behavior="simplicity"
+              :input-search="false"
+              @change="handleStageChange">
+              <bk-option
+                v-for="option in stageList"
+                :key="option.id"
+                :value="option.name"
+                :label="option.name">
+              </bk-option>
+            </bk-select>
+            <div class="search">
+              <bk-input
+                :placeholder="searchPlaceholder"
+                type="search"
+                clearable
+                v-model="keyword">
+              </bk-input>
+            </div>
+            <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
+              <template v-for="group of resourceGroup">
+                <bk-collapse-panel
+                  v-if="group?.resources?.length"
+                  :name="group.labelName"
+                  :key="group.labelId">
+                  {{group.labelName}}
+                  <template #content>
+                    <div>
+                      <ul class="component-list list">
+                        <li
+                          v-for="component of group.resources"
+                          :key="component.name"
+                          :title="component.name"
+                          :class="{ 'active': curComponentName === component.name }"
+                          @click="handleShowDoc(component)">
+                          <!-- eslint-disable-next-line vue/no-v-html -->
+                          <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
+                          <!-- eslint-disable-next-line vue/no-v-html -->
+                          <p class="label" v-html="hightlight(component.description) || $t('暂无描述')" v-bk-overflow-tips>
+                          </p>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </bk-collapse-panel>
+              </template>
+            </bk-collapse>
+            <template v-else-if="keyword">
+              <TableEmpty
+                :keyword="keyword"
+                @clear-filter="keyword = ''"
+              />
             </template>
-          </bk-collapse>
-          <template v-else-if="keyword">
-            <TableEmpty
-              :keyword="keyword"
-              @clear-filter="keyword = ''"
-            />
-          </template>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="right">
-      <bk-loading
-        :loading="mainContentLoading"
-      >
-        <router-view></router-view>
-      </bk-loading>
-    </div>
+      <div class="right">
+        <bk-loading
+          :loading="mainContentLoading"
+        >
+          <router-view></router-view>
+        </bk-loading>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -456,5 +472,46 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-  @import './detail.css';
+@import './detail.css';
+
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  .content-header{
+    display: flex;
+    flex-basis: 52px;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #dcdee5;
+    // box-shadow: 0 3px 4px rgba(64,112,203,0.05882);
+    box-shadow: 0 3px 4px 0 #0000000a;
+    height: 52px;
+    box-sizing: border-box;
+    margin-right: auto;
+    color: #313238;
+    font-size: 16px;
+    .icon-ag-return-small{
+      font-size: 32px;
+      color: #3a84ff;
+      cursor: pointer;
+    }
+    .title-name {
+      display: flex;
+      align-items: center;
+      margin-left: 8px;
+      span {
+        width: 1px;
+        height: 14px;
+        background: #DCDEE5;
+        margin-right: 8px;
+      }
+      .name {
+        font-size: 14px;
+        color: #979BA5;
+      }
+    }
+  }
+}
 </style>
