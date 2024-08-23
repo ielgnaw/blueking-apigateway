@@ -2,17 +2,23 @@
   <div class="page-wrap">
     <header class="page-header">
       <!-- 默认头部 -->
-      <div class="flex-row align-items-center content-header">
+      <main class="flex-row align-items-center header-main">
         <i
           class="icon apigateway-icon icon-ag-return-small"
           @click="router.back()"
         ></i>
         测试
-<!--        <div class="title-name">-->
-<!--          <span></span>-->
-<!--          <div class="name">测试</div>-->
-<!--        </div>-->
-      </div>
+        <!--        <div class="title-name">-->
+        <!--          <span></span>-->
+        <!--          <div class="name">测试</div>-->
+        <!--        </div>-->
+      </main>
+      <aside
+        class="detail-toggle"
+        :class="{ 'active': isAsideVisible }"
+        @click="toggleAsideVisible()"
+      ><i class="apigateway-icon icon-ag-document f14"></i>
+      </aside>
     </header>
     <main class="ag-container page-content">
       <div class="left">
@@ -26,14 +32,16 @@
               :input-search="false"
               :clearable="false"
               :placeholder="t('请输入关键字')"
-              @change="handleApigwChange">
+              @change="handleApigwChange"
+            >
               <bk-option
                 v-for="option in apigwList"
                 :key="option.id"
                 :value="option.name"
-                :label="option.name">
+                :label="option.name"
+              >
                 <div>
-                  <span>{{option.name}}</span>
+                  <span>{{ option.name }}</span>
                   <bk-tag theme="success" v-if="option.is_official">
                     {{ $t('官方') }}
                   </bk-tag>
@@ -45,10 +53,11 @@
             <p
               :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
               @click="handleShowIntro"
-              style="cursor: pointer;">
+              style="cursor: pointer;"
+            >
               {{ $t('简介') }}
             </p>
-            <div class="list-data" style="color: #979BA5;">
+            <div class="list-data" style="color: #979ba5;">
               {{ $t('环境') }}:
             </div>
             <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
@@ -60,12 +69,14 @@
               filterable
               behavior="simplicity"
               :input-search="false"
-              @change="handleStageChange">
+              @change="handleStageChange"
+            >
               <bk-option
                 v-for="option in stageList"
                 :key="option.id"
                 :value="option.name"
-                :label="option.name">
+                :label="option.name"
+              >
               </bk-option>
             </bk-select>
             <div class="search">
@@ -73,7 +84,8 @@
                 :placeholder="searchPlaceholder"
                 type="search"
                 clearable
-                v-model="keyword">
+                v-model="keyword"
+              >
               </bk-input>
             </div>
             <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
@@ -81,8 +93,9 @@
                 <bk-collapse-panel
                   v-if="group?.resources?.length"
                   :name="group.labelName"
-                  :key="group.labelId">
-                  {{group.labelName}}
+                  :key="group.labelId"
+                >
+                  {{ group.labelName }}
                   <template #content>
                     <div>
                       <ul class="component-list list">
@@ -91,11 +104,15 @@
                           :key="component.name"
                           :title="component.name"
                           :class="{ 'active': curComponentName === component.name }"
-                          @click="handleShowDoc(component)">
+                          @click="handleShowDoc(component)"
+                        >
                           <!-- eslint-disable-next-line vue/no-v-html -->
                           <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
                           <!-- eslint-disable-next-line vue/no-v-html -->
-                          <p class="label" v-html="hightlight(component.description) || $t('暂无描述')" v-bk-overflow-tips>
+                          <p
+                            class="label" v-html="hightlight(component.description) || $t('暂无描述')"
+                            v-bk-overflow-tips
+                          >
                           </p>
                         </li>
                       </ul>
@@ -126,15 +143,30 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import {
+  ref,
+  computed,
+  watch,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
-import { getGatewaysDetailsDocs, getApigwStagesDocs, getGatewaysDocs, getApigwResourcesDocs } from '@/http';
+import {
+  useRoute,
+  useRouter,
+} from 'vue-router';
+import {
+  getGatewaysDetailsDocs,
+  getApigwStagesDocs,
+  getGatewaysDocs,
+  getApigwResourcesDocs,
+} from '@/http';
+import { useToggle } from '@vueuse/core';
 import TableEmpty from '@/components/table-empty.vue';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+
+const [isAsideVisible, toggleAsideVisible] = useToggle(false);
 
 const curApigwId = ref<any>(0);
 const curApigw = ref<any>({});
@@ -174,7 +206,10 @@ const resourceGroup = computed(() => {
 
   if (keys.includes('默认')) {
     const list = keys.filter(item => item !== '默认');
-    keys = ['默认', ...list];
+    keys = [
+      '默认',
+      ...list,
+    ];
   }
   for (const key of keys) {
     const resources: any = [];
@@ -419,7 +454,10 @@ const init = async () => {
     behavior: 'smooth',
   });
   getApigwAPI();
-  if (['apigwAPIDetailIntro', 'apigwAPIDetailDoc'].includes(curRoute.name)) {
+  if ([
+    'apigwAPIDetailIntro',
+    'apigwAPIDetailDoc',
+  ].includes(curRoute.name)) {
     await getApigwStages();
     return;
   }
@@ -474,43 +512,75 @@ watch(
 <style lang="scss" scoped>
 @import './detail.css';
 
+//.page-wrap {
+//  height: 100%;
+//}
+
 .page-header {
   position: sticky;
   top: 0;
+  padding-inline: 24px;
+  background: #fff;
+  border-bottom: 1px solid #dcdee5;
+  box-shadow: 0 3px 4px 0 #0000000a;
+  height: 52px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   z-index: 1;
 
-  .content-header{
+  .header-main {
+    flex-grow: 1;
     display: flex;
     flex-basis: 52px;
-    padding: 0 24px;
-    background: #fff;
-    border-bottom: 1px solid #dcdee5;
-    // box-shadow: 0 3px 4px rgba(64,112,203,0.05882);
-    box-shadow: 0 3px 4px 0 #0000000a;
-    height: 52px;
     box-sizing: border-box;
     margin-right: auto;
     color: #313238;
     font-size: 16px;
-    .icon-ag-return-small{
+
+    .icon-ag-return-small {
       font-size: 32px;
       color: #3a84ff;
       cursor: pointer;
     }
+
     .title-name {
       display: flex;
       align-items: center;
       margin-left: 8px;
+
       span {
         width: 1px;
         height: 14px;
-        background: #DCDEE5;
+        background: #dcdee5;
         margin-right: 8px;
       }
+
       .name {
         font-size: 14px;
-        color: #979BA5;
+        color: #979ba5;
       }
+    }
+  }
+
+  .detail-toggle {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    border-radius: 2px;
+    color: #63656E;
+    cursor: pointer;
+
+    &:hover {
+      background: #F0F1F5;
+    }
+
+    &.active {
+      background: #E1ECFF;
+      color: #3A84FF;
     }
   }
 }
