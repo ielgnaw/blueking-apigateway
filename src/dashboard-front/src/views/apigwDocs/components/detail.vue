@@ -20,124 +20,144 @@
       ><i class="apigateway-icon icon-ag-document f14"></i>
       </aside>
     </header>
-    <main class="ag-container page-content">
-      <div class="left">
-        <div class="simple-side-nav">
-          <div class="metedata p0" style="min-height: 60px;">
-            <bk-select
-              class="ag-apigw-select"
-              size="large"
-              v-model="curApigw.name"
-              filterable
-              :input-search="false"
-              :clearable="false"
-              :placeholder="t('请输入关键字')"
-              @change="handleApigwChange"
-            >
-              <bk-option
-                v-for="option in apigwList"
-                :key="option.id"
-                :value="option.name"
-                :label="option.name"
-              >
-                <div>
-                  <span>{{ option.name }}</span>
-                  <bk-tag theme="success" v-if="option.is_official">
-                    {{ $t('官方') }}
-                  </bk-tag>
-                </div>
-              </bk-option>
-            </bk-select>
-          </div>
-          <div class="component-list-box">
-            <p
-              :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
-              @click="handleShowIntro"
-              style="cursor: pointer;"
-            >
-              {{ $t('简介') }}
-            </p>
-            <div class="list-data" style="color: #979ba5;">
-              {{ $t('环境') }}:
-            </div>
-            <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
-            <bk-select
-              v-model="curStageId"
-              style="width: 228px; margin: auto;"
-              class="select-custom"
-              :clearable="false"
-              filterable
-              behavior="simplicity"
-              :input-search="false"
-              @change="handleStageChange"
-            >
-              <bk-option
-                v-for="option in stageList"
-                :key="option.id"
-                :value="option.name"
-                :label="option.name"
-              >
-              </bk-option>
-            </bk-select>
-            <div class="search">
-              <bk-input
-                :placeholder="searchPlaceholder"
-                type="search"
-                clearable
-                v-model="keyword"
-              >
-              </bk-input>
-            </div>
-            <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
-              <template v-for="group of resourceGroup">
-                <bk-collapse-panel
-                  v-if="group?.resources?.length"
-                  :name="group.labelName"
-                  :key="group.labelId"
-                >
-                  {{ group.labelName }}
-                  <template #content>
-                    <div>
-                      <ul class="component-list list">
-                        <li
-                          v-for="component of group.resources"
-                          :key="component.name"
-                          :title="component.name"
-                          :class="{ 'active': curComponentName === component.name }"
-                          @click="handleShowDoc(component)"
-                        >
-                          <!-- eslint-disable-next-line vue/no-v-html -->
-                          <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
-                          <!-- eslint-disable-next-line vue/no-v-html -->
-                          <p
-                            class="label" v-html="hightlight(component.description) || $t('暂无描述')"
-                            v-bk-overflow-tips
-                          >
-                          </p>
-                        </li>
-                      </ul>
+    <main class="page-content">
+      <bk-resize-layout
+        placement="right"
+        :border="false"
+        collapsible
+        style="height: 800px; flex-grow: 1;"
+      >
+        <template #main>
+          <bk-resize-layout
+            placement="left"
+            style="height: 800px"
+            initial-divide="280px"
+            :border="false"
+          >
+            <template #aside>
+              <div class="left pr8">
+                <div class="simple-side-nav">
+                  <div class="metedata p0" style="min-height: 60px;">
+                    <bk-select
+                      class="ag-apigw-select"
+                      size="large"
+                      v-model="curApigw.name"
+                      filterable
+                      :input-search="false"
+                      :clearable="false"
+                      :placeholder="t('请输入关键字')"
+                      @change="handleApigwChange"
+                    >
+                      <bk-option
+                        v-for="option in apigwList"
+                        :key="option.id"
+                        :value="option.name"
+                        :label="option.name"
+                      >
+                        <div>
+                          <span>{{ option.name }}</span>
+                          <bk-tag theme="success" v-if="option.is_official">
+                            {{ $t('官方') }}
+                          </bk-tag>
+                        </div>
+                      </bk-option>
+                    </bk-select>
+                  </div>
+                  <div class="component-list-box">
+                    <p
+                      :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
+                      @click="handleShowIntro"
+                      style="cursor: pointer;"
+                    >
+                      {{ $t('简介') }}
+                    </p>
+                    <div class="list-data" style="color: #979ba5;">
+                      {{ $t('环境') }}:
                     </div>
-                  </template>
-                </bk-collapse-panel>
-              </template>
-            </bk-collapse>
-            <template v-else-if="keyword">
-              <TableEmpty
-                :keyword="keyword"
-                @clear-filter="keyword = ''"
-              />
+                    <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
+                    <bk-select
+                      v-model="curStageId"
+                      style="width: 228px; margin: auto;"
+                      class="select-custom"
+                      :clearable="false"
+                      filterable
+                      behavior="simplicity"
+                      :input-search="false"
+                      @change="handleStageChange"
+                    >
+                      <bk-option
+                        v-for="option in stageList"
+                        :key="option.id"
+                        :value="option.name"
+                        :label="option.name"
+                      >
+                      </bk-option>
+                    </bk-select>
+                    <div class="search">
+                      <bk-input
+                        :placeholder="searchPlaceholder"
+                        type="search"
+                        clearable
+                        v-model="keyword"
+                      >
+                      </bk-input>
+                    </div>
+                    <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
+                      <template v-for="group of resourceGroup">
+                        <bk-collapse-panel
+                          v-if="group?.resources?.length"
+                          :name="group.labelName"
+                          :key="group.labelId"
+                        >
+                          {{ group.labelName }}
+                          <template #content>
+                            <div>
+                              <ul class="component-list list">
+                                <li
+                                  v-for="component of group.resources"
+                                  :key="component.name"
+                                  :title="component.name"
+                                  :class="{ 'active': curComponentName === component.name }"
+                                  @click="handleShowDoc(component)"
+                                >
+                                  <!-- eslint-disable-next-line vue/no-v-html -->
+                                  <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
+                                  <!-- eslint-disable-next-line vue/no-v-html -->
+                                  <p
+                                    class="label" v-html="hightlight(component.description) || $t('暂无描述')"
+                                    v-bk-overflow-tips
+                                  >
+                                  </p>
+                                </li>
+                              </ul>
+                            </div>
+                          </template>
+                        </bk-collapse-panel>
+                      </template>
+                    </bk-collapse>
+                    <template v-else-if="keyword">
+                      <TableEmpty
+                        :keyword="keyword"
+                        @clear-filter="keyword = ''"
+                      />
+                    </template>
+                  </div>
+                </div>
+              </div>
             </template>
-          </div>
-        </div>
-      </div>
-
-      <div class="right">
-        <bk-loading
-          :loading="mainContentLoading"
-        >
-          <router-view></router-view>
-        </bk-loading>
-      </div>
+            <template #main>
+              <div class="right">
+                <bk-loading
+                  :loading="mainContentLoading"
+                >
+                  <router-view></router-view>
+                </bk-loading>
+              </div>
+            </template>
+          </bk-resize-layout>
+        </template>
+        <template #aside>右侧slider</template>
+      </bk-resize-layout>
     </main>
   </div>
 </template>
@@ -571,17 +591,43 @@ watch(
     align-items: center;
     background: #fff;
     border-radius: 2px;
-    color: #63656E;
+    color: #63656e;
     cursor: pointer;
 
     &:hover {
-      background: #F0F1F5;
+      background: #f0f1f5;
     }
 
     &.active {
-      background: #E1ECFF;
-      color: #3A84FF;
+      background: #e1ecff;
+      color: #3a84ff;
     }
+  }
+}
+
+.page-content {
+  display: flex;
+  margin: 16px auto 20px auto;
+  align-items: stretch;
+
+  .simple-side-nav {
+    min-width: 280px;
+    width: auto;
+  }
+
+  // 去掉左侧伸缩栏的拉伸线
+  :deep(.bk-resize-layout-left>.bk-resize-layout-aside) {
+    border-right: none;
+  }
+
+  // 去掉右侧伸缩栏的拉伸线
+  :deep(.bk-resize-layout-right>.bk-resize-layout-aside) {
+    border-left: none;
+  }
+
+  // 隐藏的折叠按钮
+  :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
+    display: none !important;
   }
 }
 </style>
