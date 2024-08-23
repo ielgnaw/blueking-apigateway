@@ -1,5 +1,5 @@
 <template>
-  <div class="docs-main">
+  <div class="docs-main" ref="docsMain">
     <header class="page-tabs">
       <nav class="tabs-group">
         <section
@@ -127,82 +127,97 @@
       </div>
       <!--  当选中 组件API文档 时  -->
       <div v-else-if="curTab === 'component'" class="content-of-component">
-        <main class="component-list">
-          <header class="top-bar">
-            <main class="bar-title">
-              <span class="title">内部版</span>
-              <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
-                <i class="apigateway-icon icon-ag-document f14"></i>
-                {{ t('查看 SDK') }}
-              </bk-link>
-              <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
-                <i class="apigateway-icon icon-ag-download f14"></i>
-                {{ t('下载 SDK') }}
-              </bk-link>
-            </main>
-            <aside>
-              <bk-input
-                type="search"
-                :placeholder="t('搜索内部版组件')"
-                v-model="filterData.keyword"
-                clearable
-                style="width: 320px"
-              />
-            </aside>
-          </header>
-          <main class="components-wrap">
-            <article class="component-group" v-for="cat in componentCatsList" :key="cat.id">
-              <header class="group-title">
-                <span class="name">{{ cat.name }}</span>
-                <span class="count">{{ `(${cat.systems.length})` }}</span>
-              </header>
-              <main class="group-items">
-                <article class="item" v-for="component in cat.systems" :key="component.name">
-                  <main class="title">
-                    <div class="name">{{ component.description }}</div>
-                    <div class="name-en">{{ component.name }}</div>
-                  </main>
-                  <aside class="background-image">
-                    <i class="apigateway-icon icon-ag-component-intro"></i>
-                  </aside>
-                </article>
+        <main class="category-list">
+          <article class="category-wrap" v-for="system in componentSystemList" :key="system.board">
+            <!--  system 类别 title 和搜索栏  -->
+            <header class="top-bar">
+              <main class="bar-title">
+                <span class="title">{{ system.board_label }}</span>
+                <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
+                  <i class="apigateway-icon icon-ag-document f14"></i>
+                  {{ t('查看 SDK') }}
+                </bk-link>
+                <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
+                  <i class="apigateway-icon icon-ag-download f14"></i>
+                  {{ t('下载 SDK') }}
+                </bk-link>
               </main>
-            </article>
-          </main>
+              <aside>
+                <bk-input
+                  type="search"
+                  :placeholder="t('搜索内部版组件')"
+                  v-model="filterData.keyword"
+                  clearable
+                  style="width: 320px"
+                />
+              </aside>
+            </header>
+            <!--  组件  -->
+            <main class="components-wrap">
+              <!--  组件分类  -->
+              <article
+                class="component-group"
+                v-for="cat in system.categories"
+                :key="cat.id"
+                :data-_nav-id="`${system.board}-${cat.id}`"
+                :ref="catRefs.set"
+              >
+                <header class="group-title">
+                  <span class="name">{{ cat.name }}</span>
+                  <span class="count">{{ `(${cat.systems.length})` }}</span>
+                </header>
+                <!--  分类中的组件卡片  -->
+                <main class="group-items">
+                  <article class="item" v-for="component in cat.systems" :key="component.name">
+                    <main class="title">
+                      <div class="name">{{ component.description }}</div>
+                      <div class="name-en">{{ component.name }}</div>
+                    </main>
+                    <aside class="background-image">
+                      <i class="apigateway-icon icon-ag-component-intro"></i>
+                    </aside>
+                  </article>
+                </main>
+              </article>
+            </main>
+          </article>
         </main>
+        <!--  右侧导航目录  -->
         <bk-affix :offset-top="128">
           <aside class="component-nav-list">
-          <bk-collapse
-            class="collapse-cls"
-            v-model="navPanelNamesList"
-            use-card-theme
-          >
-            <bk-collapse-panel name="internal">
-              <template #header>
-                <div class="panel-header">
-                  <main class="flex-row align-items-center">
-                    <angle-up-fill
-                      :class="[navPanelNamesList.includes('internal') ? 'panel-header-show' : 'panel-header-hide']"
-                    />
-                    <div class="title ml4">
-                      {{ t('内部版') }}
-                    </div>
-                  </main>
-                </div>
-              </template>
-              <template #content>
-                <div class="panel-content">
-                  <article
-                    v-for="cat in componentCatsList"
-                    :key="cat.id"
-                    class="panel-content-cat-item"
-                  >{{ cat.name }}
-                  </article>
-                </div>
-              </template>
-            </bk-collapse-panel>
-          </bk-collapse>
-        </aside>
+            <bk-collapse
+              class="collapse-cls"
+              v-model="navPanelNamesList"
+              use-card-theme
+            >
+              <bk-collapse-panel v-for="system in componentSystemList" :key="system.board" :name="system.board">
+                <template #header>
+                  <div class="panel-header">
+                    <main class="flex-row align-items-center">
+                      <angle-up-fill
+                        :class="[navPanelNamesList.includes(system.board) ? 'panel-header-show' : 'panel-header-hide']"
+                      />
+                      <div class="title ml4">
+                        {{ system.board_label }}
+                      </div>
+                    </main>
+                  </div>
+                </template>
+                <template #content>
+                  <nav class="panel-content">
+                    <article
+                      v-for="cat in system.categories"
+                      :key="cat.id"
+                      class="panel-content-cat-item"
+                      :class="{ 'active': curCatNavId === cat._navId }"
+                      @click="handleNavClick(cat)"
+                    >{{ cat.name }}
+                    </article>
+                  </nav>
+                </template>
+              </bk-collapse-panel>
+            </bk-collapse>
+          </aside>
         </bk-affix>
       </div>
     </main>
@@ -232,9 +247,14 @@ import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
 import {
   ICategory,
+  ISystem,
   TabType,
 } from '@/views/apigwDocs/types';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
+import { cloneDeep } from 'lodash';
+import {
+  useTemplateRefsList,
+} from '@vueuse/core';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -271,13 +291,10 @@ const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
 
 // 当前展示的是 网关 | 组件 相关内容
 const curTab = ref<TabType>('apigw');
-const curCategoryId = ref(-1);
-const navPanelNamesList = ref([
-  'internal',
-  'cloud',
-  'IEG-external',
-  'IEG-cloud',
-]);
+const curCatNavId = ref('');
+const navPanelNamesList = ref<string[]>([]);
+
+const catRefs = useTemplateRefsList<HTMLElement>();
 
 // 提供当前 tab 的值
 // 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
@@ -318,14 +335,40 @@ const updateTableEmptyConfig = () => {
   tableEmptyConf.value.keyword = '';
 };
 
-const componentCatsList = ref<ICategory[]>([]);
+const componentSystemList = ref<ISystem[]>([]);
 
 const fetchComponentList = async () => {
   try {
-    const res = await getComponentSystemList('default');
-    componentCatsList.value = res[0]?.categories ?? [];
+    const res = await getComponentSystemList('default') as ISystem[];
+    res.forEach((system) => {
+      // 给组件分类添加一个跳转用的 _navId
+      system.categories.forEach((cat) => {
+        cat._navId = `${system.board}-${cat.id}`;
+      });
+
+      const system2 = cloneDeep(system);
+      system2.board = `${system2.board}-test`;
+      system2.board_label = `${system2.board_label}-test`;
+      system2.categories.forEach((cat) => {
+        cat._navId = `${system2.board}-${cat.id}`;
+      });
+
+      componentSystemList.value.push(system);
+      componentSystemList.value.push(system2);
+      navPanelNamesList.value.push(system.board);
+      navPanelNamesList.value.push(system2.board);
+    });
   } catch {
-    componentCatsList.value = [];
+    componentSystemList.value = [];
+  }
+};
+
+const handleNavClick = (cat: ICategory) => {
+  const { _navId } = cat;
+  curCatNavId.value = _navId;
+  const catRef = catRefs.value.find(item => item.dataset?._navId === _navId);
+  if (catRef?.scrollIntoView) {
+    catRef.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
@@ -352,11 +395,14 @@ $primary-color: #3a84ff;
   .page-tabs {
     height: 52px;
     margin-bottom: 24px;
+    position: sticky;
+    top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #fff;
     box-shadow: 0 3px 4px 0 #0000000a;
+    z-index: 1;
 
     .tabs-group {
       display: flex;
@@ -405,107 +451,112 @@ $primary-color: #3a84ff;
       padding-bottom: 12px;
       display: flex;
 
-      .component-list {
+      .category-list {
         width: 1000px;
 
-        .top-bar {
-          margin-bottom: 16px;
-          height: 32px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+        .category-wrap {
+          margin-bottom: 4px;
 
-          .bar-title {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-
-            .title {
-              font-weight: 700;
-              font-size: 16px;
-              color: #313238;
-              letter-spacing: 0;
-              line-height: 24px;
-            }
-          }
-        }
-
-        .components-wrap {
-          .component-group {
+          .top-bar {
             margin-bottom: 16px;
+            height: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
-            .group-title {
-              padding-inline: 16px;
-              margin-bottom: 16px;
-              height: 32px;
+            .bar-title {
               display: flex;
               align-items: center;
-              border-radius: 2px;
-              background: #eaebf0;
+              gap: 24px;
 
-              .name {
-                margin-right: 8px;
-                font-size: 14px;
+              .title {
+                font-weight: 700;
+                font-size: 16px;
                 color: #313238;
-              }
-
-              .count {
-                color: #979ba5;
+                letter-spacing: 0;
+                line-height: 24px;
               }
             }
+          }
 
-            .group-items {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 16px;
+          .components-wrap {
+            .component-group {
+              margin-bottom: 16px;
+              scroll-margin-top: 68px;
 
-              .item {
-                position: relative;
-                padding: 16px;
-                width: 238px;
-                height: 80px;
-                background: #fff;
-                box-shadow: 0 2px 4px 0 #1919290d;
+              .group-title {
+                padding-inline: 16px;
+                margin-bottom: 16px;
+                height: 32px;
+                display: flex;
+                align-items: center;
                 border-radius: 2px;
-                transition: box-shadow .2s ease-in-out;
+                background: #eaebf0;
 
-                .title {
-                  .name, .name-en {
-                    font-size: 14px;
-                    letter-spacing: 0;
-                    line-height: 22px;
-                  }
-
-                  .name {
-                    margin-bottom: 5px;
-                    color: #313238;
-                    transition: color .2s ease-in-out;
-                  }
-
-                  .name-en {
-                    color: #c4c6cc;
-                  }
+                .name {
+                  margin-right: 8px;
+                  font-size: 14px;
+                  color: #313238;
                 }
 
-                .background-image {
-                  position: absolute;
-                  top: 20px;
-                  right: 16px;
-                  width: 40px;
-                  height: 40px;
-                  display: flex;
-                  align-items: center;
-                  font-size: 40px;
-                  color: #f0f5ff;
+                .count {
+                  color: #979ba5;
                 }
+              }
 
-                &:hover {
-                  box-shadow: 0 2px 4px 0 #0000001a, 0 2px 4px 0 #1919290d;
-                  cursor: pointer;
+              .group-items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 16px;
+
+                .item {
+                  position: relative;
+                  padding: 16px;
+                  width: 238px;
+                  height: 80px;
+                  background: #fff;
+                  box-shadow: 0 2px 4px 0 #1919290d;
+                  border-radius: 2px;
+                  transition: box-shadow .2s ease-in-out;
 
                   .title {
+                    .name, .name-en {
+                      font-size: 14px;
+                      letter-spacing: 0;
+                      line-height: 22px;
+                    }
+
                     .name {
-                      color: $primary-color;
+                      margin-bottom: 5px;
+                      color: #313238;
+                      transition: color .2s ease-in-out;
+                    }
+
+                    .name-en {
+                      color: #c4c6cc;
+                    }
+                  }
+
+                  .background-image {
+                    position: absolute;
+                    top: 20px;
+                    right: 16px;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    font-size: 40px;
+                    color: #f0f5ff;
+                  }
+
+                  &:hover {
+                    box-shadow: 0 2px 4px 0 #0000001a, 0 2px 4px 0 #1919290d;
+                    cursor: pointer;
+
+                    .title {
+                      .name {
+                        color: $primary-color;
+                      }
                     }
                   }
                 }

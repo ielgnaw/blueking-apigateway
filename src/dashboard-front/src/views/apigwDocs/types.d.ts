@@ -27,7 +27,7 @@ interface ISdkObject {
   released_stages: any[];
 }
 
-interface IDefaultSystemRes {
+interface ISystem {
   board: string;
   board_label: string;
   categories: ICategory[];
@@ -37,6 +37,7 @@ interface ICategory {
   id: string;
   name: string;
   systems: IComponent[];
+  _navId?: string;
 }
 
 interface IComponent {
@@ -52,7 +53,7 @@ export {
   ISdk,
   IResourceVersion,
   ISdkObject,
-  IDefaultSystemRes,
+  ISystem,
   ICategory,
   IComponent,
 };
