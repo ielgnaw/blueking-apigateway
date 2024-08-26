@@ -30,78 +30,59 @@
         <template #main>
           <bk-resize-layout
             placement="left"
-            style="height: 800px"
-            initial-divide="280px"
+            style="height: 800px;margin-left: 40px;"
+            initial-divide="288px"
             :border="false"
           >
             <template #aside>
               <div class="left pr8">
                 <div class="simple-side-nav">
-                  <div class="metedata p0" style="min-height: 60px;">
-                    <bk-select
-                      class="ag-apigw-select"
-                      size="large"
-                      v-model="curApigw.name"
-                      filterable
-                      :input-search="false"
-                      :clearable="false"
-                      :placeholder="t('请输入关键字')"
-                      @change="handleApigwChange"
-                    >
-                      <bk-option
-                        v-for="option in apigwList"
-                        :key="option.id"
-                        :value="option.name"
-                        :label="option.name"
-                      >
-                        <div>
-                          <span>{{ option.name }}</span>
-                          <bk-tag theme="success" v-if="option.is_official">
-                            {{ $t('官方') }}
-                          </bk-tag>
-                        </div>
-                      </bk-option>
-                    </bk-select>
-                  </div>
-                  <div class="component-list-box">
-                    <p
-                      :class="['span', { 'active': routeName === 'apigwAPIDetailIntro' }]"
-                      @click="handleShowIntro"
-                      style="cursor: pointer;"
-                    >
-                      {{ $t('简介') }}
-                    </p>
-                    <div class="list-data" style="color: #979ba5;">
-                      {{ $t('环境') }}:
-                    </div>
-                    <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
-                    <bk-select
-                      v-model="curStageId"
-                      style="width: 228px; margin: auto;"
-                      class="select-custom"
-                      :clearable="false"
-                      filterable
-                      behavior="simplicity"
-                      :input-search="false"
-                      @change="handleStageChange"
-                    >
-                      <bk-option
-                        v-for="option in stageList"
-                        :key="option.id"
-                        :value="option.name"
-                        :label="option.name"
-                      >
-                      </bk-option>
-                    </bk-select>
-                    <div class="search">
-                      <bk-input
-                        :placeholder="searchPlaceholder"
-                        type="search"
-                        clearable
-                        v-model="keyword"
-                      >
-                      </bk-input>
-                    </div>
+                  <header class="side-nav-header">
+                    <header class="title">
+                      {{ t('资源列表') }}
+                      <aside class="sub-title">19</aside>
+                    </header>
+                    <main class="nav-filters">
+                      <article>
+                        <bk-select
+                          v-model="curStageId"
+                          style=""
+                          :clearable="false"
+                          filterable
+                          :input-search="false"
+                          :prefix="t('环境')"
+                          @change="handleStageChange"
+                        >
+                          <bk-option
+                            v-for="option in stageList"
+                            :key="option.id"
+                            :value="option.name"
+                            :label="option.name"
+                          >
+                          </bk-option>
+                        </bk-select>
+                      </article>
+                      <article>
+                        <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
+                        <bk-input
+                          :placeholder="searchPlaceholder"
+                          type="search"
+                          clearable
+                          v-model="keyword"
+                        >
+                        </bk-input>
+                      </article>
+                    </main>
+                  </header>
+                  <main class="resource-list">
+                    <article class="resource-item">
+                      <header class="res-item-name">get_all_ad_groups</header>
+                      <main class="res-item-desc">获取所有的邮件列表</main>
+                    </article>
+                    <article class="resource-item">
+                      <header class="res-item-name">get_all_ad_groups</header>
+                      <main class="res-item-desc">获取所有的邮件列表</main>
+                    </article>
                     <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
                       <template v-for="group of resourceGroup">
                         <bk-collapse-panel
@@ -141,7 +122,7 @@
                         @clear-filter="keyword = ''"
                       />
                     </template>
-                  </div>
+                  </main>
                 </div>
               </div>
             </template>
@@ -613,10 +594,77 @@ watch(
   .simple-side-nav {
     min-width: 280px;
     width: auto;
+
+    .side-nav-header {
+      padding: 16px 24px 12px;
+
+      .title {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #313238;
+        letter-spacing: 0;
+        line-height: 22px;
+
+        .sub-title {
+          margin-left: 8px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 30px;
+          height: 16px;
+          background: #f0f1f5;
+          border-radius: 2px;
+          font-size: 12px;
+          color: #979ba5;
+        }
+      }
+
+      .nav-filters {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    .resource-list {
+      .resource-item {
+        padding-left: 24px;
+        height: 52px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #ffffff;
+        cursor: pointer;
+
+        .res-item-name {
+          font-size: 14px;
+          color: #313238;
+          letter-spacing: 0;
+          line-height: 22px;
+        }
+
+        .res-item-desc {
+          font-size: 12px;
+          color: #979ba5;
+          letter-spacing: 0;
+          line-height: 20px;
+        }
+
+        &:hover, &.active {
+          background: #e1ecff;
+          .res-item-name {
+            color: #3A84FF;
+          }
+        }
+      }
+    }
   }
 
   // 去掉左侧伸缩栏的拉伸线
   :deep(.bk-resize-layout-left>.bk-resize-layout-aside) {
+    padding-right: 8px;
     border-right: none;
   }
 
