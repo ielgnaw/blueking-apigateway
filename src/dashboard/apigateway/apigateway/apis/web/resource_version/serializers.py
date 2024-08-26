@@ -16,8 +16,11 @@
 # We undertake not to change the open source license (MIT license) applicable
 # to the current version of the project delivered to anyone in the future.
 #
+import copy
+
 from rest_framework import serializers
 
+from apigateway.apis.web.constants import PLUGIN_MERGE_TYPE
 from apigateway.apps.plugin.constants import PluginBindingScopeEnum
 from apigateway.biz.constants import SEMVER_PATTERN
 from apigateway.biz.validators import ResourceVersionValidator
@@ -78,16 +81,24 @@ class ResourceInfoSLZ(serializers.Serializer):
         return proxy
 
     def get_plugins(self, obj):
-        plugins = self.context.get("stage_plugins", {})
-
+        plugins = copy.deepcopy(self.context.get("stage_plugins", {}))
         # v2 才有plugin数据
         if not self.context["is_schema_v2"]:
             return list(plugins.values())
 
-        # 资源绑定插件覆盖环境绑定插件
+        # 如果类型是merge， 同一个类型的环境 + 资源插件将会同时存在
+        # 如果类型是override， 同一个类型的环境插件将会被资源插件覆盖
+        rules = PLUGIN_MERGE_TYPE
+
+        # 根据 rules 配置确定是否资源插件配置覆盖环境插件配置
         for plugin in obj.get("plugins", []):
-            plugin["binding_type"] = PluginBindingScopeEnum.RESOURCE.value
-            plugins[plugin["type"]] = plugin
+            plugin_type = plugin["type"]
+            if rules.get(plugin_type, "") == "merge":
+                plugin["binding_type"] = PluginBindingScopeEnum.RESOURCE.value
+                plugins[f"{plugin_type}:resource"] = plugin
+            else:
+                plugin["binding_type"] = PluginBindingScopeEnum.RESOURCE.value
+                plugins[plugin_type] = plugin
 
         return list(plugins.values())
 

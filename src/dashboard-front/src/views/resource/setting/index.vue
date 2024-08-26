@@ -240,11 +240,13 @@
                     @click="handleEditLabel(row)"
                     class="icon apigateway-icon icon-ag-edit-small edit-icon"></i>
                 </span>
-                <section style="position: absolute;" v-else>
+                <section ref="selectCheckBoxParentRef" v-else>
                   <SelectCheckBox
                     :cur-select-label-ids="curLabelIds"
                     :resource-id="resourceId"
                     :labels-data="labelsData"
+                    :width="selectCheckBoxParentRef?.offsetWidth"
+                    force-focus
                     @close="handleCloseSelect"
                     @update-success="handleUpdateLabelSuccess"
                     @label-add-success="getLabelsData"></SelectCheckBox>
@@ -443,23 +445,13 @@
     </bk-dialog>
 
     <!-- 文档侧边栏 -->
-    <bk-sideslider
-      v-model:isShow="docSliderConf.isShowDocSide"
-      quick-close
+    <ResourceDocSideSlider
+      v-model="docSliderConf.isShowDocSide"
+      :resource="curResource"
       :title="docSliderConf.title"
-      width="780"
-      ext-cls="doc-sideslider-cls doc-sides">
-      <template #default>
-        <ResourcesDoc
-          :cur-resource="curResource"
-          @fetch="handleSuccess"
-          source="side"
-          doc-root-class="doc-sideslider"
-          @on-update="handleUpdateTitle">
-        </ResourcesDoc>
-      </template>
-    </bk-sideslider>
-
+      @fetch="handleSuccess"
+      @on-update="handleUpdateTitle"
+    ></ResourceDocSideSlider>
     <!-- 生成版本 -->
     <version-sideslider ref="versionSidesliderRef" @done="mitt.emit('on-update-plugin');" />
   </div>
@@ -491,6 +483,7 @@ import mitt from '@/common/event-bus';
 import { IDialog, IDropList, MethodsEnum } from '@/types';
 import { is24HoursAgo } from '@/common/util';
 import {  useCommon, useResourceVersion } from '@/store';
+import ResourceDocSideSlider from '@/views/components/resource-doc-slider/index.vue';
 
 const props = defineProps({
   apigwId: {
@@ -549,6 +542,7 @@ const tableEmptyConf = ref<TableEmptyConfType>({
 
 // ref
 const versionSidesliderRef = ref(null);
+const selectCheckBoxParentRef = ref(null);
 // 导出参数
 const exportParams: IexportParams = reactive({
   export_type: '',

@@ -40,12 +40,18 @@
           <div class="response-main">
             <div class="response-content-type flex" v-show="tabActive === 'body'">
               <div class="payload-type">
-                <div class="payload-type-item">
-                  <span class="icon apigateway-icon icon-ag-menu"></span>
+                <div
+                  :class="['payload-type-item', bodyType === 'pretty' ? 'active' : '']"
+                  @click="handleBodyTypeChange('pretty')"
+                >
+                  <span class="icon apigateway-icon icon-ag-cardd"></span>
                   Pretty
                 </div>
-                <div class="payload-type-item active">
-                  <span class="icon apigateway-icon icon-ag-menu"></span>
+                <div
+                  :class="['payload-type-item', bodyType === 'raw' ? 'active' : '']"
+                  @click="handleBodyTypeChange('raw')"
+                >
+                  <span class="icon apigateway-icon icon-ag-shitu-liebiao"></span>
                   Raw
                 </div>
               </div>
@@ -67,11 +73,11 @@
             <div class="response-content-type flex" v-show="tabActive === 'detail'">
               <div class="payload-type">
                 <div class="payload-type-item active">
-                  <span class="icon apigateway-icon icon-ag-menu"></span>
+                  <span class="icon apigateway-icon icon-ag-shell"></span>
                   Shell
                 </div>
                 <div class="payload-type-item">
-                  <span class="icon apigateway-icon icon-ag-menu"></span>
+                  <span class="icon apigateway-icon icon-ag-python"></span>
                   Python
                 </div>
               </div>
@@ -90,18 +96,17 @@
                 />
               </bk-select>
             </div>
-            <div class="response-content" id="response-content">
-              <div class="response-editor-box">
-                <editor-monaco
-                  v-model="editorText"
-                  theme="Visual Studio"
-                  ref="resourceEditorRef"
-                  :minimap="false"
-                  :show-copy="true"
-                  :show-full-screen="true"
-                  :read-only="true"
-                />
-              </div>
+            <div class="response-content">
+              <editor-monaco
+                v-model="editorText"
+                theme="Visual Studio"
+                ref="resourceEditorRef"
+                language="json"
+                :minimap="false"
+                :show-copy="true"
+                :show-full-screen="true"
+                :read-only="true"
+              />
             </div>
           </div>
         </template>
@@ -111,7 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
 import { useI18n } from 'vue-i18n';
 import editorMonaco from '@/components/ag-editor.vue';
@@ -124,6 +129,8 @@ const props = defineProps({
     default: {},
   },
 });
+
+const emit = defineEmits(['response-fold']);
 
 const activeIndex = ref<number[]>([]);
 const tabActive = ref<string>('body');
@@ -146,6 +153,7 @@ const bodyTypeList = ref([
     label: 'TEXT',
   },
 ]);
+const bodyType = ref<string>('pretty');
 const detailsType = ref<string>('cURL');
 const detailsTypeList = ref([
   {
@@ -161,6 +169,29 @@ const stopPropa = (e: Event) => {
   e?.stopPropagation();
 };
 
+const formatBody = () => {
+  resourceEditorRef.value?.updateOptions({
+    readOnly: false,
+  });
+  setTimeout(() => {
+    resourceEditorRef.value?.handleFormat();
+  });
+  setTimeout(() => {
+    resourceEditorRef.value?.updateOptions({
+      readOnly: true,
+    });
+  }, 200);
+};
+
+const handleBodyTypeChange = (type: string) => {
+  bodyType.value = type;
+  if (type === 'pretty') {
+    formatBody();
+  } else {
+    setEditorValue();
+  }
+};
+
 const setEditorValue = () => {
   if (tabActive.value === 'body') {
     editorText.value = data.value?.body || '';
@@ -168,29 +199,11 @@ const setEditorValue = () => {
     editorText.value = data.value?.curl || '';
   }
   resourceEditorRef.value?.setValue(editorText.value);
+  if (tabActive.value === 'body' && bodyType.value === 'pretty') {
+    formatBody();
+  }
   activeIndex.value = [1];
 };
-
-const setHeight = () => {
-  const element = document.getElementById('response-content');
-
-  const resizeObserver = new ResizeObserver((entries: any) => {
-    for (const entry of entries) {
-      const { contentRect } = entry;
-
-      const box: any = document.querySelector('.response-editor-box');
-      if (box) {
-        box.style.height = `${contentRect?.height}px`;
-      }
-    }
-  });
-
-  resizeObserver.observe(element);
-};
-
-onMounted(() => {
-  setHeight();
-});
 
 watch(
   () => tabActive.value,
@@ -205,6 +218,15 @@ watch(
     data.value = v || {};
     tabActive.value = 'body';
     setEditorValue();
+  },
+);
+
+watch(
+  () => activeIndex.value,
+  (v) => {
+    if (!v?.includes(1)) {
+      emit('response-fold');
+    }
   },
 );
 
@@ -264,9 +286,8 @@ watch(
   }
   .response-main {
     padding-bottom: 15px;
-    display: flex;
-    flex-direction: column;
     height: 100%;
+    box-sizing: border-box;
     .response-content-type {
       margin-bottom: 12px;
       .payload-type {
@@ -274,16 +295,11 @@ watch(
       }
     }
     .response-content {
-      flex: 1;
+      height: calc(100% - 44px);
       overflow: hidden;
       background: #FFFFFF;
       border: 1px solid #DCDEE5;
       border-radius: 2px;
-      .response-editor-box {
-        height: 100%;
-        min-height: 100px;
-        max-height: 70vh;
-      }
     }
   }
   .bk-collapse-response {
@@ -293,8 +309,7 @@ watch(
     }
     :deep(.bk-collapse-content) {
       padding: 0;
-      // flex: 1;
-      height: calc(100% - 72px);
+      height: calc(100% - 256px);
     }
   }
 }

@@ -221,3 +221,118 @@ class TestResourceVersionRetrieveOutputSLZ:
             "created_by": fake_resource_version_v2.created_by,
         }
         assert slz.data == expected_data
+
+    def test_to_representation_v2_with_resources(
+        self,
+        fake_backend,
+        fake_stage,
+        fake_gateway,
+        fake_resource2,
+        echo_plugin_resource_binding,
+        fake_resource_version_v2,
+        echo_plugin_stage_binding,
+    ):
+        stage_plugin_bindings = PluginBindingHandler.get_stage_plugin_bindings(fake_gateway.id, fake_stage.id)
+        stage_plugins = {}
+        for plugin_type, plugin_binding in stage_plugin_bindings.items():
+            plugin_config = plugin_binding.snapshot()
+            plugin_config["binding_type"] = PluginBindingScopeEnum.STAGE.value
+            stage_plugins[plugin_type] = plugin_config
+        slz = serializers.ResourceVersionRetrieveOutputSLZ(
+            instance=fake_resource_version_v2,
+            context={
+                "resource_backends": BackendHandler.get_id_to_instance(fake_gateway.id),
+                "resource_backend_configs": BackendHandler.get_backend_configs_by_stage(
+                    fake_gateway.id, fake_stage.id
+                ),
+                "is_schema_v2": fake_resource_version_v2.is_schema_v2,
+                "stage_plugins": stage_plugins,
+                "resource_doc_updated_time": {},
+            },
+        )
+        for resource in slz.data["resources"]:
+            if resource["name"] == fake_resource2.name:
+                assert resource["plugins"] == [
+                    {
+                        "id": echo_plugin_stage_binding.id,
+                        "type": echo_plugin_stage_binding.get_type(),
+                        "name": echo_plugin_stage_binding.config.type.name,
+                        "config": echo_plugin_stage_binding.get_config(),
+                        "binding_type": echo_plugin_stage_binding.scope_type,
+                    },
+                ]
+            else:
+                assert resource["plugins"] == [
+                    {
+                        "id": echo_plugin_resource_binding.id,
+                        "type": echo_plugin_resource_binding.get_type(),
+                        "name": echo_plugin_resource_binding.config.type.name,
+                        "config": echo_plugin_resource_binding.get_config(),
+                        "binding_type": echo_plugin_resource_binding.scope_type,
+                    },
+                ]
+
+    def test_get_plugins_for_bk_header_rewrite(
+        self,
+        fake_plugin_stage_bk_header_rewrite_binding,
+        fake_plugin_resource_bk_header_rewrite_binding,
+        fake_gateway,
+        fake_stage,
+        fake_resource_version_v2,
+        fake_resource,
+    ):
+        stage_plugin_bindings = PluginBindingHandler.get_stage_plugin_bindings(fake_gateway.id, fake_stage.id)
+        stage_plugins = {}
+        for plugin_type, plugin_binding in stage_plugin_bindings.items():
+            plugin_config = plugin_binding.snapshot()
+            plugin_config["binding_type"] = PluginBindingScopeEnum.STAGE.value
+            stage_plugins[plugin_type] = plugin_config
+        slz = serializers.ResourceVersionRetrieveOutputSLZ(
+            instance=fake_resource_version_v2,
+            context={
+                "resource_backends": BackendHandler.get_id_to_instance(fake_gateway.id),
+                "resource_backend_configs": BackendHandler.get_backend_configs_by_stage(
+                    fake_gateway.id, fake_stage.id
+                ),
+                "is_schema_v2": fake_resource_version_v2.is_schema_v2,
+                "stage_plugins": stage_plugins,
+                "resource_doc_updated_time": {},
+            },
+        )
+
+        assert len(slz.data["resources"][0]["plugins"]) == 2
+        assert (
+            slz.data["resources"][0]["plugins"][0]["binding_type"]
+            != slz.data["resources"][0]["plugins"][1]["binding_type"]
+        )
+
+    def test_get_plugins_for_bk_cors(
+        self,
+        fake_plugin_stage_bk_cors_binding,
+        fake_plugin_resource_bk_cors_binding,
+        fake_gateway,
+        fake_stage,
+        fake_resource_version_v2,
+        fake_resource,
+    ):
+        stage_plugin_bindings = PluginBindingHandler.get_stage_plugin_bindings(fake_gateway.id, fake_stage.id)
+        stage_plugins = {}
+        for plugin_type, plugin_binding in stage_plugin_bindings.items():
+            plugin_config = plugin_binding.snapshot()
+            plugin_config["binding_type"] = PluginBindingScopeEnum.STAGE.value
+            stage_plugins[plugin_type] = plugin_config
+        slz = serializers.ResourceVersionRetrieveOutputSLZ(
+            instance=fake_resource_version_v2,
+            context={
+                "resource_backends": BackendHandler.get_id_to_instance(fake_gateway.id),
+                "resource_backend_configs": BackendHandler.get_backend_configs_by_stage(
+                    fake_gateway.id, fake_stage.id
+                ),
+                "is_schema_v2": fake_resource_version_v2.is_schema_v2,
+                "stage_plugins": stage_plugins,
+                "resource_doc_updated_time": {},
+            },
+        )
+
+        assert len(slz.data["resources"][0]["plugins"]) == 1
+        assert slz.data["resources"][0]["plugins"][0]["binding_type"] == PluginBindingScopeEnum.RESOURCE.value

@@ -16,7 +16,7 @@
                   <bk-date-picker
                     ref="datePickerRef"
                     type="datetimerange"
-                    style="width: 250px"
+                    style="width: 310px"
                     v-model="dateTimeRange"
                     :key="dateKey"
                     :placeholder="t('选择日期时间范围')"
@@ -25,11 +25,14 @@
                     :use-shortcut-text="true"
                     :clearable="false"
                     :shortcut-selected-index="shortcutSelectedIndex"
-                    @shortcut-change="handleShortcutChange" @change="handlePickerChange" />
+                    @shortcut-change="handleShortcutChange"
+                    @change="handlePickerChange"
+                    @pick-success="handlePickerConfirm"
+                  />
                 </bk-form-item>
                 <bk-form-item :label="t('环境')">
                   <bk-select
-                    style="width: 250px" v-model="searchParams.stage_id" :clearable="false" searchable
+                    style="width: 200px" v-model="searchParams.stage_id" :clearable="false" searchable
                     @change="handleStageChange">
                     <bk-option v-for="option in stageList" :key="option.id" :id="option.id" :name="option.name">
                     </bk-option>
@@ -685,6 +688,17 @@ const handlePickerChange = () => {
     pagination.value.current = 1;
     getSearchData();
   });
+};
+
+// 处理用户自行输入日期，点击确认后的情况。v-model 不会自动更新，要从 picker 内部拿输入的日期。
+const handlePickerConfirm = () => {
+  const internalValue = datePickerRef.value?.internalValue;
+  if (internalValue) {
+    dateTimeRange.value = internalValue;
+    handlePickerChange();
+  } else {
+    Message({ theme: 'warning', message: t('输入的时间错误'), delay: 2000, dismissable: false });
+  }
 };
 
 const handleStageChange = (value: number) => {

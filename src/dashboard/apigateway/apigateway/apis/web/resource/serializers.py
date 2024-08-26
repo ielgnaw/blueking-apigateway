@@ -404,6 +404,16 @@ class ResourceBatchUpdateInputSLZ(serializers.Serializer):
     ids = serializers.ListField(child=serializers.IntegerField(min_value=1), help_text="资源 ID 列表")
     is_public = serializers.BooleanField(help_text="是否公开，true：公开，false：不公开")
     allow_apply_permission = serializers.BooleanField(help_text="是否允许应用在开发者中心申请访问资源的权限")
+    is_update_labels = serializers.BooleanField(
+        help_text="是否批量修改标签，true:需要批量修改标签，false：不批量修改标签", required=False, default=False
+    )
+    label_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=True,
+        required=False,
+        max_length=MAX_LABEL_COUNT_PER_RESOURCE,
+        help_text="标签 ID 列表",
+    )
 
     def validate_ids(self, value):
         gateway_id = self.context["gateway_id"]
@@ -562,6 +572,11 @@ class ResourceImportDocPreviewInputSLZ(serializers.Serializer):
         help_text="文档语言，en: 英文，zh: 中文",
     )
 
+    def validate_review_resource(self, value):
+        if value.get("method") == HTTP_METHOD_ANY:
+            raise serializers.ValidationError(_("ANY的资源不支持文档预览"))
+        return value
+
 
 class ResourceImportCheckInputSLZ(serializers.Serializer):
     content = serializers.CharField(allow_blank=False, required=True, help_text="导入内容，yaml/json 格式字符串")
@@ -578,7 +593,8 @@ class ResourceImportInfoSLZ(serializers.Serializer):
     description = serializers.CharField(read_only=True, help_text="资源描述")
     description_en = serializers.CharField(help_text="资源英文描述")
     method = serializers.CharField(read_only=True, help_text="请求方法")
-    path = serializers.SerializerMethodField(help_text="请求路径")
+    path = serializers.CharField(help_text="请求路径")
+    path_display = serializers.SerializerMethodField(required=False, help_text="请求路径(需要体现是否匹配所有子路径)")
     match_subpath = serializers.BooleanField(help_text="是否匹配所有子路径")
     is_public = serializers.BooleanField(help_text="是否公开")
     allow_apply_permission = serializers.BooleanField(help_text="是否允许应用在开发者中心申请访问资源的权限")
@@ -599,7 +615,7 @@ class ResourceImportInfoSLZ(serializers.Serializer):
     def get_id(self, obj):
         return obj.resource and obj.resource.id
 
-    def get_path(self, obj):
+    def get_path_display(self, obj):
         return get_path_display(obj.path, obj.match_subpath)
 
     def get_doc(self, obj):
