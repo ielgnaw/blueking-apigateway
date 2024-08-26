@@ -223,7 +223,7 @@
           <!--  新增的资源  -->
           <bk-collapse-panel name="add">
             <template #header>
-              <div class="panel-header">
+              <div class="panel-header" ref="panelHeadAddRef">
                 <main class="flex-row align-items-center">
                   <angle-up-fill
                     :class="[panelNamesList.includes('add') ? 'panel-header-show' : 'panel-header-hide']"
@@ -275,7 +275,7 @@
           <!--  更新的资源  -->
           <bk-collapse-panel name="update">
             <template #header>
-              <div class="panel-header">
+              <div class="panel-header" ref="panelHeadUpdateRef">
                 <main class="flex-row align-items-center">
                   <angle-up-fill
                     :class="[panelNamesList.includes('update') ? 'panel-header-show' : 'panel-header-hide']"
@@ -326,7 +326,7 @@
           <!--  不导入的资源  -->
           <bk-collapse-panel name="uncheck">
             <template #header>
-              <div class="panel-header">
+              <div class="panel-header" ref="panelHeadUncheckRef">
                 <main class="flex-row align-items-center">
                   <angle-up-fill
                     :class="[panelNamesList.includes('uncheck') ? 'panel-header-show' : 'panel-header-hide']"
@@ -583,6 +583,7 @@ import { IImportedResource, ILocalImportedResource } from '@/views/resource/sett
 import TableResToAdd from '@/views/resource/setting/comps/table-res-to-add.vue';
 import TableResToUpdate from '@/views/resource/setting/comps/table-res-to-update.vue';
 import TableResToUncheck from '@/views/resource/setting/comps/table-res-to-uncheck.vue';
+import { useParentElement } from '@vueuse/core';
 
 type CodeErrorResponse = {
   code: string,
@@ -622,6 +623,10 @@ const errorReasons = ref<ErrorReasonType[]>([]);
 const isFindPanelVisible = ref(false);
 // 资源确认页的 collapse 面板列表
 const panelNamesList = ref(['add', 'update', 'uncheck']);
+// 资源确认页的 collapse 面板标题，稍后添加样式要用
+const panelHeadAddRef = ref<HTMLDivElement | null>(null);
+const panelHeadUpdateRef = ref<HTMLDivElement | null>(null);
+const panelHeadUncheckRef = ref<HTMLDivElement | null>(null);
 
 const isImportConfirmDialogVisible = ref(false);
 const isResourceDocSliderVisible = ref(false);
@@ -713,8 +718,20 @@ watch(editorText, () => {
 watch(curView, async (newCurView, oldCurView) => {
   if (newCurView === 'import' && oldCurView === 'resources') {
     await nextTick(() => {
-      resizeLayoutRef?.value?.setCollapse(true);
+      resizeLayoutRef.value?.setCollapse(true);
       isEditorMsgCollapsed = true;
+    });
+  } else if (newCurView === 'resources' && oldCurView === 'import') {
+    // 从编辑器页进入资源结果确认页时会走到这里
+    // 给 collapse 表头添加固定样式
+    await nextTick(() => {
+      [
+        useParentElement(panelHeadAddRef),
+        useParentElement(panelHeadUpdateRef),
+        useParentElement(panelHeadUncheckRef),
+      ].forEach((parentEl) => {
+        parentEl.value?.classList.add('panel-head-sticky-top');
+      });
     });
   }
 });
@@ -1544,8 +1561,8 @@ const handleReturnClick = () => {
 }
 
 .imported-resources-wrap {
-  margin: 20px 24px;
-  min-height: 768px;
+  margin: 20px 24px 0 24px;
+  //min-height: 768px;
 
   .res-counter-banner {
     height: 40px;
@@ -1560,13 +1577,35 @@ const handleReturnClick = () => {
   }
 
   .res-content-wrap {
+    height: calc(100vh - 285px);
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 20px;
+      box-shadow: inset 0 0 6px #cccccc4d;
+    }
+
     :deep(.collapse-cls) {
-      margin-bottom: 52px;
+      margin-bottom: 24px;
 
       .bk-collapse-item {
         background: #fff;
         box-shadow: 0 2px 4px 0 #1919290d;
         margin-bottom: 16px;
+      }
+
+      // 折叠让 .panel-header 粘滞固定到顶部
+      .panel-head-sticky-top {
+        position: sticky;
+        top: 0;
+        background-color: #ffffff;
+        z-index: 3;
       }
     }
 
