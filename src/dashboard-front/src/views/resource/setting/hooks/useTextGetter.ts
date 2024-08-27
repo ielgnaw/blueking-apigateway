@@ -6,35 +6,43 @@ export default function useTextGetter() {
     if (!authConfig) return '--';
     let auth;
 
-    if (typeof authConfig === 'string') {
-      auth = JSON.parse(authConfig);
-    } else {
-      auth = authConfig;
-    }
-    const tmpArr: string[] = [];
+    try {
+      if (typeof authConfig === 'string') {
+        auth = JSON.parse(authConfig);
+      } else {
+        auth = authConfig;
+      }
+      const tmpArr: string[] = [];
 
-    if (auth?.app_verified_required) {
-      tmpArr.push(`${t('蓝鲸应用认证')}`);
+      if (auth?.app_verified_required) {
+        tmpArr.push(`${t('蓝鲸应用认证')}`);
+      }
+      if (auth?.auth_verified_required) {
+        tmpArr.push(`${t('用户认证')}`);
+      }
+      return tmpArr.join(', ') || '--';
+    } catch {
+      return '--';
     }
-    if (auth?.auth_verified_required) {
-      tmpArr.push(`${t('用户认证')}`);
-    }
-    return tmpArr.join(', ') || '--';
   };
 
   const getPermRequiredText = (authConfig: string | object | null | undefined) => {
     if (!authConfig) return '--';
     let auth;
 
-    if (typeof authConfig === 'string') {
-      auth = JSON.parse(authConfig);
-    } else {
-      auth = authConfig;
+    try {
+      if (typeof authConfig === 'string') {
+        auth = JSON.parse(authConfig);
+      } else {
+        auth = authConfig;
+      }
+      if (auth?.resource_perm_required) {
+        return `${t('是')}`;
+      }
+      return `${t('否')}`;
+    } catch {
+      return '--';
     }
-    if (auth?.resource_perm_required) {
-      return `${t('是')}`;
-    }
-    return `${t('否')}`;
   };
 
   const getPublicSettingText = (is_public: boolean | null | undefined) => {
