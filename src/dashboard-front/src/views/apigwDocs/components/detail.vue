@@ -7,10 +7,10 @@
           class="icon apigateway-icon icon-ag-return-small"
           @click="router.back()"
         ></i>
-        测试
+        {{ curApigw.name }}
         <!--        <div class="title-name">-->
         <!--          <span></span>-->
-        <!--          <div class="name">测试</div>-->
+        <!--          <div class="name"></div>-->
         <!--        </div>-->
       </main>
       <aside
@@ -40,7 +40,7 @@
                   <header class="side-nav-header">
                     <header class="title">
                       {{ t('资源列表') }}
-                      <aside class="sub-title">19</aside>
+                      <aside v-if="resourceList.length" class="sub-title">{{ resourceList.length }}</aside>
                     </header>
                     <main class="nav-filters">
                       <article>
@@ -75,47 +75,12 @@
                     </main>
                   </header>
                   <main class="resource-list">
-                    <article class="resource-item">
-                      <header class="res-item-name">get_all_ad_groups</header>
-                      <main class="res-item-desc">获取所有的邮件列表</main>
-                    </article>
-                    <article class="resource-item">
-                      <header class="res-item-name">get_all_ad_groups</header>
-                      <main class="res-item-desc">获取所有的邮件列表</main>
-                    </article>
-                    <bk-collapse class="ml10 my-menu" v-model="activeName" v-if="Object.keys(resourceGroup).length">
-                      <template v-for="group of resourceGroup">
-                        <bk-collapse-panel
-                          v-if="group?.resources?.length"
-                          :name="group.labelName"
-                          :key="group.labelId"
-                        >
-                          {{ group.labelName }}
-                          <template #content>
-                            <div>
-                              <ul class="component-list list">
-                                <li
-                                  v-for="component of group.resources"
-                                  :key="component.name"
-                                  :title="component.name"
-                                  :class="{ 'active': curComponentName === component.name }"
-                                  @click="handleShowDoc(component)"
-                                >
-                                  <!-- eslint-disable-next-line vue/no-v-html -->
-                                  <p class="name" v-html="hightlight(component.name)" v-bk-overflow-tips></p>
-                                  <!-- eslint-disable-next-line vue/no-v-html -->
-                                  <p
-                                    class="label" v-html="hightlight(component.description) || $t('暂无描述')"
-                                    v-bk-overflow-tips
-                                  >
-                                  </p>
-                                </li>
-                              </ul>
-                            </div>
-                          </template>
-                        </bk-collapse-panel>
-                      </template>
-                    </bk-collapse>
+                    <template v-if="Object.keys(resourceGroup).length">
+                      <article class="resource-item" v-for="resource in resourceList" :key="resource.id">
+                        <header class="res-item-name">{{ t(resource.name) }}</header>
+                        <main class="res-item-desc">{{ t(resource.description) }}</main>
+                      </article>
+                    </template>
                     <template v-else-if="keyword">
                       <TableEmpty
                         :keyword="keyword"
@@ -629,13 +594,16 @@ watch(
     }
 
     .resource-list {
+      height: calc(100vh - 282px);
+      overflow-y: scroll;
+
       .resource-item {
         padding-left: 24px;
         height: 52px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background: #ffffff;
+        background: #fff;
         cursor: pointer;
 
         .res-item-name {
@@ -654,10 +622,22 @@ watch(
 
         &:hover, &.active {
           background: #e1ecff;
+
           .res-item-name {
-            color: #3A84FF;
+            color: #3a84ff;
           }
         }
+      }
+
+      &::-webkit-scrollbar {
+        width: 4px;
+        background-color: lighten(#c4c6cc, 80%);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        height: 5px;
+        border-radius: 2px;
+        background-color: #c4c6cc;
       }
     }
   }
