@@ -1593,6 +1593,10 @@ const lang: ILANG = {
   '文件名需要跟资源名称完全一致才能导入，请检查文件名': ['Filename must matches resource name'],
   '已匹配到资源': ['Resource matched'],
   '未匹配到资源': ['Resource not matched'],
+  'API 地址': ['API Address'],
+  '公共请求参数': ['Common Request Parameter'],
+  '网关详情': ['Gateway Detail'],
+  '权限申请': ['Permission Required'],
 
   // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
   // // 变量的使用 $t('test', { vari1: 1, vari2: 2 })

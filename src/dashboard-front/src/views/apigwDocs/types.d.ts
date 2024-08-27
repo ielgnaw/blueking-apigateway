@@ -45,6 +45,18 @@ interface IComponent {
   description: string;
 }
 
+interface IResource {
+  id: number;
+  name: string;
+  description: string;
+  method: string;
+  path: string;
+  verified_user_required: boolean;
+  verified_app_required: boolean;
+  resource_perm_required: boolean;
+  labels: string[];
+}
+
 
 export {
   TabType,
@@ -56,4 +68,5 @@ export {
   ISystem,
   ICategory,
   IComponent,
+  IResource,
 };

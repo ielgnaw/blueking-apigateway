@@ -22,16 +22,22 @@
     </header>
     <main class="page-content">
       <bk-resize-layout
+        ref="outerResizeLayoutRef"
         placement="right"
         :border="false"
         collapsible
-        style="height: 800px; flex-grow: 1;"
+        initial-divide="392px"
+        :max="480"
+        :min="392"
+        @collapse-change="updateIsRightAsideCollapsed"
       >
         <template #main>
           <bk-resize-layout
             placement="left"
-            style="height: 800px;margin-left: 40px;"
+            style="margin-left: 40px;"
             initial-divide="288px"
+            :max="400"
+            :min="288"
             :border="false"
           >
             <template #aside>
@@ -74,11 +80,16 @@
                       </article>
                     </main>
                   </header>
-                  <main class="resource-list">
-                    <template v-if="Object.keys(resourceGroup).length">
-                      <article class="resource-item" v-for="resource in resourceList" :key="resource.id">
-                        <header class="res-item-name">{{ t(resource.name) }}</header>
-                        <main class="res-item-desc">{{ t(resource.description) }}</main>
+                  <main class="resource-list custom-scroll-bar">
+                    <template v-if="resourceList.length">
+                      <article
+                        class="resource-item"
+                        v-for="resource in resourceList"
+                        :key="resource.id"
+                        @click="handleResClick(resource.id)"
+                      >
+                        <header class="res-item-name">{{ resource.name }}</header>
+                        <main class="res-item-desc">{{ resource.description }}</main>
                       </article>
                     </template>
                     <template v-else-if="keyword">
@@ -92,17 +103,24 @@
               </div>
             </template>
             <template #main>
-              <div class="right">
-                <bk-loading
-                  :loading="mainContentLoading"
-                >
-                  <router-view></router-view>
-                </bk-loading>
+              <div class="main-content-wrap">
+                <DetailMainContent
+                  :resource="curResource"
+                  :nav-list="navList"
+                  :markdown-html="curResMarkdownHtml"
+                  :updated-time="updatedTime"
+                ></DetailMainContent>
               </div>
             </template>
           </bk-resize-layout>
         </template>
-        <template #aside>右侧slider</template>
+        <template #aside>
+          <aside class="aside-right">
+            <main class="apigw-desc-wrap custom-scroll-bar">
+              <IntroSideContent :apigw-id="curApigwId"></IntroSideContent>
+            </main>
+          </aside>
+        </template>
       </bk-resize-layout>
     </main>
   </div>
@@ -113,6 +131,8 @@ import {
   ref,
   computed,
   watch,
+  nextTick,
+  onMounted,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
@@ -124,19 +144,25 @@ import {
   getApigwStagesDocs,
   getGatewaysDocs,
   getApigwResourcesDocs,
+  getApigwResourceDocDocs,
 } from '@/http';
-import { useToggle } from '@vueuse/core';
 import TableEmpty from '@/components/table-empty.vue';
+import IntroSideContent from '@/views/apigwDocs/components/intro-side-content.vue';
+import { IResource } from '@/views/apigwDocs/types';
+import DetailMainContent from '@/views/apigwDocs/components/detail-main-content.vue';
+import MarkdownIt from 'markdown-it';
+import hljs from 'highlight.js';
+import { slugify } from 'transliteration';
+import { copy } from '@/common/util';
+import { ResizeLayout } from 'bkui-vue';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const [isAsideVisible, toggleAsideVisible] = useToggle(false);
-
 const curApigwId = ref<any>(0);
 const curApigw = ref<any>({});
-const resourceList = ref<any>([]);
+const resourceList = ref<IResource[]>([]);
 const stageList = ref<any>([]);
 const curStageId = ref<any>('');
 const originResourceGroup = ref<any>({});
@@ -144,8 +170,13 @@ const curComponentName = ref<any>('');
 const activeName = ref<any>([]);
 const apigwList = ref<any>([]);
 const keyword = ref<string>('');
-const curResource = ref<any>({});
+const curResource = ref<IResource | null>(null);
 const mainContentLoading = ref<boolean>(false);
+const navList = ref<{ id: number, name: string }[]>([
+  { id: 1, name: t('API 地址') },
+  { id: 2, name: t('公共请求参数') },
+]);
+const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
 
 const searchPlaceholder = computed(() => {
   return t('在{resourceLength}个资源中搜索...', { resourceLength: resourceList.value?.length });
@@ -286,50 +317,21 @@ const getApigwResources = async () => {
         offset: 0,
         stage_name: curStageId.value,
       };
-      const res = await getApigwResourcesDocs(curApigwId.value, query);
+      const res = await getApigwResourcesDocs(curApigwId.value, query) as IResource[];
       const group: any = {};
       const defaultItem: any = {
         labelId: 'default',
         labelName: t('默认'),
         resources: [],
       };
-      resourceList.value = res;
-      resourceList.value?.forEach((resource: any) => {
-        const { labels } = resource;
-        if (labels?.length) {
-          labels.forEach((label: any) => {
-            if (typeof label === 'object') {
-              if (group[label.id]) {
-                group[label.id]?.resources.push(resource);
-              } else {
-                if (group[label.name]) {
-                  group[label.name]?.resources.push(resource);
-                } else {
-                  const obj = {
-                    labelId: label.id,
-                    labelName: label.name,
-                    resources: [resource],
-                  };
-                  group[label.name] = obj;
-                }
-              }
-            } else {
-              if (group[label]) {
-                group[label]?.resources?.push(resource);
-              } else {
-                const obj = {
-                  labelId: label,
-                  labelName: label,
-                  resources: [resource],
-                };
-                group[label] = obj;
-              }
-            }
-          });
-        } else {
-          defaultItem.resources.push(resource);
-        }
+      resourceList.value = res ?? [];
+      resourceList.value?.forEach((resource) => {
+        defaultItem.resources.push(resource);
       });
+      curResource.value = resourceList.value[0] ?? null;
+      if (curResource.value) {
+        await getApigwResourceDoc();
+      }
       if (defaultItem.resources.length) {
         group['默认'] = defaultItem;
       }
@@ -345,6 +347,47 @@ const getApigwResources = async () => {
 
 const reset = () => {
   curComponentName.value = '';
+};
+
+const handleResClick = async (resId: number) => {
+  curResource.value = resourceList.value.find(res => res.id === resId) ?? null;
+  if (curResource.value) {
+    await getApigwResourceDoc();
+  }
+};
+
+const md = new MarkdownIt({
+  linkify: false,
+  html: true,
+  breaks: true,
+  highlight(str: string, lang: string) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(lang, str, true).value;
+      } catch (__) {
+      }
+    }
+
+    return '';
+  },
+});
+
+const curResMarkdownHtml = ref('');
+const updatedTime = ref<string | null>(null);
+
+const getApigwResourceDoc = async () => {
+  try {
+    const query = {
+      stage_name: curStageId.value,
+    };
+    const res = await getApigwResourceDocDocs(curApigwId.value, curResource.value.name, query);
+    const { content, updated_time } = res;
+    curResMarkdownHtml.value = md.render(content);
+    updatedTime.value = updated_time;
+  } catch (e) {
+    console.log(e);
+  } finally {
+  }
 };
 
 const handleShowDoc = (resource: any) => {
@@ -428,6 +471,19 @@ const init = async () => {
     return;
   }
   getApigwAPIDetail();
+};
+
+// 记录右栏折叠状态
+const isAsideVisible = ref(true);
+
+const toggleAsideVisible = () => {
+  nextTick(() => {
+    outerResizeLayoutRef.value?.setCollapse(isAsideVisible.value);
+  });
+};
+
+const updateIsRightAsideCollapsed = (collapsed: boolean) => {
+  isAsideVisible.value = !collapsed;
 };
 
 watch(
@@ -559,6 +615,8 @@ watch(
   .simple-side-nav {
     min-width: 280px;
     width: auto;
+    box-shadow: 0 2px 4px 0 #1919290d;
+    border-radius: 2px;
 
     .side-nav-header {
       padding: 16px 24px 12px;
@@ -628,17 +686,17 @@ watch(
           }
         }
       }
+    }
+  }
 
-      &::-webkit-scrollbar {
-        width: 4px;
-        background-color: lighten(#c4c6cc, 80%);
-      }
+  //.main-content-wrap {
+  //}
 
-      &::-webkit-scrollbar-thumb {
-        height: 5px;
-        border-radius: 2px;
-        background-color: #c4c6cc;
-      }
+  .aside-right {
+    .apigw-desc-wrap {
+      height: calc(100vh - 144px);
+      overflow-y: scroll;
+      background-color: #fff;
     }
   }
 
@@ -656,6 +714,23 @@ watch(
   // 隐藏的折叠按钮
   :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-collapse) {
     display: none !important;
+  }
+}
+
+.custom-scroll-bar {
+  &::-webkit-scrollbar {
+    width: 4px;
+    background-color: lighten(#c4c6cc, 80%);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    height: 5px;
+    border-radius: 2px;
+    background-color: #c4c6cc;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 </style>

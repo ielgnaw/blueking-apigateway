@@ -1,41 +1,32 @@
 <template>
-  <div class="intro-doc">
-    <div class="component-content">
-      <div class="component-metedata mb10">
-        <strong class="name"> {{ $t('简介') }} </strong>
-      </div>
-
-      <div style="position: relative;">
-        <bk-breadcrumb separator=">">
-          <bk-breadcrumb-item :to="{ name: 'apigwDoc' }"> {{ $t('网关API文档') }} </bk-breadcrumb-item>
-          <bk-breadcrumb-item>{{curApigw.name || '--'}}</bk-breadcrumb-item>
-          <bk-breadcrumb-item> {{ $t('简介') }} </bk-breadcrumb-item>
-        </bk-breadcrumb>
+  <div class="intro-side-content-wrap">
+    <header class="intro-header">
+      <main class="title">{{ t('网关详情') }}</main>
+      <aside>
         <chat
-          class="ag-chat"
           v-if="userStore.featureFlags?.ALLOW_CREATE_APPCHAT"
           :default-user-list="userList"
           :owner="curUser.username"
           :name="chatName"
           :content="chatContent"
-          :is-query="true">
+          :is-query="true"
+        >
         </chat>
-      </div>
-
-      <bk-divider></bk-divider>
-
+      </aside>
+    </header>
+    <main class="component-content">
       <div class="ag-markdown-view" id="markdown">
-        <h3> {{ $t('网关描述') }} </h3>
-        <p class="mb30">{{curApigw.description}}</p>
+        <header class="content-title">{{ t('网关描述') }}</header>
+        <main class="content-main">{{ curApigw.description }}</main>
 
-        <h3> {{ $t('网关负责人') }} </h3>
-        <p class="mb30">{{curApigw.maintainers.join(', ')}}</p>
+        <header class="content-title">{{ t('网关负责人') }}</header>
+        <main class="content-main">{{ curApigw.maintainers.join(', ') }}</main>
 
-        <h3> {{ $t('网关访问地址') }} </h3>
-        <p class="mb30">{{curApigw.api_url}}</p>
+        <header class="content-title">{{ t('网关访问地址') }}</header>
+        <main class="content-main">{{ curApigw.api_url }}</main>
 
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
-          <h3> {{ $t('网关 SDK') }} </h3>
+          <header class="content-title">{{ t('网关 SDK') }}</header>
           <div class="bk-button-group">
             <bk-button class="is-selected">Python</bk-button>
           </div>
@@ -48,7 +39,8 @@
           :data="sdks"
           show-overflow-tooltip
           :border="['outer']"
-          :size="'small'">
+          :size="'small'"
+        >
           <!-- <template #empty>
           <table-empty
             :abnormal="isAbnormal"
@@ -56,32 +48,32 @@
           />
         </template> -->
 
-          <bk-table-column :label="$t('网关环境')" field="stage_name">
+          <bk-table-column :label="t('网关环境')" field="stage_name">
             <template #default="{ data }">
-              {{data?.stage?.name || '--'}}
+              {{ data?.stage?.name || '--' }}
             </template>
           </bk-table-column>
 
-          <bk-table-column :label="$t('网关API资源版本')" field="resource_version_display">
+          <bk-table-column :label="t('网关API资源版本')" field="resource_version_display">
             <template #default="{ data }">
-              {{data?.resource_version?.version || '--'}}
+              {{ data?.resource_version?.version || '--' }}
             </template>
           </bk-table-column>
 
-          <bk-table-column :label="$t('SDK 版本号')" field="sdk_version_number">
+          <bk-table-column :label="t('SDK 版本号')" field="sdk_version_number">
             <template #default="{ data }">
-              {{data?.sdk?.version || '--'}}
+              {{ data?.sdk?.version || '--' }}
             </template>
           </bk-table-column>
 
-          <bk-table-column :label="$t('SDK下载')">
+          <bk-table-column :label="t('SDK下载')">
             <template #default="{ data }">
               <template v-if="data?.sdk?.url">
-                <bk-button theme="primary" class="mr5" text @click="handleShow(data)"> {{ $t('查看') }} </bk-button>
-                <bk-button theme="primary" text @click="handleDownload(data)"> {{ $t('下载') }} </bk-button>
+                <bk-button theme="primary" class="mr5" text @click="handleShow(data)"> {{ t('查看') }}</bk-button>
+                <bk-button theme="primary" text @click="handleDownload(data)"> {{ t('下载') }}</bk-button>
               </template>
               <template v-else>
-                {{ $t('未生成-doc') }}
+                {{ t('未生成-doc') }}
               </template>
             </template>
           </bk-table-column>
@@ -89,7 +81,7 @@
 
         <p class="ag-tip mt5">
           <info-line style="margin-right: 8px;" />
-          {{ $t('若资源版本对应的SDK未生成，可联系网关负责人生成SDK') }}
+          {{ t('若资源版本对应的SDK未生成，可联系网关负责人生成SDK') }}
         </p>
       </template>
 
@@ -97,33 +89,37 @@
         :width="720"
         :title="sdkConfig.title"
         v-model:is-show="sdkConfig.isShow"
-        :quick-close="true">
+        :quick-close="true"
+      >
         <template #default>
           <div class="p25">
             <sdk-detail :params="curSdk"></sdk-detail>
           </div>
         </template>
       </bk-sideslider>
-    </div>
-<!--    <bk-affix :offset-top="128">-->
-<!--      <div class="component-nav-box" v-if="componentNavList.length">-->
-<!--        <div>-->
-<!--          <side-nav :list="componentNavList"></side-nav>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </bk-affix>-->
+    </main>
   </div>
 </template>
 
-<script lang="ts"  setup>
-import { ref, reactive, watch, nextTick, computed } from 'vue';
+<script lang="ts" setup>
+import {
+  ref,
+  reactive,
+  watch,
+  nextTick,
+  computed,
+  onMounted,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { slugify } from 'transliteration';
 import chat from '@/components/chat/index.vue';
 import sdkDetail from '@/components/sdk-detail/index.vue';
 import sideNav from '@/components/side-nav/index.vue';
-import { getGatewaysDetailsDocs, getApigwSDKDocs } from '@/http';
+import {
+  getGatewaysDetailsDocs,
+  getApigwSDKDocs,
+} from '@/http';
 import { InfoLine } from 'bkui-vue/lib/icon';
 import { useUser } from '@/store';
 
@@ -141,18 +137,27 @@ const curApigw = ref<any>({
   id: 2,
   name: '',
   description: '',
-  maintainers: [
-  ],
+  maintainers: [],
   is_official: '',
   api_url: '',
 });
 const isAbnormal = ref<boolean>(false);
 const curApigwId = ref();
 
+const props = defineProps({
+  apigwId: {
+    type: Number,
+    default: 0,
+  },
+});
+
 const curUser = computed(() => userStore?.user);
 const userList = computed(() => {
   // 去重
-  const set = new Set([curUser.value?.username, ...curApigw.value?.maintainers]);
+  const set = new Set([
+    curUser.value?.username,
+    ...curApigw.value?.maintainers,
+  ]);
   return [...set];
 });
 const chatName = computed(() => `${t('[蓝鲸网关API咨询] 网关')}${curApigw.value?.name}`);
@@ -196,7 +201,7 @@ const initMarkdownHtml = () => {
       const code = item.querySelector('code').innerText;
       btn.className = 'ag-copy-btn';
       codeBox.className = 'code-box';
-      btn.innerHTML = '<span :title="$t(`复制`)"><i class="bk-icon icon-clipboard mr5"></i></span>';
+      btn.innerHTML = '<span :title="t(`复制`)"><i class="bk-icon icon-clipboard mr5"></i></span>';
       btn.setAttribute('data-clipboard-text', code);
       item.appendChild(btn);
       codeBox.appendChild(item.querySelector('code'));
@@ -233,41 +238,50 @@ const getApigwSDK = async (language: string) => {
 };
 
 const init = async () => {
-  const container = document.querySelector('.container-content');
-  container.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
-  const routeParams = route.params;
-  curApigwId.value = routeParams.apigwId;
-  getApigwAPIDetail();
-  getApigwSDK('python');
+  curApigwId.value = props.apigwId;
+  await getApigwAPIDetail();
+  await getApigwSDK('python');
 };
 
-watch(
-  () => route,
-  (value: any) => {
-    if (value?.params?.apigwId && ['apigwAPIDetailIntro'].includes(value.name)) {
-      init();
-    }
-  },
-  { immediate: true, deep: true },
-);
+onMounted(() => {
+  init();
+});
+
 </script>
 
 <style lang="scss" scoped>
-  @import './detail.css';
+.intro-side-content-wrap {
+  padding: 0 24px 12px 24px;
 
-  .intro-doc {
-    padding-inline: 8px;
+  .intro-header {
+    margin-bottom: 12px;
+    height: 48px;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .component-content {
     width: auto;
-  }
 
-  .component-nav-box {
-    position: static;
+    .ag-markdown-view {
+      .content-title,
+      .content-main {
+        font-size: 14px;
+        color: #63656E;
+        letter-spacing: 0;
+        line-height: 22px;
+      }
+
+      .content-title {
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      .content-main {
+        margin-bottom: 32px;
+      }
+    }
   }
+}
 </style>
