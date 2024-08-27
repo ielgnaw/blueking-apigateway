@@ -1,4 +1,5 @@
 type TRequestMethod = 'ANY' | 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
+type ActionType = 'add' | 'update';
 
 interface IAuthConfig {
   auth_verified_required: boolean;
@@ -60,6 +61,7 @@ interface ILocalImportedResource extends Partial<IImportedResource> {
 }
 
 export {
+  ActionType,
   IBackend,
   IBackendConfig,
   IAuthConfig,

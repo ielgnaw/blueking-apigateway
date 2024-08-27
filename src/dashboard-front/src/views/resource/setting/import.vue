@@ -257,7 +257,9 @@
             </template>
             <template #content>
               <div>
-                <TableResToAdd
+                <!--  新增资源 table  -->
+                <TableResToAction
+                  action="add"
                   :table-data="tableDataToAdd"
                   :show-doc="showDoc"
                   v-model:tempAuthConfig="tempAuthConfig"
@@ -268,7 +270,7 @@
                   @toggle-row-unchecked="toggleRowUnchecked"
                   @confirm-auth-config="handleConfirmAuthConfigPopConfirm"
                   @confirm-pub-config="handleConfirmPublicConfigPopConfirm"
-                ></TableResToAdd>
+                ></TableResToAction>
               </div>
             </template>
           </bk-collapse-panel>
@@ -309,7 +311,9 @@
             </template>
             <template #content>
               <div>
-                <TableResToUpdate
+                <!--  更新资源 table  -->
+                <TableResToAction
+                  action="update"
                   :table-data="tableDataToUpdate"
                   v-model:tempAuthConfig="tempAuthConfig"
                   v-model:tempPublicConfig="tempPublicConfig"
@@ -319,7 +323,7 @@
                   @toggle-row-unchecked="toggleRowUnchecked"
                   @confirm-auth-config="handleConfirmAuthConfigPopConfirm"
                   @confirm-pub-config="handleConfirmPublicConfigPopConfirm"
-                ></TableResToUpdate>
+                ></TableResToAction>
               </div>
             </template>
           </bk-collapse-panel>
@@ -579,9 +583,12 @@ import EditImportResourceSideSlider from "@/views/resource/setting/comps/edit-im
 import DownloadDialog from "@/views/resource/setting/comps/download-dialog.vue";
 import PluginPreviewSideSlider from '@/views/resource/setting/comps/plugin-preview-side-slider.vue';
 import ResourceDocSideSlider from '@/views/components/resource-doc-slider/index.vue';
-import { IImportedResource, ILocalImportedResource } from '@/views/resource/setting/types';
-import TableResToAdd from '@/views/resource/setting/comps/table-res-to-add.vue';
-import TableResToUpdate from '@/views/resource/setting/comps/table-res-to-update.vue';
+import {
+  ActionType,
+  IImportedResource,
+  ILocalImportedResource,
+} from '@/views/resource/setting/types';
+import TableResToAction from '@/views/resource/setting/comps/table-res-to-action.vue';
 import TableResToUncheck from '@/views/resource/setting/comps/table-res-to-uncheck.vue';
 import { useParentElement } from '@vueuse/core';
 
@@ -1176,7 +1183,7 @@ const tempAuthConfig = ref({
 });
 
 // 批量修改认证方式确认后
-const handleConfirmAuthConfigPopConfirm = (action: 'add' | 'update') => {
+const handleConfirmAuthConfigPopConfirm = (action: ActionType) => {
   if (tempAuthConfig.value.app_verified_required === false) tempAuthConfig.value.resource_perm_required = false;
   tableData.value.filter(item => !item._unchecked)
     .forEach(data => {
@@ -1194,7 +1201,7 @@ const tempPublicConfig = ref({
 });
 
 // 批量修改公开设置确认后
-const handleConfirmPublicConfigPopConfirm = (action: 'add' | 'update') => {
+const handleConfirmPublicConfigPopConfirm = (action: ActionType) => {
   const isPublic = tempPublicConfig.value.is_public;
   const allowApplyPermission = tempPublicConfig.value.allow_apply_permission && isPublic;
 
@@ -1211,7 +1218,7 @@ const filterInputAdd = ref('')
 const filterInputAddClone = ref('')
 const filterInputUpdate = ref('')
 const filterInputUpdateClone = ref('')
-const filterData = (action: 'add' | 'update') => {
+const filterData = (action: ActionType) => {
   if (action === 'add') {
     filterInputAdd.value = filterInputAddClone.value;
   }

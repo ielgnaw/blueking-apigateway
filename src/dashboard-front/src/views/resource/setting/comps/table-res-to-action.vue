@@ -16,7 +16,7 @@
     </bk-table-column>
     <!--  认证方式列  -->
     <bk-table-column
-      :label="() => renderAuthConfigColLabel('update')"
+      :label="() => renderAuthConfigColLabel()"
       :show-overflow-tooltip="false"
       width="100"
     >
@@ -37,7 +37,7 @@
     </bk-table-column>
     <!--  “是否公开”列  -->
     <bk-table-column
-      :label="() => renderIsPublicColLabel('update')"
+      :label="() => renderIsPublicColLabel()"
       width="100"
     >
       <template #default="{ row }: { row: ILocalImportedResource }">
@@ -169,7 +169,12 @@
 </template>
 
 <script lang="tsx" setup>
-import { IAuthConfig, ILocalImportedResource, IPublicConfig } from '@/views/resource/setting/types';
+import {
+  ActionType,
+  IAuthConfig,
+  ILocalImportedResource,
+  IPublicConfig,
+} from '@/views/resource/setting/types';
 import { ref, toRefs } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { MethodsEnum } from '@/types';
@@ -185,16 +190,16 @@ const {
 const { t } = useI18n();
 const methodsEnum = Object.freeze(MethodsEnum);
 
-type ActionType = 'add' | 'update';
-
 interface IProps {
   tableData: ILocalImportedResource[];
   showDoc: boolean;
+  action: ActionType;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   tableData: () => [],
   showDoc: true,
+  action: 'add',
 });
 
 const emit = defineEmits<{
@@ -217,6 +222,7 @@ const tempPublicConfig = defineModel<IPublicConfig>('tempPublicConfig', {
 const {
   tableData,
   showDoc,
+  action,
 } = toRefs(props);
 
 const pagination = ref({
@@ -241,8 +247,8 @@ const toggleRowUnchecked = (row: ILocalImportedResource) => {
 };
 
 // 批量修改认证方式确认后
-const handleConfirmAuthConfig = (action: ActionType) => {
-  emit('confirm-auth-config', action);
+const handleConfirmAuthConfig = () => {
+  emit('confirm-auth-config', action.value);
 };
 
 // 批量修改认证方式取消后
@@ -255,8 +261,8 @@ const handleCancelAuthConfig = () => {
 };
 
 // 批量修改公开设置确认后
-const handleConfirmPublicConfig = (action: ActionType) => {
-  emit('confirm-pub-config', action);
+const handleConfirmPublicConfig = () => {
+  emit('confirm-pub-config', action.value);
 };
 
 // 批量修改公开设置取消后
@@ -267,7 +273,7 @@ const handleCancelPublicConfig = () => {
   }
 };
 
-const renderAuthConfigColLabel = (action: ActionType) => {
+const renderAuthConfigColLabel = () => {
   return (
     <div>
       <div class="auth-config-col-label">
@@ -284,12 +290,12 @@ const renderAuthConfigColLabel = (action: ActionType) => {
                     v-model={tempAuthConfig.value.app_verified_required}
                   >
                     <span class="bottom-line" v-bk-tooltips={{ content: t('请求方需提供蓝鲸应用身份信息') }}>
-                      {t('蓝鲸应用认证')}
+                    {t('蓝鲸应用认证')}
                     </span>
                   </bk-checkbox>
                   <bk-checkbox class="ml40" v-model={tempAuthConfig.value.auth_verified_required}>
                     <span class="bottom-line" v-bk-tooltips={{ content: t('请求方需提供蓝鲸用户身份信息') }}>
-                      {t('用户认证')}
+                    {t('用户认证')}
                     </span>
                   </bk-checkbox>
                 </bk-form-item>
@@ -309,7 +315,7 @@ const renderAuthConfigColLabel = (action: ActionType) => {
               </bk-form>
             </div>
           }
-          onConfirm={() => handleConfirmAuthConfig(action)}
+          onConfirm={() => handleConfirmAuthConfig()}
           onCancel={() => handleCancelAuthConfig()}
         >
           <i
@@ -329,7 +335,7 @@ const renderAuthConfigColLabel = (action: ActionType) => {
 };
 
 // 公开设置列 TSX
-const renderIsPublicColLabel = (action: ActionType) => {
+const renderIsPublicColLabel = () => {
   return (
     <div>
       <div class="public-config-col-label">
@@ -367,7 +373,7 @@ const renderIsPublicColLabel = (action: ActionType) => {
               </bk-form>
             </div>
           }
-          onConfirm={() => handleConfirmPublicConfig(action)}
+          onConfirm={() => handleConfirmPublicConfig()}
           onCancel={() => handleCancelPublicConfig()}
         >
           <i
