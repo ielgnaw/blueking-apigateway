@@ -1,6 +1,6 @@
 <template>
   <div class="content-wrap">
-    <main v-if="resource" class="resource-detail custom-scroll-bar">
+    <main v-if="resource" class="target-detail custom-scroll-bar">
       <header class="detail-header">
         <header class="res-name">{{ resource?.name ?? '--' }}</header>
         <footer class="res-header-footer">
@@ -23,7 +23,7 @@
           </section>
           <section class="basic-cell">
             <span>
-              <span class="label" v-bk-tooltips="t('应用访问该网关API时，是否需提供应用认证信息')">
+              <span class="label" v-bk-tooltips="appVerifiedTooltips">
                 {{ t('应用认证') }}
               </span>：
               {{ resource.verified_app_required ? t('是') : t('否') }}
@@ -32,7 +32,7 @@
           <section class="basic-cell">
             <span>
               <span
-                class="label" v-bk-tooltips="t('应用访问该网关API前，是否需要在开发者中心申请该网关API权限')"
+                class="label" v-bk-tooltips="resourcePermTooltips"
               >
                 {{ t('权限申请') }}
               </span>：
@@ -41,7 +41,7 @@
           </section>
           <section class="basic-cell">
             <span>
-              <span class="label" v-bk-tooltips="t('应用访问该组件API时，是否需要提供用户认证信息')">
+              <span class="label" v-bk-tooltips="userVerifiedTooltips">
                 {{ t('用户认证') }}
               </span>：
               {{ resource.verified_user_required ? t('是') : t('否') }}
@@ -62,10 +62,16 @@
 
 <script setup lang="ts">
 import SideNav from '@/components/side-nav/index.vue';
-import { IResource } from '@/views/apigwDocs/types';
 import {
+  IResource,
+  TabType,
+} from '@/views/apigwDocs/types';
+import {
+  computed,
+  inject,
   nextTick,
   onMounted,
+  Ref,
   ref,
   toRefs,
   watch,
@@ -95,6 +101,27 @@ const {
   markdownHtml,
   updatedTime,
 } = toRefs(props);
+
+// 注入当前的总 tab 变量
+const curTab = inject<Ref<TabType>>('curTab');
+
+const appVerifiedTooltips = computed(() => {
+  if (curTab.value === 'apigw') return t('应用访问该网关API时，是否需提供应用认证信息');
+  if (curTab.value === 'component') return t('应用访问该组件API时，是否需提供应用认证信息');
+  return '--';
+});
+
+const resourcePermTooltips = computed(() => {
+  if (curTab.value === 'apigw') return t('应用访问该网关API前，是否需要在开发者中心申请该网关API权限');
+  if (curTab.value === 'component') return t('应用访问该组件API前，是否需要在开发者中心申请该组件API权限');
+  return '--';
+});
+
+const userVerifiedTooltips = computed(() => {
+  if (curTab.value === 'apigw') return t('应用访问该网关API时，是否需要提供用户认证信息');
+  if (curTab.value === 'component') return t('应用访问该组件API时，是否需要提供用户认证信息');
+  return '--';
+});
 
 const initMarkdownHtml = (box: string) => {
   nextTick(() => {
@@ -149,10 +176,11 @@ $code-color: #63656e;
   display: flex;
   align-items: flex-start;
 
-  .resource-detail {
+  .target-detail {
+    flex-grow: 1;
     padding-right: 8px;
     padding-left: 8px;
-    //width: 960px;
+    max-width: 1000px;
     height: calc(100vh - 144px);
     overflow-y: scroll;
 

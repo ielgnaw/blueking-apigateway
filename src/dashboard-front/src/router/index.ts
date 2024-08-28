@@ -9,6 +9,7 @@ const { t } = i18n.global;
 
 const Home = () => import(/* webpackChunkName: "Home" */ '@/views/home.vue');
 const ApigwDocs = () => import(/* webpackChunkName: "ApigwDocs" */ '@/views/apigwDocs/index.vue');
+const APIDocDetail = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/doc-detail.vue');
 const ApigwAPIDetail = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/detail.vue');
 const ApigwAPIDetailIntro = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/intro.vue');
 const ApigwAPIDetailDoc = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/doc.vue');
@@ -362,6 +363,15 @@ const routes: RouteRecordRaw[] = [
           topMenu: 'esbSDK',
           type: 'esb',
           isDocRouter: true,
+        },
+      },
+      {
+        path: ':curTab/:targetId/',
+        name: 'apiDocDetail',
+        component: APIDocDetail,
+        meta: {
+          matchRoute: 'apiDocDetail',
+          topMenu: 'apigwDoc',
         },
       },
       {

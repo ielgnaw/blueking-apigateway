@@ -1165,6 +1165,7 @@ const lang: ILANG = {
   '返回首页': ['Back to home'],
   '默认': ['Default'],
   '应用访问该网关API时，是否需提供应用认证信息': ['Whether the app needs to provide app authentication when accessing the API'],
+  '应用访问该网关API时，是否需要提供用户认证信息': ['Whether the app needs to provide user authentication when accessing the API'],
   '应用访问该组件API时，是否需要提供用户认证信息': ['Whether the app needs to provide user authentication when accessing the API'],
   '是否需申请权限': ['Permission Required'],
   '应用访问该网关API前，是否需要在开发者中心申请该网关API权限': ['Whether the app needs to apply for API permission in the Developer Center before accessing the API'],

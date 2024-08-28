@@ -168,7 +168,12 @@
                 </header>
                 <!--  分类中的组件卡片  -->
                 <main class="group-items">
-                  <article class="item" v-for="component in cat.systems" :key="component.name">
+                  <article
+                    class="item"
+                    v-for="component in cat.systems"
+                    :key="component.name"
+                    @click="gotoDetails(component)"
+                  >
                     <main class="title">
                       <div class="name">{{ component.description }}</div>
                       <div class="name-en">{{ component.name }}</div>
@@ -305,9 +310,11 @@ const isSdkDetailDialogShow = ref(false);
 
 const gotoDetails = (data: any) => {
   router.push({
-    name: 'apigwAPIDetailIntro',
+    // name: 'apigwAPIDetailIntro',
+    name: 'apiDocDetail',
     params: {
-      apigwId: data?.name,
+      targetId: data?.name,
+      curTab: curTab.value,
     },
   });
 };

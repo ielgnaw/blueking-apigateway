@@ -41,8 +41,12 @@ interface ICategory {
 }
 
 interface IComponent {
+  id: number;
   name: string;
   description: string;
+  verified_app_required: boolean;
+  verified_user_required: boolean;
+  component_permission_required: boolean;
 }
 
 interface IResource {
@@ -57,6 +61,22 @@ interface IResource {
   labels: string[];
 }
 
+interface IApiGatewayBasics {
+  id: number;
+  name: string;
+  description: string;
+  maintainers: string[];
+  is_official: boolean;
+  api_url: string;
+}
+
+
+interface IComponentBasics {
+  name: string;
+  description: string;
+  comment: string;
+  maintainers: string[];
+}
 
 export {
   TabType,
@@ -69,4 +89,6 @@ export {
   ICategory,
   IComponent,
   IResource,
+  IApiGatewayBasics,
+  IComponentBasics,
 };

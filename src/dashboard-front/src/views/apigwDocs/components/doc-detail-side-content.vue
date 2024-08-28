@@ -1,7 +1,8 @@
 <template>
   <div class="intro-side-content-wrap">
     <header class="intro-header">
-      <main class="title">{{ t('网关详情') }}</main>
+      <main v-if="curTab === 'apigw'" class="title">{{ t('网关详情') }}</main>
+      <main v-else-if="curTab === 'component'" class="title">{{ t('组件详情') }}</main>
       <aside>
         <chat
           v-if="userStore.featureFlags?.ALLOW_CREATE_APPCHAT"
@@ -14,17 +15,14 @@
         </chat>
       </aside>
     </header>
-    <main class="component-content">
+    <main v-if="curTab === 'apigw'" class="component-content">
       <div class="ag-markdown-view" id="markdown">
         <header class="content-title">{{ t('网关描述') }}</header>
         <main class="content-main">{{ curApigw.description }}</main>
-
         <header class="content-title">{{ t('网关负责人') }}</header>
         <main class="content-main">{{ curApigw.maintainers.join(', ') }}</main>
-
         <header class="content-title">{{ t('网关访问地址') }}</header>
         <main class="content-main">{{ curApigw.api_url }}</main>
-
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
           <header class="content-title">{{ t('网关 SDK') }}</header>
           <div class="bk-button-group">
@@ -84,19 +82,18 @@
           {{ t('若资源版本对应的SDK未生成，可联系网关负责人生成SDK') }}
         </p>
       </template>
-
-      <bk-sideslider
-        :width="720"
-        :title="sdkConfig.title"
-        v-model:is-show="sdkConfig.isShow"
-        :quick-close="true"
-      >
-        <template #default>
-          <div class="p25">
-            <sdk-detail :params="curSdk"></sdk-detail>
-          </div>
-        </template>
-      </bk-sideslider>
+    </main>
+    <main v-else-if="curTab === 'component'" class="component-content">
+      <div class="ag-markdown-view">
+        <header class="content-title">{{ t('网关描述') }}</header>
+        <main class="content-main">{{ curApigw.comment }}</main>
+        <header class="content-title">{{ t('网关负责人') }}</header>
+        <main class="content-main">{{ curApigw.maintainers.join(', ') }}</main>
+        <header class="content-title">{{ t('组件 API SDK') }}</header>
+        <main class="content-main">
+          <SdkDetail :params="curSdk"></SdkDetail>
+        </main>
+      </div>
     </main>
   </div>
 </template>
@@ -109,19 +106,23 @@ import {
   nextTick,
   computed,
   onMounted,
+  inject,
+  Ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { slugify } from 'transliteration';
 import chat from '@/components/chat/index.vue';
-import sdkDetail from '@/components/sdk-detail/index.vue';
-import sideNav from '@/components/side-nav/index.vue';
+import SdkDetail from './sdk-detail.vue';
 import {
   getGatewaysDetailsDocs,
   getApigwSDKDocs,
+  getComponenSystemDetail,
+  getESBSDKDetail,
 } from '@/http';
 import { InfoLine } from 'bkui-vue/lib/icon';
 import { useUser } from '@/store';
+import { TabType } from '@/views/apigwDocs/types';
 
 const userStore = useUser();
 const route = useRoute();
@@ -132,7 +133,6 @@ const sdkConfig = reactive({
   isShow: false,
 });
 const curSdk = ref<any>({});
-const componentNavList = ref<any>([]);
 const curApigw = ref<any>({
   id: 2,
   name: '',
@@ -144,10 +144,13 @@ const curApigw = ref<any>({
 const isAbnormal = ref<boolean>(false);
 const curApigwId = ref();
 
+// 注入当前的总 tab 变量
+const curTab = inject<Ref<TabType>>('curTab');
+
 const props = defineProps({
-  apigwId: {
-    type: Number,
-    default: 0,
+  targetId: {
+    type: String,
+    default: '',
   },
 });
 
@@ -176,21 +179,6 @@ const handleDownload = (data: any) => {
 const initMarkdownHtml = () => {
   nextTick(() => {
     const markdownDom = document.getElementById('markdown');
-    // 右侧导航
-    const titles = markdownDom.querySelectorAll('h3');
-    componentNavList.value = [];
-    titles.forEach((item) => {
-      const name = String(item.innerText).trim();
-      const newName = slugify(name);
-      // const id = `${curComponentName.value}?${newName}`;
-      const id = newName;
-      componentNavList.value.push({
-        id,
-        name,
-      });
-      item.id = id;
-    });
-
     // 复制代码
     markdownDom.querySelectorAll('a').forEach((item) => {
       item.target = '_blank';
@@ -214,10 +202,19 @@ const getApigwAPIDetail = async () => {
   try {
     const res = await getGatewaysDetailsDocs(curApigwId.value);
     curApigw.value = res;
-    initMarkdownHtml();
   } catch (e) {
     console.log(e);
   } finally {
+  }
+};
+
+// 获取当前system 的信息
+const getSystemDetail = async () => {
+  try {
+    const res = await getComponenSystemDetail('default', curApigwId.value);
+    curApigw.value = res;
+  } catch (error) {
+    console.log('error', error);
   }
 };
 
@@ -237,10 +234,33 @@ const getApigwSDK = async (language: string) => {
   }
 };
 
+// 获取当前SDK的信息
+const getSDKDetail = async () => {
+  try {
+    const res = await getESBSDKDetail('default', { language: 'python' });
+    curSdk.value = {
+      sdk: {
+        name: res.sdk_name,
+        version: res.sdk_version_number,
+        url: res.sdk_download_url,
+        install_command: res.sdk_install_command,
+      },
+    };
+  } catch (error) {
+    console.log('error', error);
+  }
+};
+
 const init = async () => {
-  curApigwId.value = props.apigwId;
-  await getApigwAPIDetail();
+  curApigwId.value = props.targetId;
+  if (curTab.value === 'apigw') {
+    await getApigwAPIDetail();
+  } else if (curTab.value === 'component') {
+    await getSystemDetail();
+    await getSDKDetail();
+  }
   await getApigwSDK('python');
+  initMarkdownHtml();
 };
 
 onMounted(() => {
