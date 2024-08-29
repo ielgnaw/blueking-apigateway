@@ -190,33 +190,33 @@ const headerList = computed(() => ([
     enabled: true,
     link: '',
   },
-  {
-    name: t('组件API文档'),
-    id: 4,
-    url: 'componentDoc',
-    enabled: user.featureFlags?.MENU_ITEM_ESB_API_DOC,
-    link: '',
-  },
-  {
-    name: t('网关API SDK'),
-    id: 5,
-    params: {
-      type: 'apigateway',
-    },
-    url: 'apigwSDK',
-    enabled: user.featureFlags?.ENABLE_SDK,
-    link: '',
-  },
-  {
-    name: t('组件API SDK'),
-    id: 6,
-    params: {
-      type: 'esb',
-    },
-    url: 'esbSDK',
-    enabled: user.featureFlags?.ENABLE_SDK,
-    link: '',
-  },
+  // {
+  //   name: t('组件API文档'),
+  //   id: 4,
+  //   url: 'componentDoc',
+  //   enabled: user.featureFlags?.MENU_ITEM_ESB_API_DOC,
+  //   link: '',
+  // },
+  // {
+  //   name: t('网关API SDK'),
+  //   id: 5,
+  //   params: {
+  //     type: 'apigateway',
+  //   },
+  //   url: 'apigwSDK',
+  //   enabled: user.featureFlags?.ENABLE_SDK,
+  //   link: '',
+  // },
+  // {
+  //   name: t('组件API SDK'),
+  //   id: 6,
+  //   params: {
+  //     type: 'esb',
+  //   },
+  //   url: 'esbSDK',
+  //   enabled: user.featureFlags?.ENABLE_SDK,
+  //   link: '',
+  // },
 ]));
 
 const systemCls = ref('mac');

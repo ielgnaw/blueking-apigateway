@@ -1,5 +1,6 @@
 <template>
-  <div class="intro-side-content-wrap">
+  <!--  页面右侧的网关详情/组件详情  -->
+  <div v-if="basics" class="intro-side-content-wrap">
     <header class="intro-header">
       <main v-if="curTab === 'apigw'" class="title">{{ t('网关详情') }}</main>
       <main v-else-if="curTab === 'component'" class="title">{{ t('组件详情') }}</main>
@@ -18,15 +19,16 @@
     <main v-if="curTab === 'apigw'" class="component-content">
       <div class="ag-markdown-view" id="markdown">
         <header class="content-title">{{ t('网关描述') }}</header>
-        <main class="content-main">{{ curApigw.description }}</main>
+        <main class="content-main">{{ basics.description }}</main>
         <header class="content-title">{{ t('网关负责人') }}</header>
-        <main class="content-main">{{ curApigw.maintainers.join(', ') }}</main>
+        <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
         <header class="content-title">{{ t('网关访问地址') }}</header>
-        <main class="content-main">{{ curApigw.api_url }}</main>
+        <main class="content-main">{{ basics.api_url }}</main>
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
           <header class="content-title">{{ t('网关 SDK') }}</header>
           <div class="bk-button-group">
             <bk-button class="is-selected">Python</bk-button>
+            <bk-button>Java</bk-button>
           </div>
         </template>
       </div>
@@ -86,12 +88,12 @@
     <main v-else-if="curTab === 'component'" class="component-content">
       <div class="ag-markdown-view">
         <header class="content-title">{{ t('网关描述') }}</header>
-        <main class="content-main">{{ curApigw.comment }}</main>
+        <main class="content-main">{{ basics.comment }}</main>
         <header class="content-title">{{ t('网关负责人') }}</header>
-        <main class="content-main">{{ curApigw.maintainers.join(', ') }}</main>
+        <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
         <header class="content-title">{{ t('组件 API SDK') }}</header>
         <main class="content-main">
-          <SdkDetail :params="curSdk"></SdkDetail>
+          <SdkDetail :sdk="sdks[0]"></SdkDetail>
         </main>
       </div>
     </main>
@@ -108,62 +110,62 @@ import {
   onMounted,
   inject,
   Ref,
+  toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { slugify } from 'transliteration';
 import chat from '@/components/chat/index.vue';
 import SdkDetail from './sdk-detail.vue';
-import {
-  getGatewaysDetailsDocs,
-  getApigwSDKDocs,
-  getComponenSystemDetail,
-  getESBSDKDetail,
-} from '@/http';
 import { InfoLine } from 'bkui-vue/lib/icon';
 import { useUser } from '@/store';
-import { TabType } from '@/views/apigwDocs/types';
+import {
+  IApiGatewayBasics,
+  IApiGatewaySdk,
+  IComponentSdk,
+  ISystemBasics,
+  TabType,
+} from '@/views/apigwDocs/types';
 
 const userStore = useUser();
 const route = useRoute();
 const { t } = useI18n();
-const sdks = ref<any>([]);
 const sdkConfig = reactive({
   title: '',
   isShow: false,
 });
 const curSdk = ref<any>({});
-const curApigw = ref<any>({
-  id: 2,
-  name: '',
-  description: '',
-  maintainers: [],
-  is_official: '',
-  api_url: '',
-});
 const isAbnormal = ref<boolean>(false);
 const curApigwId = ref();
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');
 
-const props = defineProps({
-  targetId: {
-    type: String,
-    default: '',
-  },
+interface IProps {
+  basics: IApiGatewayBasics & ISystemBasics | null;
+  sdks: IApiGatewaySdk[] & IComponentSdk[];
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  basics: () => null,
+  sdks: () => [],
 });
+
+const {
+  basics,
+  sdks,
+} = toRefs(props);
 
 const curUser = computed(() => userStore?.user);
 const userList = computed(() => {
   // 去重
   const set = new Set([
     curUser.value?.username,
-    ...curApigw.value?.maintainers,
+    ...basics.value?.maintainers,
   ]);
   return [...set];
 });
-const chatName = computed(() => `${t('[蓝鲸网关API咨询] 网关')}${curApigw.value?.name}`);
+const chatName = computed(() => `${t('[蓝鲸网关API咨询] 网关')}${basics.value?.name}`);
 const chatContent = computed(() => `${t('网关API文档')}:${location.href}`);
 
 const handleShow = (data: any) => {
@@ -198,75 +200,6 @@ const initMarkdownHtml = () => {
   });
 };
 
-const getApigwAPIDetail = async () => {
-  try {
-    const res = await getGatewaysDetailsDocs(curApigwId.value);
-    curApigw.value = res;
-  } catch (e) {
-    console.log(e);
-  } finally {
-  }
-};
-
-// 获取当前system 的信息
-const getSystemDetail = async () => {
-  try {
-    const res = await getComponenSystemDetail('default', curApigwId.value);
-    curApigw.value = res;
-  } catch (error) {
-    console.log('error', error);
-  }
-};
-
-const getApigwSDK = async (language: string) => {
-  try {
-    const query = {
-      limit: 10000,
-      offset: 0,
-      language,
-    };
-    const res = await getApigwSDKDocs(curApigwId.value, query);
-    sdks.value = res;
-    isAbnormal.value = false;
-  } catch (e) {
-    isAbnormal.value = true;
-    console.log(e);
-  }
-};
-
-// 获取当前SDK的信息
-const getSDKDetail = async () => {
-  try {
-    const res = await getESBSDKDetail('default', { language: 'python' });
-    curSdk.value = {
-      sdk: {
-        name: res.sdk_name,
-        version: res.sdk_version_number,
-        url: res.sdk_download_url,
-        install_command: res.sdk_install_command,
-      },
-    };
-  } catch (error) {
-    console.log('error', error);
-  }
-};
-
-const init = async () => {
-  curApigwId.value = props.targetId;
-  if (curTab.value === 'apigw') {
-    await getApigwAPIDetail();
-  } else if (curTab.value === 'component') {
-    await getSystemDetail();
-    await getSDKDetail();
-  }
-  await getApigwSDK('python');
-  initMarkdownHtml();
-};
-
-onMounted(() => {
-  init();
-});
-
 </script>
 
 <style lang="scss" scoped>
@@ -288,7 +221,7 @@ onMounted(() => {
       .content-title,
       .content-main {
         font-size: 14px;
-        color: #63656E;
+        color: #63656e;
         letter-spacing: 0;
         line-height: 22px;
       }

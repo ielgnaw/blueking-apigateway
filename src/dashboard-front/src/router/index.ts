@@ -366,7 +366,7 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: ':curTab/:targetId/',
+        path: ':curTab/:targetName/',
         name: 'apiDocDetail',
         component: APIDocDetail,
         meta: {

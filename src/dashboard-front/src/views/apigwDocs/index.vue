@@ -107,7 +107,7 @@
                   </bk-button>
                   <a
                     class="ag-link pl10 pr10"
-                    :href="curTab === 'apigw' ? row?.sdk?.url || '' : row?.sdk_download_url || ''"
+                    :href="row?.sdk_download_url ?? ''"
                   >
                     {{ t('下载 SDK') }}
                   </a>
@@ -137,7 +137,13 @@
                   <i class="apigateway-icon icon-ag-document f14"></i>
                   {{ t('查看 SDK') }}
                 </bk-link>
-                <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
+                <bk-link
+                  :href="system.sdk?.sdk_download_url"
+                  :disabled="!system.sdk?.sdk_download_url"
+                  theme="primary"
+                  v-bk-tooltips="{ content: t('SDK未生成，可联系负责人生成SDK'), disabled: system.sdk?.sdk_download_url }"
+                  class="f12"
+                >
                   <i class="apigateway-icon icon-ag-download f14"></i>
                   {{ t('下载 SDK') }}
                 </bk-link>
@@ -228,6 +234,7 @@
     </main>
     <!--  SDK使用说明 Slider  -->
     <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
+    <!--  网关 SDK 地址 dialog  -->
     <SdkDetailDialog v-model="isSdkDetailDialogShow"></SdkDetailDialog>
   </div>
 </template>
@@ -313,7 +320,7 @@ const gotoDetails = (data: any) => {
     // name: 'apigwAPIDetailIntro',
     name: 'apiDocDetail',
     params: {
-      targetId: data?.name,
+      targetName: data?.name,
       curTab: curTab.value,
     },
   });

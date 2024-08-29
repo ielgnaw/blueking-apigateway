@@ -11,6 +11,7 @@
       <div class="dialog-main">
         <div class="bk-button-group mb24">
           <bk-button class="is-selected" style="width: 150px">Python</bk-button>
+          <bk-button style="width: 150px">Java</bk-button>
           <!-- <bk-button disabled style="width: 150px">GO</bk-button> -->
         </div>
         <div class="data-box">
@@ -77,38 +78,35 @@
               </i>
             </main>
           </article>
-
-          <template v-if="type === 'apigateway'">
-            <article class="row-item">
-              <aside class="key">
-                <span class="column-key">
-                  {{ t('资源版本') }}
-                  <span v-bk-tooltips="t('该SDK关联的API资源版本')">
-                    <i class="icon apigateway-icon icon-ag-help"></i>
-                  </span>
-                  :
+          <article class="row-item">
+            <aside class="key">
+              <span class="column-key">
+                {{ t('资源版本') }}
+                <span v-bk-tooltips="t('该SDK关联的API资源版本')">
+                  <i class="icon apigateway-icon icon-ag-help"></i>
                 </span>
-              </aside>
-              <main class="value">
-                <span
-                  class="column-value"
-                  v-bk-tooltips.top="{ content: curParams.resource_version_display, allowHTML: false }"
-                >
-                  {{ curParams.resource_version_display || '--' }}
-                </span>
-              </main>
-            </article>
-            <article class="row-item" v-if="stageText">
-              <aside class="key">
-                <span class="column-key">
-                  {{ t('版本已发环境') }}:
-                </span>
-              </aside>
-              <main class="value">
-                <span class="column-value" v-bk-tooltips.top="stageText">{{ stageText || '--' }}</span>
-              </main>
-            </article>
-          </template>
+                :
+              </span>
+            </aside>
+            <main class="value">
+              <span
+                class="column-value"
+                v-bk-tooltips.top="{ content: curParams.resource_version_display, allowHTML: false }"
+              >
+                {{ curParams.resource_version_display || '--' }}
+              </span>
+            </main>
+          </article>
+          <article class="row-item" v-if="stageText">
+            <aside class="key">
+              <span class="column-key">
+                {{ t('版本已发环境') }}:
+              </span>
+            </aside>
+            <main class="value">
+              <span class="column-value" v-bk-tooltips.top="stageText">{{ stageText || '--' }}</span>
+            </main>
+          </article>
         </div>
       </div>
     </main>

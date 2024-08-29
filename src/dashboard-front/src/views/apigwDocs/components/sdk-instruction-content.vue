@@ -2,7 +2,8 @@
   <!--  SDK使用说明 Slider 的内容  -->
   <div class="sdk-wrapper">
     <div class="bk-button-group ">
-      <bk-button class="is-selected">Python</bk-button>
+      <bk-button :class="{ 'is-selected': language === 'python' }" @click="changeLanguage('python')">Python</bk-button>
+      <bk-button :class="{ 'is-selected': language === 'java' }" @click="changeLanguage('java')">Java</bk-button>
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <div class="ag-markdown-view" id="markdown" :key="renderHtmlIndex" v-html="markdownHtml"></div>
@@ -17,7 +18,6 @@ import {
   inject,
   Ref,
 } from 'vue';
-import { useRoute } from 'vue-router';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/monokai-sublime.css';
@@ -30,14 +30,15 @@ import {
   getGatewaySDKDoc,
   getESBSDKDoc,
 } from '@/http';
-import { TabType } from '@/views/apigwDocs/types';
+import {
+  LanguageType,
+  TabType,
+} from '@/views/apigwDocs/types';
 
-const curType = inject<Ref<TabType>>('curTab');
+const curTab = inject<Ref<TabType>>('curTab');
 
-const route = useRoute();
-
+const language = ref<LanguageType>('python');
 const board = ref<string>('-');
-const type = ref<TabType>('apigw');
 const sdkDoc = ref<string>('');
 const markdownHtml = ref<string>('');
 const active = ref<string>('sdk');
@@ -123,12 +124,12 @@ const getSDKlist = async (keyword: any | string = null) => {
   const pageParams = {
     limit: pagination.value.limit,
     offset: pagination.value.offset,
-    language: 'python',
+    language: language.value,
     keyword,
   };
   isLoading.value = true;
   try {
-    if (type.value === 'apigw') {
+    if (curTab.value === 'apigw') {
       const res = await getGatewaySDKlist(pageParams);
       curPageData.value = res.results;
       pagination.value.count = res.count;
@@ -138,17 +139,17 @@ const getSDKlist = async (keyword: any | string = null) => {
       pagination.value.count = res.length;
     }
     isLoading.value = false;
-  } catch (error) {
-    console.log('error', error);
+  } catch {
+    isLoading.value = false;
   }
 };
 
 // 获取SDK 说明
 const getSDKDoc = async () => {
-  const params = { language: 'python' };
+  const params = { language: language.value };
   isLoading.value = true;
   try {
-    if (type.value === 'apigw') {
+    if (curTab.value === 'apigw') {
       const res = await getGatewaySDKDoc(params);
       sdkDoc.value = res.content;
     } else {
@@ -157,22 +158,36 @@ const getSDKDoc = async () => {
     }
     isLoading.value = false;
     initMarkdownHtml(sdkDoc.value);
-  } catch (error) {
-
+  } catch {
+    isLoading.value = false;
   }
 };
 
+const changeLanguage = (lang: LanguageType) => {
+  if (lang === language.value) return;
+  language.value = lang;
+  init();
+};
+
 const init = () => {
-  const tab: any = route.query.tab;
-  active.value = tab ? tab : 'sdk';
-  type.value = curType.value;
-  getSDKlist();
-  getSDKDoc();
+  try {
+    getSDKlist();
+    getSDKDoc();
+  } catch {
+    sdkDoc.value = '';
+    markdownHtml.value = '';
+    curPageData.value = [];
+    pagination.value = {
+      offset: 0,
+      count: 0,
+      limit: 10,
+    };
+  }
 };
 
 // 监听type的变化
 watch(
-  () => curType.value,
+  () => curTab.value,
   () => {
     active.value = 'sdk';
     curPageData.value = [];

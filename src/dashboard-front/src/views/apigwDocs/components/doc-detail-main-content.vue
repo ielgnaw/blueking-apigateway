@@ -6,10 +6,10 @@
         <footer class="res-header-footer">
           <main class="res-desc">{{ resource?.description ?? '--' }}</main>
           <aside class="res-sdk">
-            <bk-link theme="primary" class="f12">
+            <span class="f12" @click="handleSdkInstructionClick">
               <i class="apigateway-icon icon-ag-document f14"></i>
               {{ t('SDK 使用说明') }}
-            </bk-link>
+            </span>
           </aside>
         </footer>
       </header>
@@ -36,7 +36,7 @@
               >
                 {{ t('权限申请') }}
               </span>：
-              {{ resource.resource_perm_required ? t('是') : t('否') }}
+              {{ (resource.resource_perm_required || resource.component_permission_required) ? t('是') : t('否') }}
             </span>
           </section>
           <section class="basic-cell">
@@ -63,6 +63,7 @@
 <script setup lang="ts">
 import SideNav from '@/components/side-nav/index.vue';
 import {
+  IComponent,
   IResource,
   TabType,
 } from '@/views/apigwDocs/types';
@@ -82,7 +83,7 @@ import { copy } from '@/common/util';
 const { t } = useI18n();
 
 interface IProps {
-  resource: IResource | null;
+  resource: IResource & IComponent | null;
   navList: { id: number, name: string }[];
   markdownHtml: string;
   updatedTime: string;
@@ -104,6 +105,8 @@ const {
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');
+
+const emit = defineEmits(['show-sdk-instruction']);
 
 const appVerifiedTooltips = computed(() => {
   if (curTab.value === 'apigw') return t('应用访问该网关API时，是否需提供应用认证信息');
@@ -161,6 +164,10 @@ const initMarkdownHtml = (box: string) => {
   });
 };
 
+const handleSdkInstructionClick = () => {
+  emit('show-sdk-instruction');
+};
+
 watch(markdownHtml, () => {
   initMarkdownHtml('resMarkdown');
 });
@@ -205,6 +212,11 @@ $code-color: #63656e;
           color: #979ba5;
           letter-spacing: 0;
           line-height: 22px;
+        }
+
+        .res-sdk {
+          color: #3a84ff;
+          cursor: pointer;
         }
       }
     }

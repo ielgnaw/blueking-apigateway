@@ -7,7 +7,7 @@
           class="icon apigateway-icon icon-ag-return-small"
           @click="router.back()"
         ></i>
-        {{ curTargetId }}
+        {{ curTargetName }}
         <!--        <div class="title-name">-->
         <!--          <span></span>-->
         <!--          <div class="name"></div>-->
@@ -46,14 +46,13 @@
                 <div class="simple-side-nav">
                   <header class="side-nav-header">
                     <header class="title">
-                      {{ t('资源列表') }}
-                      <aside v-if="resourceList.length" class="sub-title">{{ resourceList.length }}</aside>
+                      {{ curTab === 'apigw' ? t('资源列表') : t('API列表') }}
+                      <aside v-if="resourceList.length" class="sub-title">{{ filteredResourceList.length }}</aside>
                     </header>
                     <main class="nav-filters">
-                      <article>
+                      <article v-if="curTab === 'apigw'">
                         <bk-select
-                          v-model="curStageId"
-                          style=""
+                          v-model="curStageName"
                           :clearable="false"
                           filterable
                           :input-search="false"
@@ -72,25 +71,29 @@
                       <article>
                         <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
                         <bk-input
-                          :placeholder="searchPlaceholder"
                           type="search"
-                          clearable
                           v-model="keyword"
+                          :placeholder="searchPlaceholder"
+                          clearable
                         >
                         </bk-input>
                       </article>
                     </main>
                   </header>
                   <main class="resource-list custom-scroll-bar">
-                    <template v-if="resourceList.length">
+                    <template v-if="filteredResourceList.length">
                       <article
                         class="resource-item"
-                        v-for="resource in resourceList"
+                        v-for="resource in filteredResourceList"
                         :key="resource.id"
+                        :class="{ active: resource.id === curResource.id }"
                         @click="handleResClick(resource.id)"
                       >
-                        <header class="res-item-name">{{ resource.name }}</header>
-                        <main class="res-item-desc">{{ resource.description }}</main>
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <header class="res-item-name" v-html="getHighlightedHtml(resource.name)" v-bk-overflow-tips
+                        ></header>
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <main class="res-item-desc" v-html="getHighlightedHtml(resource.description)"></main>
                       </article>
                     </template>
                     <template v-else-if="keyword">
@@ -105,12 +108,13 @@
             </template>
             <template #main>
               <div class="main-content-wrap">
-                <DetailMainContent
+                <DocDetailMainContent
                   :resource="curResource"
                   :nav-list="navList"
                   :markdown-html="curResMarkdownHtml"
                   :updated-time="updatedTime"
-                ></DetailMainContent>
+                  @show-sdk-instruction="isSdkInstructionSliderShow = true"
+                ></DocDetailMainContent>
               </div>
             </template>
           </bk-resize-layout>
@@ -118,12 +122,17 @@
         <template #aside>
           <aside class="aside-right">
             <main class="apigw-desc-wrap custom-scroll-bar">
-              <DocDetailSideContent :target-id="curTargetId"></DocDetailSideContent>
+              <DocDetailSideContent
+                :basics="curTargetBasics"
+                :sdks="sdks"
+              ></DocDetailSideContent>
             </main>
           </aside>
         </template>
       </bk-resize-layout>
     </main>
+    <!--  SDK使用说明 Slider  -->
+    <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
   </div>
 </template>
 
@@ -131,11 +140,7 @@
 import {
   ref,
   computed,
-  watch,
   nextTick,
-  onMounted,
-  inject,
-  Ref,
   provide,
   onBeforeMount,
 } from 'vue';
@@ -153,35 +158,44 @@ import {
   getComponenSystemDetail,
   getSystemAPIList,
   getSystemComponentDoc,
+  getApigwSDKDocs,
+  getESBSDKDetail,
 } from '@/http';
 import TableEmpty from '@/components/table-empty.vue';
 import DocDetailSideContent from '@/views/apigwDocs/components/doc-detail-side-content.vue';
 import {
+  IApiGatewayBasics,
   IComponent,
+  ISystemBasics,
   IResource,
   TabType,
+  IComponentSdk,
+  IApiGatewaySdk,
+  LanguageType,
+  IStage,
 } from '@/views/apigwDocs/types';
-import DetailMainContent from '@/views/apigwDocs/components/detail-main-content.vue';
+import DocDetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import { slugify } from 'transliteration';
 import { copy } from '@/common/util';
 import { ResizeLayout } from 'bkui-vue';
+import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const curApigwId = ref<any>(0);
-const curTargetId = ref('');
-const curApigw = ref<any>({});
-const resourceList = ref<IResource[] | IComponent[]>([]);
-const stageList = ref<any>([]);
-const curStageId = ref<any>('');
-const curComponentName = ref<any>('');
-const keyword = ref<string>('');
-const curResource = ref<IResource | IComponent | null>(null);
+const curTargetName = ref('');
+const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null);
+const sdks = ref<IApiGatewaySdk[] & IComponentSdk[]>([]);
+const resourceList = ref<(IResource & IComponent)[]>([]);
+const stageList = ref<IStage[]>([]);
+const curStageName = ref('');
+const keyword = ref('');
+const curResource = ref<IResource & IComponent | null>(null);
 const mainContentLoading = ref<boolean>(false);
+const isSdkInstructionSliderShow = ref(false);
 const navList = ref<{ id: number, name: string }[]>([
   { id: 1, name: t('API 地址') },
   { id: 2, name: t('公共请求参数') },
@@ -195,39 +209,59 @@ const curTab = ref<TabType>('apigw');
 provide('curTab', curTab);
 
 const searchPlaceholder = computed(() => {
-  return t('在{resourceLength}个资源中搜索...', { resourceLength: resourceList.value?.length });
+  return t(
+    '在{resourceLength}个{type}中搜索...',
+    {
+      resourceLength: resourceList.value.length,
+      type: curTab.value === 'apigw' ? t('资源') : 'API',
+    },
+  );
 });
 
-const getApigwAPIDetail = async () => {
+const filteredResourceList = computed(() => {
+  return resourceList.value.filter(res => res.name.includes(keyword.value) || res.description.includes(keyword.value));
+});
+
+const fetchBasics = async () => {
   try {
-    const res = await getGatewaysDetailsDocs(curTargetId.value);
-    curApigw.value = res;
-  } catch (e) {
-    console.log(e);
+    if (curTab.value === 'apigw') {
+      curTargetBasics.value = await getGatewaysDetailsDocs(curTargetName.value);
+    } else if (curTab.value === 'component') {
+      curTargetBasics.value = await getComponenSystemDetail('default', curTargetName.value);
+    }
+  } catch {
+    curTargetBasics.value = null;
   }
 };
 
-const getApigwStages = async () => {
-  if (stageList.value.length) {
-    return;
+const fetchSdks = async (language: LanguageType = 'python') => {
+  try {
+    if (curTab.value === 'apigw') {
+      const query = {
+        limit: 10000,
+        offset: 0,
+        language,
+      };
+      sdks.value = await getApigwSDKDocs(curTargetName.value, query);
+    } else if (curTab.value === 'component') {
+      const res = await getESBSDKDetail('default', { language });
+      sdks.value = res ? [{ language, ...res }] : [];
+    }
+  } catch {
+    sdks.value = [];
   }
+};
+
+const fetchApigwStages = async () => {
   try {
     const query = {
       limit: 10000,
       offset: 0,
     };
-    const res = await getApigwStagesDocs(curTargetId.value, query);
-    stageList.value = res;
-    if (route.params.stage) {
-      curStageId.value = route.params.stage;
-    } else if (stageList.value?.length) {
-      curStageId.value = stageList.value[0]?.name;
-    } else {
-      curStageId.value = '';
-    }
-    await fetchResources();
-  } catch (e) {
-    console.log(e);
+    stageList.value = await getApigwStagesDocs(curTargetName.value, query);
+    curStageName.value = stageList.value[0]?.name ?? '';
+  } catch {
+    stageList.value = [];
   }
 };
 
@@ -245,20 +279,16 @@ const getApigwAPI = async () => {
 
 const fetchResources = async () => {
   try {
-    let res: IResource[] | IComponent[] = [];
+    let res: (IResource & IComponent)[] = [];
     if (curTab.value === 'apigw') {
-      if (stageList.value.length) {
-        const query = {
-          limit: 10000,
-          offset: 0,
-          stage_name: curStageId.value,
-        };
-        res = await getApigwResourcesDocs(curTargetId.value, query) as IResource[];
-      } else {
-        resourceList.value = [];
-      }
+      const query = {
+        limit: 10000,
+        offset: 0,
+        stage_name: curStageName.value,
+      };
+      res = await getApigwResourcesDocs(curTargetName.value, query) as (IResource & IComponent)[];
     } else if (curTab.value === 'component') {
-      res = await getSystemAPIList('default', curTargetId.value) as IComponent[];
+      res = await getSystemAPIList('default', curTargetName.value) as (IResource & IComponent)[];
     }
     resourceList.value = res ?? [];
     curResource.value = resourceList.value[0] ?? null;
@@ -270,11 +300,8 @@ const fetchResources = async () => {
   }
 };
 
-const reset = () => {
-  curComponentName.value = '';
-};
-
 const handleResClick = async (resId: number) => {
+  if (curResource.value.id === resId) return;
   curResource.value = resourceList.value.find(res => res.id === resId) ?? null;
   if (curResource.value) {
     await getApigwResourceDoc();
@@ -305,11 +332,11 @@ const getApigwResourceDoc = async () => {
     let res: any;
     if (curTab.value === 'apigw') {
       const query = {
-        stage_name: curStageId.value,
+        stage_name: curStageName.value,
       };
-      res = await getApigwResourceDocDocs(curTargetId.value, curResource.value.name, query);
+      res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
     } else if (curTab.value === 'component') {
-      res = await getSystemComponentDoc('default', curTargetId.value, curResource.value.name);
+      res = await getSystemComponentDoc('default', curTargetName.value, curResource.value.name);
     }
     const { content, updated_time } = res;
     curResMarkdownHtml.value = md.render(content);
@@ -320,75 +347,24 @@ const getApigwResourceDoc = async () => {
   }
 };
 
-const handleShowDoc = (resource: any) => {
-  curResource.value = resource;
-  curComponentName.value = resource.name;
-
-  router.push({
-    name: 'apigwAPIDetailDoc',
-    params: {
-      apigwId: curApigwId.value,
-      stage: curStageId.value,
-      resourceId: resource.name,
-    },
-    query: {
-      stage: curStageId.value,
-    },
-  });
+const handleStageChange = async () => {
+  await fetchResources();
 };
 
-const handleShowIntro = () => {
-  curComponentName.value = '';
-  // router.push({
-  //   name: 'apigwAPIDetailIntro',
-  // });
-};
-
-const hightlight = (value: string) => {
+const getHighlightedHtml = (value: string) => {
   if (keyword.value) {
     return value.replace(new RegExp(`(${keyword.value})`), '<em class="ag-keyword">$1</em>');
   }
   return value;
 };
 
-const handleApigwChange = async (data: string) => {
-  reset();
-  stageList.value = [];
-  curApigwId.value = data;
-  await getApigwStages();
-  // router.push({
-  //   name: 'apigwAPIDetailIntro',
-  //   params: {
-  //     apigwId: data,
-  //   },
-  //   query: {
-  //     stage: curStageId.value,
-  //   },
-  // });
-};
-
-const handleStageChange = async () => {
-  reset();
-  await fetchResources();
-  const match = resourceList.value?.find((resource: any) => curResource.value?.name === resource.name);
-  if (match) {
-    // handleShowDoc(match);
-  } else {
-    handleShowIntro();
-  }
-  // router.push({
-  //   query: { stage: curStageId.value },
-  // });
-};
-
 const init = async () => {
-  // getApigwAPI();
   if (curTab.value === 'apigw') {
-    await getApigwStages();
-  } else if (curTab.value === 'component') {
-    await fetchResources();
+    await fetchApigwStages();
   }
-  await getApigwAPIDetail();
+  await fetchBasics();
+  await fetchSdks();
+  await fetchResources();
 };
 
 // 记录右栏折叠状态
@@ -405,30 +381,11 @@ const updateIsRightAsideCollapsed = (collapsed: boolean) => {
 };
 
 onBeforeMount(() => {
-  const params = route.params;
-  curTargetId.value = params.targetId as string;
+  const { params } = route;
+  curTargetName.value = params.targetName as string;
   curTab.value = params.curTab as TabType || 'apigw';
   init();
 });
-
-// onBeforeRouteUpdate((to, from) => {
-//   console.log(to);
-//   console.log(from);
-// });
-
-// watch(
-//   () => route,
-//   (payload: any) => {
-//     console.log('doc-detail.vue');
-//     if (payload.params?.apigwId) {
-//       console.log('=>(doc-detail.vue:538) payload', payload.params);
-//       curApigw.value = { name: payload.params.apigwId };
-//       curTab.value = payload.params?.curTab || 'apigw';
-//       init();
-//     }
-//   },
-//   { immediate: true, deep: true },
-// );
 
 </script>
 
@@ -565,10 +522,17 @@ onBeforeMount(() => {
         background: #fff;
         cursor: pointer;
 
+        .res-item-name,
+        .res-item-desc {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
         .res-item-name {
           font-size: 14px;
           color: #313238;
-          letter-spacing: 0;
           line-height: 22px;
         }
 
@@ -576,10 +540,6 @@ onBeforeMount(() => {
           font-size: 12px;
           color: #979ba5;
           line-height: 20px;
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow-y: hidden;
         }
 
         &:hover, &.active {

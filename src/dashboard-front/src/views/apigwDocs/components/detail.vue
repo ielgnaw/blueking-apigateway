@@ -155,7 +155,7 @@ import {
   IResource,
   TabType,
 } from '@/views/apigwDocs/types';
-import DetailMainContent from '@/views/apigwDocs/components/detail-main-content.vue';
+import DetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import { slugify } from 'transliteration';
