@@ -104,17 +104,13 @@
 import {
   ref,
   reactive,
-  watch,
   nextTick,
   computed,
-  onMounted,
   inject,
   Ref,
   toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
-import { slugify } from 'transliteration';
 import chat from '@/components/chat/index.vue';
 import SdkDetail from './sdk-detail.vue';
 import { InfoLine } from 'bkui-vue/lib/icon';
@@ -128,7 +124,6 @@ import {
 } from '@/views/apigwDocs/types';
 
 const userStore = useUser();
-const route = useRoute();
 const { t } = useI18n();
 const sdkConfig = reactive({
   title: '',

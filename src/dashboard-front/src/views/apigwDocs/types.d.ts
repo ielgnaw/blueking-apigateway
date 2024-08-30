@@ -7,6 +7,11 @@ interface ICategory {
   _navId?: string;
 }
 
+interface INavItem {
+  id: number | string;
+  name: string;
+}
+
 type LanguageType = 'python' | 'java';
 
 // 网关类型
@@ -91,6 +96,7 @@ export {
   ICategory,
   IComponent,
   IComponentSdk,
+  INavItem,
   IResource,
   IResourceVersion,
   IStage,

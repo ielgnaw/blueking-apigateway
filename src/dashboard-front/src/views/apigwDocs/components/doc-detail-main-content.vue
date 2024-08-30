@@ -1,6 +1,6 @@
 <template>
   <div class="content-wrap">
-    <main v-if="resource" class="target-detail custom-scroll-bar">
+    <main v-if="resource" class="target-detail custom-scroll-bar" ref="detailWrapRef">
       <header class="detail-header">
         <header class="res-name">{{ resource?.name ?? '--' }}</header>
         <footer class="res-header-footer">
@@ -61,9 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import SideNav from '@/components/side-nav/index.vue';
+import SideNav from './side-nav.vue';
 import {
   IComponent,
+  INavItem,
   IResource,
   TabType,
 } from '@/views/apigwDocs/types';
@@ -71,20 +72,20 @@ import {
   computed,
   inject,
   nextTick,
-  onMounted,
-  Ref,
   ref,
+  Ref,
   toRefs,
   watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { copy } from '@/common/util';
+import { useScroll } from '@vueuse/core';
 
 const { t } = useI18n();
 
 interface IProps {
   resource: IResource & IComponent | null;
-  navList: { id: number, name: string }[];
+  navList: INavItem[];
   markdownHtml: string;
   updatedTime: string;
 }
@@ -107,6 +108,9 @@ const {
 const curTab = inject<Ref<TabType>>('curTab');
 
 const emit = defineEmits(['show-sdk-instruction']);
+
+const detailWrapRef = ref<HTMLElement | null>(null);
+const { y } = useScroll(detailWrapRef);
 
 const appVerifiedTooltips = computed(() => {
   if (curTab.value === 'apigw') return t('应用访问该网关API时，是否需提供应用认证信息');
@@ -170,6 +174,13 @@ const handleSdkInstructionClick = () => {
 
 watch(markdownHtml, () => {
   initMarkdownHtml('resMarkdown');
+});
+
+watch(resource, () => {
+  if (y.value === 0) return;
+  nextTick(() => {
+    y.value = 0;
+  });
 });
 
 </script>

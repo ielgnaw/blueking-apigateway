@@ -69,7 +69,6 @@
                         </bk-select>
                       </article>
                       <article>
-                        <!-- 环境切换时添加 query参数 ， 根据query参数切换对应的环境 -->
                         <bk-input
                           type="search"
                           v-model="keyword"
@@ -173,12 +172,10 @@ import {
   IApiGatewaySdk,
   LanguageType,
   IStage,
+  INavItem,
 } from '@/views/apigwDocs/types';
 import DocDetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
 import MarkdownIt from 'markdown-it';
-import hljs from 'highlight.js';
-import { slugify } from 'transliteration';
-import { copy } from '@/common/util';
 import { ResizeLayout } from 'bkui-vue';
 import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
 
@@ -196,13 +193,11 @@ const keyword = ref('');
 const curResource = ref<IResource & IComponent | null>(null);
 const mainContentLoading = ref<boolean>(false);
 const isSdkInstructionSliderShow = ref(false);
-const navList = ref<{ id: number, name: string }[]>([
-  { id: 1, name: t('API 地址') },
-  { id: 2, name: t('公共请求参数') },
-]);
+const navList = ref<INavItem[]>([]);
 const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
 
 const curTab = ref<TabType>('apigw');
+const board = ref('default');
 
 // 提供当前 tab 的值
 // 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
@@ -227,7 +222,7 @@ const fetchBasics = async () => {
     if (curTab.value === 'apigw') {
       curTargetBasics.value = await getGatewaysDetailsDocs(curTargetName.value);
     } else if (curTab.value === 'component') {
-      curTargetBasics.value = await getComponenSystemDetail('default', curTargetName.value);
+      curTargetBasics.value = await getComponenSystemDetail(board.value, curTargetName.value);
     }
   } catch {
     curTargetBasics.value = null;
@@ -244,7 +239,7 @@ const fetchSdks = async (language: LanguageType = 'python') => {
       };
       sdks.value = await getApigwSDKDocs(curTargetName.value, query);
     } else if (curTab.value === 'component') {
-      const res = await getESBSDKDetail('default', { language });
+      const res = await getESBSDKDetail(board.value, { language });
       sdks.value = res ? [{ language, ...res }] : [];
     }
   } catch {
@@ -265,18 +260,6 @@ const fetchApigwStages = async () => {
   }
 };
 
-const getApigwAPI = async () => {
-  const pageParams = {
-    limit: 10000,
-    offset: 0,
-  };
-  try {
-    const res = await getGatewaysDocs('', pageParams);
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 const fetchResources = async () => {
   try {
     let res: (IResource & IComponent)[] = [];
@@ -288,7 +271,7 @@ const fetchResources = async () => {
       };
       res = await getApigwResourcesDocs(curTargetName.value, query) as (IResource & IComponent)[];
     } else if (curTab.value === 'component') {
-      res = await getSystemAPIList('default', curTargetName.value) as (IResource & IComponent)[];
+      res = await getSystemAPIList(board.value, curTargetName.value) as (IResource & IComponent)[];
     }
     resourceList.value = res ?? [];
     curResource.value = resourceList.value[0] ?? null;
@@ -302,49 +285,46 @@ const fetchResources = async () => {
 
 const handleResClick = async (resId: number) => {
   if (curResource.value.id === resId) return;
+  navList.value = [];
   curResource.value = resourceList.value.find(res => res.id === resId) ?? null;
   if (curResource.value) {
     await getApigwResourceDoc();
   }
 };
 
+const curResMarkdownHtml = ref('');
+const updatedTime = ref<string | null>(null);
+
 const md = new MarkdownIt({
   linkify: false,
   html: true,
   breaks: true,
-  highlight(str: string, lang: string) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(lang, str, true).value;
-      } catch (__) {
-      }
-    }
-
-    return '';
-  },
 });
 
-const curResMarkdownHtml = ref('');
-const updatedTime = ref<string | null>(null);
+md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
+  const curToken = tokens[idx];
+  const nextToken = tokens[idx + 1];
+  if (curToken.markup === '###' && nextToken?.type === 'inline') {
+    const headingText = nextToken.content;
+    curToken.attrPush(['id', headingText]);
+    navList.value.push({ id: headingText, name: headingText });
+  }
+  return self.renderToken(tokens, idx, options);
+};
 
 const getApigwResourceDoc = async () => {
-  try {
-    let res: any;
-    if (curTab.value === 'apigw') {
-      const query = {
-        stage_name: curStageName.value,
-      };
-      res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
-    } else if (curTab.value === 'component') {
-      res = await getSystemComponentDoc('default', curTargetName.value, curResource.value.name);
-    }
-    const { content, updated_time } = res;
-    curResMarkdownHtml.value = md.render(content);
-    updatedTime.value = updated_time;
-  } catch (e) {
-    console.log(e);
-  } finally {
+  let res: any;
+  if (curTab.value === 'apigw') {
+    const query = {
+      stage_name: curStageName.value,
+    };
+    res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
+  } else if (curTab.value === 'component') {
+    res = await getSystemComponentDoc(board.value, curTargetName.value, curResource.value.name);
   }
+  const { content, updated_time } = res;
+  curResMarkdownHtml.value = md.render(content);
+  updatedTime.value = updated_time;
 };
 
 const handleStageChange = async () => {

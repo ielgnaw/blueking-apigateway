@@ -303,6 +303,7 @@ const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
 
 // 当前展示的是 网关 | 组件 相关内容
 const curTab = ref<TabType>('apigw');
+const board = ref('default');
 const curCatNavId = ref('');
 const navPanelNamesList = ref<string[]>([]);
 
@@ -353,7 +354,7 @@ const componentSystemList = ref<ISystem[]>([]);
 
 const fetchComponentList = async () => {
   try {
-    const res = await getComponentSystemList('default') as ISystem[];
+    const res = await getComponentSystemList(board.value) as ISystem[];
     res.forEach((system) => {
       // 给组件分类添加一个跳转用的 _navId
       system.categories.forEach((cat) => {
