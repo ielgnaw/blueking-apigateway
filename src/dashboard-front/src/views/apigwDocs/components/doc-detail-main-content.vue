@@ -236,13 +236,13 @@ $code-color: #63656e;
       .res-basics,
       .res-detail-content {
         padding: 24px;
-        margin-bottom: 16px;
         background-color: #fff;
         box-shadow: 0 2px 4px 0 #1919290d;
         border-radius: 2px;
       }
 
       .res-basics {
+        margin-bottom: 16px;
         display: grid;
         grid-template-columns: 280px 280px;
         grid-template-rows: 40px 40px;
@@ -321,7 +321,7 @@ $code-color: #63656e;
     font-weight: bold;
     text-align: left;
     color: #313238;
-    line-height: 21px;
+    line-height: 22px;
   }
 
   h1 {
@@ -334,6 +334,10 @@ $code-color: #63656e;
 
   h3 {
     font-size: 16px;
+
+    &:first-of-type {
+      margin-top: 0 !important;
+    }
   }
 
   h4 {

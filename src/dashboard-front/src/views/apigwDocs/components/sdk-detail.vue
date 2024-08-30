@@ -107,7 +107,6 @@
 </template>
 
 <script lang="ts" setup>
-// import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { copy } from '@/common/util';
 import { HelpFill } from 'bkui-vue/lib/icon';
@@ -131,18 +130,9 @@ const props = withDefaults(defineProps<IProps>(), {
 
 const { sdk } = toRefs(props);
 
-// const stageText = computed(() => {
-//   let texts = [];
-//   if (props.released_stages) {
-//     texts = props.released_stages.map((item: any) => item.name);
-//   }
-
-//   return texts.join(', ');
-// });
-
 const handleDownload = () => {
-  if (sdk.value.url) {
-    window.open(sdk.value.url);
+  if (sdk.value.sdk_download_url) {
+    window.open(sdk.value.sdk_download_url);
   }
 };
 </script>

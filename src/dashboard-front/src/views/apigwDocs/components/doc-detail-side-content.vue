@@ -102,11 +102,10 @@
 
 <script lang="ts" setup>
 import {
-  ref,
-  reactive,
-  nextTick,
   computed,
   inject,
+  reactive,
+  ref,
   Ref,
   toRefs,
 } from 'vue';
@@ -122,16 +121,6 @@ import {
   ISystemBasics,
   TabType,
 } from '@/views/apigwDocs/types';
-
-const userStore = useUser();
-const { t } = useI18n();
-const sdkConfig = reactive({
-  title: '',
-  isShow: false,
-});
-const curSdk = ref<any>({});
-const isAbnormal = ref<boolean>(false);
-const curApigwId = ref();
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');
@@ -150,6 +139,15 @@ const {
   basics,
   sdks,
 } = toRefs(props);
+
+const userStore = useUser();
+const { t } = useI18n();
+const sdkConfig = reactive({
+  title: '',
+  isShow: false,
+});
+const curSdk = ref<any>({});
+const curApigwId = ref();
 
 const curUser = computed(() => userStore?.user);
 const userList = computed(() => {
@@ -171,28 +169,6 @@ const handleShow = (data: any) => {
 
 const handleDownload = (data: any) => {
   window.open(data?.sdk?.url);
-};
-
-const initMarkdownHtml = () => {
-  nextTick(() => {
-    const markdownDom = document.getElementById('markdown');
-    // 复制代码
-    markdownDom.querySelectorAll('a').forEach((item) => {
-      item.target = '_blank';
-    });
-    markdownDom.querySelectorAll('pre').forEach((item) => {
-      const btn = document.createElement('button');
-      const codeBox = document.createElement('div');
-      const code = item.querySelector('code').innerText;
-      btn.className = 'ag-copy-btn';
-      codeBox.className = 'code-box';
-      btn.innerHTML = '<span :title="t(`复制`)"><i class="bk-icon icon-clipboard mr5"></i></span>';
-      btn.setAttribute('data-clipboard-text', code);
-      item.appendChild(btn);
-      codeBox.appendChild(item.querySelector('code'));
-      item.appendChild(codeBox);
-    });
-  });
 };
 
 </script>

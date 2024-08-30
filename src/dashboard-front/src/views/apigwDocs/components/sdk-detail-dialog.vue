@@ -115,7 +115,11 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { computed, defineModel, ref } from 'vue';
+import {
+  computed,
+  defineModel,
+  ref,
+} from 'vue';
 import { copy } from '@/common/util';
 
 const { t } = useI18n();
@@ -133,8 +137,6 @@ const curParams = ref({
   resource_version_display: '',
   released_stages: [],
 });
-
-const type = ref<string | any>('');
 
 // 获取所有stage的name
 const stageText = computed(() => {

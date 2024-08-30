@@ -42,9 +42,9 @@
             :border="false"
           >
             <template #aside>
-              <div class="left pr8">
-                <div class="simple-side-nav">
-                  <header class="side-nav-header">
+              <div class="left">
+                <div class="left-aside-wrap">
+                  <header class="left-aside-header">
                     <header class="title">
                       {{ curTab === 'apigw' ? t('资源列表') : t('API列表') }}
                       <aside v-if="resourceList.length" class="sub-title">{{ filteredResourceList.length }}</aside>
@@ -137,11 +137,11 @@
 
 <script lang="ts" setup>
 import {
-  ref,
   computed,
   nextTick,
-  provide,
   onBeforeMount,
+  provide,
+  ref,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
@@ -149,59 +149,60 @@ import {
   useRouter,
 } from 'vue-router';
 import {
-  getGatewaysDetailsDocs,
-  getApigwStagesDocs,
-  getGatewaysDocs,
-  getApigwResourcesDocs,
   getApigwResourceDocDocs,
+  getApigwResourcesDocs,
+  getApigwSDKDocs,
+  getApigwStagesDocs,
   getComponenSystemDetail,
+  getESBSDKDetail,
+  getGatewaysDetailsDocs,
   getSystemAPIList,
   getSystemComponentDoc,
-  getApigwSDKDocs,
-  getESBSDKDetail,
 } from '@/http';
-import TableEmpty from '@/components/table-empty.vue';
-import DocDetailSideContent from '@/views/apigwDocs/components/doc-detail-side-content.vue';
 import {
   IApiGatewayBasics,
-  IComponent,
-  ISystemBasics,
-  IResource,
-  TabType,
-  IComponentSdk,
   IApiGatewaySdk,
-  LanguageType,
-  IStage,
+  IComponent,
+  IComponentSdk,
   INavItem,
+  IResource,
+  IStage,
+  ISystemBasics,
+  LanguageType,
+  TabType,
 } from '@/views/apigwDocs/types';
-import DocDetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
 import MarkdownIt from 'markdown-it';
 import { ResizeLayout } from 'bkui-vue';
+import DocDetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
+import DocDetailSideContent from '@/views/apigwDocs/components/doc-detail-side-content.vue';
 import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
+import TableEmpty from '@/components/table-empty.vue';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const curTargetName = ref('');
-const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null);
-const sdks = ref<IApiGatewaySdk[] & IComponentSdk[]>([]);
-const resourceList = ref<(IResource & IComponent)[]>([]);
-const stageList = ref<IStage[]>([]);
-const curStageName = ref('');
-const keyword = ref('');
-const curResource = ref<IResource & IComponent | null>(null);
-const mainContentLoading = ref<boolean>(false);
-const isSdkInstructionSliderShow = ref(false);
-const navList = ref<INavItem[]>([]);
-const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
-
 const curTab = ref<TabType>('apigw');
 const board = ref('default');
-
 // 提供当前 tab 的值
 // 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
 provide('curTab', curTab);
+
+const stageList = ref<IStage[]>([]);
+const curStageName = ref('');
+const keyword = ref('');
+const curTargetName = ref('');
+const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null);
+const resourceList = ref<(IResource & IComponent)[]>([]);
+const curResource = ref<IResource & IComponent | null>(null);
+const curResMarkdownHtml = ref('');
+const updatedTime = ref<string | null>(null);
+const sdks = ref<IApiGatewaySdk[] & IComponentSdk[]>([]);
+const isSdkInstructionSliderShow = ref(false);
+const navList = ref<INavItem[]>([]);
+const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
+// 记录右栏折叠状态
+const isAsideVisible = ref(true);
 
 const searchPlaceholder = computed(() => {
   return t(
@@ -292,9 +293,6 @@ const handleResClick = async (resId: number) => {
   }
 };
 
-const curResMarkdownHtml = ref('');
-const updatedTime = ref<string | null>(null);
-
 const md = new MarkdownIt({
   linkify: false,
   html: true,
@@ -347,9 +345,6 @@ const init = async () => {
   await fetchResources();
 };
 
-// 记录右栏折叠状态
-const isAsideVisible = ref(true);
-
 const toggleAsideVisible = () => {
   nextTick(() => {
     outerResizeLayoutRef.value?.setCollapse(isAsideVisible.value);
@@ -370,11 +365,7 @@ onBeforeMount(() => {
 </script>
 
 <style lang="scss" scoped>
-@import './detail.css';
-
-//.page-wrap {
-//  height: 100%;
-//}
+//@import './detail.css';
 
 .page-header {
   position: sticky;
@@ -447,16 +438,20 @@ onBeforeMount(() => {
 
 .page-content {
   display: flex;
-  margin: 16px auto 20px auto;
-  //align-items: stretch;
+  margin: 0 auto;
 
-  .simple-side-nav {
+  .left {
+    padding: 16px 8px 0 0;
+  }
+
+  .left-aside-wrap {
     min-width: 280px;
     width: auto;
     box-shadow: 0 2px 4px 0 #1919290d;
     border-radius: 2px;
+    background-color: #ffffff;
 
-    .side-nav-header {
+    .left-aside-header {
       padding: 16px 24px 12px;
 
       .title {
@@ -533,9 +528,9 @@ onBeforeMount(() => {
     }
   }
 
-  //.main-content-wrap {
-  //  width: calc(100vw - 612px);
-  //}
+  .main-content-wrap {
+    padding-top: 16px;
+  }
 
   .aside-right {
     .apigw-desc-wrap {

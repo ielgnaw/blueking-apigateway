@@ -12,11 +12,11 @@
 
 <script setup lang="ts">
 import {
-  ref,
-  watch,
-  nextTick,
   inject,
+  nextTick,
+  ref,
   Ref,
+  watch,
 } from 'vue';
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
@@ -25,10 +25,10 @@ import 'highlight.js/styles/monokai-sublime.css';
 import { copy } from '@/common/util';
 
 import {
-  getGatewaySDKlist,
+  getESBSDKDoc,
   getESBSDKlist,
   getGatewaySDKDoc,
-  getESBSDKDoc,
+  getGatewaySDKlist,
 } from '@/http';
 import {
   LanguageType,
@@ -38,14 +38,14 @@ import {
 const curTab = inject<Ref<TabType>>('curTab');
 
 const language = ref<LanguageType>('python');
-const board = ref<string>('-');
-const sdkDoc = ref<string>('');
-const markdownHtml = ref<string>('');
-const active = ref<string>('sdk');
-const renderKey = ref<number>(0);
-const renderHtmlIndex = ref<number>(0);
-const keyword = ref<string>('');
-const isLoading = ref<boolean>(false);
+const board = ref('default');
+const sdkDoc = ref('');
+const markdownHtml = ref('');
+const active = ref('sdk');
+const renderKey = ref(0);
+const renderHtmlIndex = ref(0);
+const keyword = ref('');
+const isLoading = ref(false);
 const pagination = ref({
   offset: 0,
   count: 0,

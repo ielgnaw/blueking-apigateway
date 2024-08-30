@@ -264,9 +264,7 @@ import {
 } from '@/views/apigwDocs/types';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
 import { cloneDeep } from 'lodash';
-import {
-  useTemplateRefsList,
-} from '@vueuse/core';
+import { useTemplateRefsList } from '@vueuse/core';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -318,7 +316,6 @@ const isSdkDetailDialogShow = ref(false);
 
 const gotoDetails = (data: any) => {
   router.push({
-    // name: 'apigwAPIDetailIntro',
     name: 'apiDocDetail',
     params: {
       targetName: data?.name,
