@@ -302,8 +302,13 @@ const md = new MarkdownIt({
 md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
   const curToken = tokens[idx];
   const nextToken = tokens[idx + 1];
+  let count = 2;
   if (curToken.markup === '###' && nextToken?.type === 'inline') {
-    const headingText = nextToken.content;
+    let headingText = nextToken.content;
+    if (navList.value.find(item => item.name === headingText)) {
+      headingText = `${headingText}${count}`;
+      count = count + 1;
+    }
     curToken.attrPush(['id', headingText]);
     navList.value.push({ id: headingText, name: headingText });
   }

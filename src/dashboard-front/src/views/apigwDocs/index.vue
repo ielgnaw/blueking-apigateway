@@ -263,7 +263,6 @@ import {
   TabType,
 } from '@/views/apigwDocs/types';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
-import { cloneDeep } from 'lodash';
 import { useTemplateRefsList } from '@vueuse/core';
 
 const { t } = useI18n();
@@ -357,18 +356,8 @@ const fetchComponentList = async () => {
       system.categories.forEach((cat) => {
         cat._navId = `${system.board}-${cat.id}`;
       });
-
-      const system2 = cloneDeep(system);
-      system2.board = `${system2.board}-test`;
-      system2.board_label = `${system2.board_label}-test`;
-      system2.categories.forEach((cat) => {
-        cat._navId = `${system2.board}-${cat.id}`;
-      });
-
       componentSystemList.value.push(system);
-      componentSystemList.value.push(system2);
       navPanelNamesList.value.push(system.board);
-      navPanelNamesList.value.push(system2.board);
     });
   } catch {
     componentSystemList.value = [];
