@@ -101,7 +101,7 @@
                   <bk-button
                     text
                     theme="primary"
-                    @click="isSdkDetailDialogShow = true"
+                    @click="handleSdkDetailClick(row)"
                   >
                     {{ t('查看 SDK') }}
                   </bk-button>
@@ -258,6 +258,7 @@ import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-s
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
 import {
+  IApiGatewaySdk,
   ICategory,
   ISystem,
   TabType,
@@ -371,6 +372,13 @@ const handleNavClick = (cat: ICategory) => {
   if (catRef?.scrollIntoView) {
     catRef.scrollIntoView({ behavior: 'smooth' });
   }
+};
+
+const curSdks = ref<IApiGatewaySdk[]>([]);
+
+const handleSdkDetailClick = (row: any) => {
+  curSdks.value = row?.sdks ?? [];
+  isSdkDetailDialogShow.value = true;
 };
 
 watch(

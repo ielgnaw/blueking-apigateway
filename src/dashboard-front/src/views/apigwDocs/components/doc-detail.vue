@@ -161,7 +161,7 @@ import {
 } from '@/http';
 import {
   IApiGatewayBasics,
-  IApiGatewaySdk,
+  IApiGatewaySdkDoc,
   IComponent,
   IComponentSdk,
   INavItem,
@@ -197,7 +197,7 @@ const resourceList = ref<(IResource & IComponent)[]>([]);
 const curResource = ref<IResource & IComponent | null>(null);
 const curResMarkdownHtml = ref('');
 const updatedTime = ref<string | null>(null);
-const sdks = ref<IApiGatewaySdk[] & IComponentSdk[]>([]);
+const sdks = ref<IApiGatewaySdkDoc[] & IComponentSdk[]>([]);
 const isSdkInstructionSliderShow = ref(false);
 const navList = ref<INavItem[]>([]);
 const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);

@@ -9,14 +9,14 @@
   >
     <main class="dialog-content">
       <div class="dialog-main">
-        <LangSelector></LangSelector>
+        <LangSelector v-model="language" :sdk-languages="sdks.map(item => item.language)"></LangSelector>
         <div class="data-box">
           <article class="row-item">
             <aside class="key">
               <span class="column-key"> {{ t('SDK包名称') }}: </span>
             </aside>
             <main class="value">
-              <span class="column-value" v-bk-overflow-tips>{{ curParams.sdk_name || '--' }}</span>
+              <span class="column-value" v-bk-overflow-tips>{{ curSdk.name ?? '--' }}</span>
             </main>
           </article>
           <article class="row-item">
@@ -24,7 +24,7 @@
               <span class="column-key"> {{ t('SDK版本') }}: </span>
             </aside>
             <main class="value">
-              <span class="column-value" v-bk-overflow-tips>{{ curParams.sdk_version_number || '--' }}</span>
+              <span class="column-value" v-bk-overflow-tips>{{ curSdk.version ?? '--' }}</span>
             </main>
           </article>
           <article class="row-item">
@@ -32,23 +32,23 @@
               <span class="column-key"> {{ t('SDK地址') }}: </span>
             </aside>
             <main class="value flex-row align-items-center">
-              <bk-popover placement="top" width="600" theme="dark" :disabled="curParams.sdk_download_url === ''">
-                <span class="column-value vm">{{ curParams.sdk_download_url || '--' }}</span>
+              <bk-popover placement="top" width="600" theme="dark" :disabled="!curSdk.url">
+                <span class="column-value vm">{{ curSdk.url ?? '--' }}</span>
                 <template #content>
                   <div class="popover-text">
-                    {{ curParams.sdk_download_url }}
+                    {{ curSdk.url }}
                   </div>
                 </template>
               </bk-popover>
               <i
-                @click="copy(curParams.sdk_download_url)"
+                @click="copy(curSdk.url)"
                 class="doc-copy vm icon-hover apigateway-icon icon-ag-copy ag-doc-icon"
-                v-if="curParams.sdk_download_url" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curParams.sdk_download_url"
+                v-if="curSdk.url" v-bk-tooltips="t('复制')"
+                :data-clipboard-text="curSdk.url"
               ></i>
               <i
                 class="ag-doc-icon doc-download-line vm icon-hover apigateway-icon icon-ag-download-line"
-                v-if="curParams.sdk_download_url" v-bk-tooltips="t('下载')" @click="handleDownload"
+                v-if="curSdk.url" v-bk-tooltips="t('下载')" @click="handleDownload"
               ></i>
             </main>
           </article>
@@ -57,19 +57,19 @@
               <span class="column-key"> {{ t('安装') }}: </span>
             </aside>
             <main class="value flex-row align-items-center">
-              <bk-popover placement="top" width="600" theme="dark" :disabled="curParams.sdk_install_command === ''">
-                <span class="column-value vm">{{ curParams.sdk_install_command || '--' }}</span>
+              <bk-popover placement="top" width="600" theme="dark" :disabled="!curSdk.install_command">
+                <span class="column-value vm">{{ curSdk.install_command || '--' }}</span>
                 <template #content>
                   <div class="popover-text">
-                    {{ curParams.sdk_install_command }}
+                    {{ curSdk.install_command }}
                   </div>
                 </template>
               </bk-popover>
               <i
-                @click="copy(curParams.sdk_install_command)"
+                @click="copy(curSdk.install_command)"
                 class="ag-doc-icon doc-copy vm icon-hover apigateway-icon icon-ag-copy"
-                v-if="curParams.sdk_install_command" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curParams.sdk_install_command"
+                v-if="curSdk.install_command" v-bk-tooltips="t('复制')"
+                :data-clipboard-text="curSdk.install_command"
               >
               </i>
             </main>
@@ -87,20 +87,10 @@
             <main class="value">
               <span
                 class="column-value"
-                v-bk-tooltips.top="{ content: curParams.resource_version_display, allowHTML: false }"
+                v-bk-tooltips.top="{ content: curSdk.version, allowHTML: false }"
               >
-                {{ curParams.resource_version_display || '--' }}
+                {{ curSdk.version ?? '--' }}
               </span>
-            </main>
-          </article>
-          <article class="row-item" v-if="stageText">
-            <aside class="key">
-              <span class="column-key">
-                {{ t('版本已发环境') }}:
-              </span>
-            </aside>
-            <main class="value">
-              <span class="column-value" v-bk-tooltips.top="stageText">{{ stageText || '--' }}</span>
             </main>
           </article>
         </div>
@@ -115,9 +105,14 @@ import {
   computed,
   defineModel,
   ref,
+  toRefs,
 } from 'vue';
 import { copy } from '@/common/util';
 import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
+import {
+  IApiGatewaySdk,
+  LanguageType,
+} from '@/views/apigwDocs/types';
 
 const { t } = useI18n();
 
@@ -126,25 +121,33 @@ const isShow = defineModel<boolean>({
   default: false,
 });
 
-const curParams = ref({
-  sdk_name: '',
-  sdk_version_number: '',
-  sdk_download_url: '',
-  sdk_install_command: '',
-  resource_version_display: '',
-  released_stages: [],
+interface IProps {
+  sdks: IApiGatewaySdk[];
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  sdks: () => [],
 });
 
-// 获取所有stage的name
-const stageText = computed(() => {
-  const text = curParams.value.released_stages.map((item: any) => item.name);
-  return text.join('，');
+const { sdks } = toRefs(props);
+
+const language = ref<LanguageType>('python');
+
+const curSdk = computed(() => {
+  const sdk = sdks.value.find((item: IApiGatewaySdk) => item.language === language.value);
+  return sdk || {
+    language: 'python',
+    name: '--',
+    version: '--',
+    url: '--',
+    install_command: '--',
+  };
 });
 
 // 下载
 const handleDownload = () => {
-  if (curParams.value.sdk_download_url) {
-    window.open(curParams.value.sdk_download_url);
+  if (curSdk.value?.url) {
+    window.open(curSdk.value.url);
   }
 };
 </script>

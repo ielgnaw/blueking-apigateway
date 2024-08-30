@@ -25,11 +25,19 @@ interface IApiGatewayBasics {
   api_url: string;
 }
 
-interface IApiGatewaySdk {
+interface IApiGatewaySdkDoc {
   language: LanguageType;
   resource_version: IResourceVersion;
-  sdk?: any;
+  sdk?: IApiGatewaySdk | IApiGatewaySdk[];
   stage: { id: number, name: string }
+}
+
+interface IApiGatewaySdk {
+  language: LanguageType;
+  name: string;
+  version: string;
+  url: string;
+  install_command: string;
 }
 
 interface IResourceVersion {
@@ -92,6 +100,7 @@ interface IComponentSdk {
 
 export {
   IApiGatewayBasics,
+  IApiGatewaySdkDoc,
   IApiGatewaySdk,
   ICategory,
   IComponent,

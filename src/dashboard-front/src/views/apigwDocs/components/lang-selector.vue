@@ -4,10 +4,12 @@
       v-for="lang in langList"
       :key="lang"
       :class="{ 'is-selected': lang === language }"
+      :disabled="!isSdkGenerated(lang)"
       :style="{
         width: `${width}px`,
         'margin-bottom': `${marginBottom}px`,
       }"
+      v-bk-tooltips="{ content: t(`{lang} SDK未生成，可联系负责人生成SDK`, { lang }), disabled: isSdkGenerated(lang) }"
       @click="handleSelect(lang)"
     >
       {{ useChangeCase(lang, 'capitalCase') }}
@@ -22,6 +24,9 @@ import {
 } from 'vue';
 import { useChangeCase } from '@vueuse/integrations/useChangeCase';
 import { LanguageType } from '@/views/apigwDocs/types';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const language = defineModel<LanguageType>({
   default: 'python',
@@ -30,14 +35,19 @@ const language = defineModel<LanguageType>({
 interface IProps {
   width: number;
   marginBottom: number;
+  sdkLanguages: LanguageType[],
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   width: 150,
   marginBottom: 24,
+  sdkLanguages: () => [
+    'python',
+    'java',
+  ],
 });
 
-const { width } = toRefs(props);
+const { width, marginBottom, sdkLanguages } = toRefs(props);
 
 const langList = ref<LanguageType[]>([
   'python',
@@ -47,6 +57,10 @@ const langList = ref<LanguageType[]>([
 const emit = defineEmits<{
   'select': [language: LanguageType]
 }>();
+
+const isSdkGenerated = (lang: LanguageType) => {
+  return sdkLanguages.value.includes(lang);
+};
 
 const handleSelect = (lang: LanguageType) => {
   language.value = lang;

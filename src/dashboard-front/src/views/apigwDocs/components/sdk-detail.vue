@@ -111,7 +111,7 @@ import { useI18n } from 'vue-i18n';
 import { copy } from '@/common/util';
 import { HelpFill } from 'bkui-vue/lib/icon';
 import {
-  IApiGatewaySdk,
+  IApiGatewaySdkDoc,
   IComponentSdk,
 } from '@/views/apigwDocs/types';
 import { toRefs } from 'vue';
@@ -120,7 +120,7 @@ const { t } = useI18n();
 
 interface IProps {
   isApigw: boolean;
-  sdk: IApiGatewaySdk & IComponentSdk | null
+  sdk: IApiGatewaySdkDoc & IComponentSdk | null
 }
 
 const props = withDefaults(defineProps<IProps>(), {

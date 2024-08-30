@@ -30,6 +30,7 @@
         </template>
       </div>
 
+      <!--  网关SDK信息表格  -->
       <template v-if="userStore.featureFlags?.ENABLE_SDK">
         <bk-table
           style="margin-top: 15px;"
@@ -82,6 +83,7 @@
         </p>
       </template>
     </main>
+
     <main v-else-if="curTab === 'component'" class="component-content">
       <div class="ag-markdown-view">
         <header class="content-title">{{ t('网关描述') }}</header>
@@ -113,7 +115,7 @@ import { InfoLine } from 'bkui-vue/lib/icon';
 import { useUser } from '@/store';
 import {
   IApiGatewayBasics,
-  IApiGatewaySdk,
+  IApiGatewaySdkDoc,
   IComponentSdk,
   ISystemBasics,
   TabType,
@@ -125,7 +127,7 @@ const curTab = inject<Ref<TabType>>('curTab');
 
 interface IProps {
   basics: IApiGatewayBasics & ISystemBasics | null;
-  sdks: IApiGatewaySdk[] & IComponentSdk[];
+  sdks: IApiGatewaySdkDoc[] & IComponentSdk[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
