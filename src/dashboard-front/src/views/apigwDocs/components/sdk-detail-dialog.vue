@@ -9,11 +9,7 @@
   >
     <main class="dialog-content">
       <div class="dialog-main">
-        <div class="bk-button-group mb24">
-          <bk-button class="is-selected" style="width: 150px">Python</bk-button>
-          <bk-button style="width: 150px">Java</bk-button>
-          <!-- <bk-button disabled style="width: 150px">GO</bk-button> -->
-        </div>
+        <LangSelector></LangSelector>
         <div class="data-box">
           <article class="row-item">
             <aside class="key">
@@ -121,6 +117,7 @@ import {
   ref,
 } from 'vue';
 import { copy } from '@/common/util';
+import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
 
 const { t } = useI18n();
 

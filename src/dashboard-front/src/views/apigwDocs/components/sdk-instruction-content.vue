@@ -1,10 +1,7 @@
 <template>
   <!--  SDK使用说明 Slider 的内容  -->
   <div class="sdk-wrapper">
-    <div class="bk-button-group ">
-      <bk-button :class="{ 'is-selected': language === 'python' }" @click="changeLanguage('python')">Python</bk-button>
-      <bk-button :class="{ 'is-selected': language === 'java' }" @click="changeLanguage('java')">Java</bk-button>
-    </div>
+    <LangSelector v-model="language" :margin-bottom="0" @select="handleLangSelect"></LangSelector>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <div class="ag-markdown-view" id="markdown" :key="renderHtmlIndex" v-html="markdownHtml"></div>
   </div>
@@ -34,6 +31,7 @@ import {
   LanguageType,
   TabType,
 } from '@/views/apigwDocs/types';
+import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
 
 const curTab = inject<Ref<TabType>>('curTab');
 
@@ -163,9 +161,8 @@ const getSDKDoc = async () => {
   }
 };
 
-const changeLanguage = (lang: LanguageType) => {
+const handleLangSelect = (lang: LanguageType) => {
   if (lang === language.value) return;
-  language.value = lang;
   init();
 };
 

@@ -26,10 +26,7 @@
         <main class="content-main">{{ basics.api_url }}</main>
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
           <header class="content-title">{{ t('网关 SDK') }}</header>
-          <div class="bk-button-group">
-            <bk-button class="is-selected">Python</bk-button>
-            <bk-button>Java</bk-button>
-          </div>
+          <LangSelector :width="90" :margin-bottom="0"></LangSelector>
         </template>
       </div>
 
@@ -121,6 +118,7 @@ import {
   ISystemBasics,
   TabType,
 } from '@/views/apigwDocs/types';
+import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');
