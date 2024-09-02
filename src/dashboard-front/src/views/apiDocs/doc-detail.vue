@@ -16,8 +16,13 @@
             </div>
             <template #content>
               <bk-dropdown-menu class="dropdown-trigger-content bk-dropdown-list">
-                <bk-dropdown-item v-for="system in allSystemList" :key="system.name" :title="system.description">
-                  <span class="f14" @click="handleSystemChange(system)">{{ system.description }}</span>
+                <bk-dropdown-item
+                  v-for="system in allSystemList"
+                  :key="system.name"
+                  :title="system.description"
+                  @click="handleSystemChange(system)"
+                >
+                  <span class="f14">{{ system.description }}</span>
                 </bk-dropdown-item>
               </bk-dropdown-menu>
             </template>
@@ -96,7 +101,7 @@
                         class="resource-item"
                         v-for="resource in filteredResourceList"
                         :key="resource.id"
-                        :class="{ active: resource.id === curResource.id }"
+                        :class="{ active: resource.id === curResource?.id }"
                         @click="handleResClick(resource.id)"
                       >
                         <!-- eslint-disable-next-line vue/no-v-html -->
@@ -381,6 +386,7 @@ const fetchBoardList = async () => {
 const handleSystemChange = async (system: ISystem) => {
   if (system.name === curTargetName.value) return;
   curTargetName.value = system.name;
+  curComponentName.value = '';
   await init();
 };
 
