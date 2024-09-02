@@ -1,13 +1,6 @@
 type TabType = 'apigw' | 'component';
 type LanguageType = 'python' | 'java';
 
-interface ICategory {
-  id: string;
-  name: string;
-  systems: IComponent[];
-  _navId?: string;
-}
-
 interface INavItem {
   id: number | string;
   name: string;
@@ -65,11 +58,23 @@ interface IStage {
 
 // 组件类型
 
-interface ISystem {
+interface IBoard {
   board: string;
   board_label: string;
   categories: ICategory[];
   sdk?: IComponentSdk;
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+  systems: ISystem[];
+  _navId?: string;
+}
+
+interface ISystem {
+  name: string;
+  description: string;
 }
 
 interface ISystemBasics {
@@ -107,6 +112,7 @@ export {
   IApiGatewayBasics,
   IApiGatewaySdk,
   IApiGatewaySdkDoc,
+  IBoard,
   ICategory,
   IComponent,
   IComponentSdk,

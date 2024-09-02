@@ -1601,6 +1601,8 @@ const lang: ILANG = {
   '公共请求参数': ['Common Request Parameter'],
   '网关详情': ['Gateway Detail'],
   '权限申请': ['Permission Required'],
+  '组件详情': ['Component Details'],
+  'API列表': ['API List'],
 
   // 变量的使用 $t('test', { vari1: 1, vari2: 2 })
   // // 变量的使用 $t('test', { vari1: 1, vari2: 2 })

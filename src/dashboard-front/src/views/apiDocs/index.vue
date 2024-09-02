@@ -54,7 +54,7 @@
                 field="name"
               >
                 <template #default="{ data }">
-                  <span class="link-name" @click="gotoDetails(data)">{{ data.name || '--' }}</span>
+                  <span class="link-name" @click="gotoDetails(data)">{{ data?.name || '--' }}</span>
                   <bk-tag theme="success" v-if="data?.is_official">
                     {{ t('官方') }}
                   </bk-tag>
@@ -171,13 +171,13 @@
                 <main class="group-items">
                   <article
                     class="item"
-                    v-for="component in cat.systems"
-                    :key="component.name"
-                    @click="gotoDetails(component)"
+                    v-for="system in cat.systems"
+                    :key="system.name"
+                    @click="gotoDetails(system)"
                   >
                     <main class="title">
-                      <div class="name">{{ component.description }}</div>
-                      <div class="name-en">{{ component.name }}</div>
+                      <div class="name">{{ system.description }}</div>
+                      <div class="name-en">{{ system.name }}</div>
                     </main>
                     <aside class="background-image">
                       <i class="apigateway-icon icon-ag-component-intro"></i>
@@ -260,11 +260,10 @@ import ComponentSearcher from '@/views/apiDocs/components/component-searcher.vue
 import {
   IApiGatewayBasics,
   ICategory,
-  IComponent,
-  IResource,
   ISdk,
-  ISystem,
+  IBoard,
   TabType,
+  ISystem,
 } from '@/views/apiDocs/types';
 import { AngleUpFill } from 'bkui-vue/lib/icon';
 import { useTemplateRefsList } from '@vueuse/core';
@@ -314,7 +313,7 @@ provide('curTab', curTab);
 const isSdkInstructionSliderShow = ref(false);
 const isSdkDetailDialogShow = ref(false);
 
-const gotoDetails = (data: IResource | IComponent) => {
+const gotoDetails = (data: IApiGatewayBasics | ISystem) => {
   router.push({
     name: 'apiDocDetail',
     params: {
@@ -347,11 +346,11 @@ const updateTableEmptyConfig = () => {
   tableEmptyConf.value.keyword = '';
 };
 
-const componentSystemList = ref<ISystem[]>([]);
+const componentSystemList = ref<IBoard[]>([]);
 
-const fetchComponentList = async () => {
+const fetchComponentSystemList = async () => {
   try {
-    const res = await getComponentSystemList(board.value) as ISystem[];
+    const res = await getComponentSystemList(board.value) as IBoard[];
     res.forEach((system) => {
       // 给组件分类添加一个跳转用的 _navId
       system.categories.forEach((cat) => {
@@ -396,7 +395,7 @@ onBeforeMount(() => {
 });
 
 onMounted(async () => {
-  await fetchComponentList();
+  await fetchComponentSystemList();
 });
 
 </script>

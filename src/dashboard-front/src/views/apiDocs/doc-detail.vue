@@ -7,11 +7,22 @@
           class="icon apigateway-icon icon-ag-return-small"
           @click="handleGoBack()"
         ></i>
-        {{ curTargetName }}
-        <!--        <div class="title-name">-->
-        <!--          <span></span>-->
-        <!--          <div class="name"></div>-->
-        <!--        </div>-->
+        {{ curTargetBasics?.description ?? '' }}
+        <div class="system-dropdown-wrap">
+          <bk-dropdown ref="dropdown" :popover-options="{ boundary: 'body', placement: 'bottom-start' }">
+            <div class="dropdown-trigger-btn">
+              <span>{{ curTargetName }}</span>
+              <i class="ag-doc-icon doc-down-shape apigateway-icon icon-ag-down-shape"></i>
+            </div>
+            <template #content>
+              <bk-dropdown-menu class="dropdown-trigger-content bk-dropdown-list">
+                <bk-dropdown-item v-for="system in allSystemList" :key="system.name" :title="system.description">
+                  <span class="f14" @click="handleSystemChange(system)">{{ system.description }}</span>
+                </bk-dropdown-item>
+              </bk-dropdown-menu>
+            </template>
+          </bk-dropdown>
+        </div>
       </main>
       <aside
         class="detail-toggle"
@@ -154,6 +165,7 @@ import {
   getApigwSDKDocs,
   getApigwStagesDocs,
   getComponenSystemDetail,
+  getComponentSystemList,
   getESBSDKDetail,
   getGatewaysDetailsDocs,
   getSystemAPIList,
@@ -167,9 +179,11 @@ import {
   INavItem,
   IResource,
   IStage,
+  IBoard,
   ISystemBasics,
   LanguageType,
   TabType,
+  ISystem,
 } from '@/views/apiDocs/types';
 import MarkdownIt from 'markdown-it';
 import { ResizeLayout } from 'bkui-vue';
@@ -219,6 +233,13 @@ const filteredResourceList = computed(() => {
   return resourceList.value.filter(res => res.name.includes(keyword.value) || res.description.includes(keyword.value));
 });
 
+const allSystemList = computed(() => {
+  const curBoard = boardList.value[0];
+  const systems: ISystem[] = [];
+  curBoard.categories.forEach(cat => cat.systems.forEach(system => systems.push(system)));
+  return systems;
+});
+
 const fetchBasics = async () => {
   try {
     if (curTab.value === 'apigw') {
@@ -265,6 +286,7 @@ const fetchApigwStages = async () => {
 const fetchResources = async () => {
   try {
     let res: (IResource & IComponent)[] = [];
+    navList.value = [];
     if (curTab.value === 'apigw') {
       const query = {
         limit: 10000,
@@ -346,6 +368,22 @@ const getHighlightedHtml = (value: string) => {
   return value;
 };
 
+const boardList = ref<IBoard[]>([]);
+
+const fetchBoardList = async () => {
+  try {
+    boardList.value = await getComponentSystemList(board.value) as IBoard[];
+  } catch {
+    boardList.value = [];
+  }
+};
+
+const handleSystemChange = async (system: ISystem) => {
+  if (system.name === curTargetName.value) return;
+  curTargetName.value = system.name;
+  await init();
+};
+
 const init = async () => {
   if (curTab.value === 'apigw') {
     await fetchApigwStages();
@@ -353,6 +391,7 @@ const init = async () => {
   await fetchBasics();
   await fetchSdks();
   await fetchResources();
+  await fetchBoardList();
 };
 
 const toggleAsideVisible = () => {
@@ -372,7 +411,7 @@ const handleGoBack = () => {
       curTab: curTab.value,
     },
   });
-}
+};
 
 onBeforeMount(() => {
   const { params } = route;
@@ -414,21 +453,26 @@ onBeforeMount(() => {
       cursor: pointer;
     }
 
-    .title-name {
+    .system-dropdown-wrap {
       display: flex;
       align-items: center;
       margin-left: 8px;
 
-      span {
-        width: 1px;
-        height: 14px;
-        background: #dcdee5;
-        margin-right: 8px;
+      .dropdown-trigger-btn {
+        height: 30px;
+        line-height: 28px;
+        padding-inline: 6px;
+        color: #63656E;
+        font-size: 12px;
       }
 
-      .name {
-        font-size: 14px;
-        color: #979ba5;
+      .dropdown-trigger-content {
+        :deep(.bk-dropdown-item) {
+          max-width: 300px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
     }
   }
