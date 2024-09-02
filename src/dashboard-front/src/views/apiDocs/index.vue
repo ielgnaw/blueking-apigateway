@@ -415,7 +415,7 @@ $primary-color: #3a84ff;
     align-items: center;
     background: #fff;
     box-shadow: 0 3px 4px 0 #0000000a;
-    z-index: 1;
+    z-index: 2;
 
     .tabs-group {
       display: flex;
