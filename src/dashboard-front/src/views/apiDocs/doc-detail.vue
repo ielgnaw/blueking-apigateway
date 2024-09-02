@@ -194,6 +194,7 @@ const keyword = ref('');
 const curTargetName = ref('');
 const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null);
 const resourceList = ref<(IResource & IComponent)[]>([]);
+const curComponentName = ref('');
 const curResource = ref<IResource & IComponent | null>(null);
 const curResMarkdownHtml = ref('');
 const updatedTime = ref<string | null>(null);
@@ -275,7 +276,11 @@ const fetchResources = async () => {
       res = await getSystemAPIList(board.value, curTargetName.value) as (IResource & IComponent)[];
     }
     resourceList.value = res ?? [];
-    curResource.value = resourceList.value[0] ?? null;
+    if (curComponentName.value) {
+      curResource.value = resourceList.value.find(resource => resource.name === curComponentName.value) ?? null;
+    } else {
+      curResource.value = resourceList.value[0] ?? null;
+    }
     if (curResource.value) {
       await getApigwResourceDoc();
     }
@@ -362,8 +367,9 @@ const updateIsRightAsideCollapsed = (collapsed: boolean) => {
 
 onBeforeMount(() => {
   const { params } = route;
-  curTargetName.value = params.targetName as string;
   curTab.value = params.curTab as TabType || 'apigw';
+  curTargetName.value = params.targetName as string;
+  curComponentName.value = params.componentName as string || '';
   init();
 });
 

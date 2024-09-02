@@ -150,13 +150,7 @@
                 </bk-link>
               </main>
               <aside>
-                <bk-input
-                  type="search"
-                  :placeholder="t('搜索内部版组件')"
-                  v-model="filterData.keyword"
-                  clearable
-                  style="width: 320px"
-                />
+                <ComponentSearcher class="ag-searcher-box" :version-list="componentSystemList"></ComponentSearcher>
               </aside>
             </header>
             <!--  组件  -->
@@ -254,10 +248,11 @@ import {
   getGatewaysDocs,
 } from '@/http';
 import { useRouter } from 'vue-router';
+import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import TableEmpty from '@/components/table-empty.vue';
 import SdkInstructionSlider from '@/views/apiDocs/components/sdk-instruction-slider.vue';
-import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apiDocs/components/sdk-detail-dialog.vue';
+import ComponentSearcher from '@/views/apiDocs/components/component-searcher.vue';
 import {
   IApiGatewayBasics,
   ICategory,
@@ -292,10 +287,6 @@ maxTableLimit.value = useMaxTableLimit(271);
 pagination.value.limitList.unshift(maxTableLimit.value);
 pagination.value.limit = maxTableLimit.value;
 
-
-// const handleGoApigw = () => {
-//   window.open(window.BK_DASHBOARD_URL);
-// };
 const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
   keyword: '',
   isAbnormal: false,
