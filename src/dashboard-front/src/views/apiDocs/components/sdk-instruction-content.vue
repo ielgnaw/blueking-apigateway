@@ -30,8 +30,8 @@ import {
 import {
   LanguageType,
   TabType,
-} from '@/views/apigwDocs/types';
-import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
+} from '@/views/apiDocs/types';
+import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
 
 const curTab = inject<Ref<TabType>>('curTab');
 

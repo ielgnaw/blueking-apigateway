@@ -105,13 +105,12 @@
         </template>
       </bk-sideslider>
     </div>
-<!--    <bk-affix :offset-top="128">-->
-<!--      <div class="component-nav-box" v-if="componentNavList.length">-->
-<!--        <div>-->
-<!--          <side-nav :list="componentNavList"></side-nav>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </bk-affix>-->
+
+    <div class="component-nav-box" v-if="componentNavList.length">
+      <div style="position: fixed;">
+        <side-nav :list="componentNavList"></side-nav>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -257,17 +256,4 @@ watch(
 
 <style lang="scss" scoped>
   @import './detail.css';
-
-  .intro-doc {
-    padding-inline: 8px;
-    display: flex;
-  }
-
-  .component-content {
-    width: auto;
-  }
-
-  .component-nav-box {
-    position: static;
-  }
 </style>

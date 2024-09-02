@@ -170,12 +170,12 @@ import {
   ISystemBasics,
   LanguageType,
   TabType,
-} from '@/views/apigwDocs/types';
+} from '@/views/apiDocs/types';
 import MarkdownIt from 'markdown-it';
 import { ResizeLayout } from 'bkui-vue';
-import DocDetailMainContent from '@/views/apigwDocs/components/doc-detail-main-content.vue';
-import DocDetailSideContent from '@/views/apigwDocs/components/doc-detail-side-content.vue';
-import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
+import DocDetailMainContent from '@/views/apiDocs/components/doc-detail-main-content.vue';
+import DocDetailSideContent from '@/views/apiDocs/components/doc-detail-side-content.vue';
+import SdkInstructionSlider from '@/views/apiDocs/components/sdk-instruction-slider.vue';
 import TableEmpty from '@/components/table-empty.vue';
 
 const { t } = useI18n();
@@ -370,7 +370,6 @@ onBeforeMount(() => {
 </script>
 
 <style lang="scss" scoped>
-//@import './detail.css';
 
 .page-header {
   position: sticky;

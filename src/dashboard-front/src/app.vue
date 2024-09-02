@@ -186,10 +186,17 @@ const headerList = computed(() => ([
   {
     name: t('API 文档'),
     id: 3,
-    url: 'apigwDoc',
+    url: 'apiDocs',
     enabled: true,
     link: '',
   },
+  // {
+  //   name: t('网关API文档'),
+  //   id: 3,
+  //   url: 'apigwDoc',
+  //   enabled: true,
+  //   link: '',
+  // },
   // {
   //   name: t('组件API文档'),
   //   id: 4,
@@ -339,7 +346,7 @@ const goPage = (routeName: string) => {
     router.push({
       name: routeName,
       params: {
-        id: ['home', 'apigwDoc'].includes(routeName) ? '' : apigwId.value,
+        id: ['home', 'apigwDoc', 'apiDocs'].includes(routeName) ? '' : apigwId.value,
       },
     });
   }

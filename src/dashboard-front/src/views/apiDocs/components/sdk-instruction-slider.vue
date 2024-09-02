@@ -20,7 +20,7 @@
 import { useI18n } from 'vue-i18n';
 import { defineModel } from 'vue';
 
-import SdkInstructionContent from '@/views/apigwDocs/components/sdk-instruction-content.vue';
+import SdkInstructionContent from '@/views/apiDocs/components/sdk-instruction-content.vue';
 
 const { t } = useI18n();
 

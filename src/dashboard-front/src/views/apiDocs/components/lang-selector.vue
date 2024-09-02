@@ -23,7 +23,7 @@ import {
   toRefs,
 } from 'vue';
 import { useChangeCase } from '@vueuse/integrations/useChangeCase';
-import { LanguageType } from '@/views/apigwDocs/types';
+import { LanguageType } from '@/views/apiDocs/types';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();

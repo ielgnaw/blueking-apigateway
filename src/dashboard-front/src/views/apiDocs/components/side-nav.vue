@@ -18,7 +18,7 @@ import {
   toRefs,
   watch,
 } from 'vue';
-import { INavItem } from '@/views/apigwDocs/types';
+import { INavItem } from '@/views/apiDocs/types';
 
 const curNav = defineModel<INavItem | null>({
   default: (): INavItem | null => null,

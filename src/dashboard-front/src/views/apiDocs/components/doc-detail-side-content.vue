@@ -119,8 +119,8 @@ import {
   IComponentSdk,
   ISystemBasics,
   TabType,
-} from '@/views/apigwDocs/types';
-import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
+} from '@/views/apiDocs/types';
+import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');

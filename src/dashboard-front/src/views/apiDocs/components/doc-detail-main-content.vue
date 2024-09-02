@@ -67,7 +67,7 @@ import {
   INavItem,
   IResource,
   TabType,
-} from '@/views/apigwDocs/types';
+} from '@/views/apiDocs/types';
 import {
   computed,
   inject,

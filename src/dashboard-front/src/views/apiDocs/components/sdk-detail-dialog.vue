@@ -108,11 +108,11 @@ import {
   toRefs,
 } from 'vue';
 import { copy } from '@/common/util';
-import LangSelector from '@/views/apigwDocs/components/lang-selector.vue';
+import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
 import {
   IApiGatewaySdk,
   LanguageType,
-} from '@/views/apigwDocs/types';
+} from '@/views/apiDocs/types';
 
 const { t } = useI18n();
 

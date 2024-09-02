@@ -113,7 +113,7 @@ import { HelpFill } from 'bkui-vue/lib/icon';
 import {
   IApiGatewaySdkDoc,
   IComponentSdk,
-} from '@/views/apigwDocs/types';
+} from '@/views/apiDocs/types';
 import { toRefs } from 'vue';
 
 const { t } = useI18n();

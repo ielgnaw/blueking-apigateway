@@ -8,8 +8,9 @@ import globalConfig from '@/constant/config';
 const { t } = i18n.global;
 
 const Home = () => import(/* webpackChunkName: "Home" */ '@/views/home.vue');
+const ApiDocs = () => import(/* webpackChunkName: "ApiDocs" */ '@/views/apiDocs/index.vue');
+const APIDocDetail = () => import(/* webpackChunkName: "ApiDocDetail" */ '@/views/apiDocs/doc-detail.vue');
 const ApigwDocs = () => import(/* webpackChunkName: "ApigwDocs" */ '@/views/apigwDocs/index.vue');
-const APIDocDetail = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/doc-detail.vue');
 const ApigwAPIDetail = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/detail.vue');
 const ApigwAPIDetailIntro = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/intro.vue');
 const ApigwAPIDetailDoc = () => import(/* webpackChunkName: "apigw-doc" */ '@/views/apigwDocs/components/doc.vue');
@@ -322,6 +323,27 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: 'apigw-api',
+        name: 'apiDocs',
+        component: ApiDocs,
+        meta: {
+          matchRoute: 'apiDocs',
+          topMenu: 'apiDocs',
+          notAppHeader: true,
+          isDocRouter: true,
+          isMenu: false,   // 是否作为侧边栏菜单
+        },
+      },
+      {
+        path: ':curTab/:targetName/',
+        name: 'apiDocDetail',
+        component: APIDocDetail,
+        meta: {
+          matchRoute: 'apiDocDetail',
+          topMenu: 'apiDocs',
+        },
+      },
+      {
+        path: 'apigw-api',
         name: 'apigwDoc',
         component: ApigwDocs,
         meta: {
@@ -363,15 +385,6 @@ const routes: RouteRecordRaw[] = [
           topMenu: 'esbSDK',
           type: 'esb',
           isDocRouter: true,
-        },
-      },
-      {
-        path: ':curTab/:targetName/',
-        name: 'apiDocDetail',
-        component: APIDocDetail,
-        meta: {
-          matchRoute: 'apiDocDetail',
-          topMenu: 'apigwDoc',
         },
       },
       {

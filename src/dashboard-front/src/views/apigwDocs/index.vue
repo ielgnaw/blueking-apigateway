@@ -1,270 +1,79 @@
 <template>
-  <div class="docs-main" ref="docsMain">
-    <header class="page-tabs">
-      <nav class="tabs-group">
-        <section
-          class="page-tab"
-          :class="{ 'active': curTab === 'apigw' }"
-          @click="curTab = 'apigw'"
-        >{{ t('网关 API 文档') }}
-        </section>
-        <section
-          class="page-tab"
-          :class="{ 'active': curTab === 'component' }"
-          @click="curTab = 'component'"
-        >{{ t('组件 API 文档') }}
-        </section>
-      </nav>
-    </header>
-    <main class="docs-main-content">
-      <!--  当选中 网关API文档 时  -->
-      <div v-if="curTab === 'apigw'" class="content-of-apigw">
-        <div class="top-bar">
-          <bk-input
-            type="search"
-            :placeholder="t('请输入网关名称或描述')"
-            v-model="filterData.keyword"
-            clearable
-            style="width: 400px"
-          />
-          <bk-link theme="primary" class="f12 ml24" @click.prevent="isSdkInstructionSliderShow = true">
-            <i class="apigateway-icon icon-ag-document f14"></i>
-            {{ t('SDK 使用说明') }}
-          </bk-link>
-          <!-- <bk-button
-            theme="primary"
-            @click="handleGoApigw"
+  <div class="docs-main">
+    <div class="top-bar">
+      <bk-input
+        type="search"
+        :placeholder="t('请输入网关名称或描述')"
+        v-model="filterData.keyword"
+        clearable
+        style="width: 500px"
+      />
+      <!-- <bk-button
+        theme="primary"
+        @click="handleGoApigw"
+      >
+        {{ t('网关管理') }}
+      </bk-button> -->
+    </div>
+    <div class="docs-list">
+      <bk-loading :loading="isLoading">
+        <bk-table
+          :data="tableData"
+          remote-pagination
+          :pagination="pagination"
+          show-overflow-tooltip
+          @page-limit-change="handlePageSizeChange"
+          @page-value-change="handlePageChange"
+          :border="['outer']"
+        >
+          <bk-table-column
+            :label="t('网关名称')"
+            field="name"
           >
-            {{ t('网关管理') }}
-          </bk-button> -->
-        </div>
-        <div class="docs-list">
-          <bk-loading :loading="isLoading">
-            <bk-table
-              :data="tableData"
-              remote-pagination
-              :pagination="pagination"
-              show-overflow-tooltip
-              @page-limit-change="handlePageSizeChange"
-              @page-value-change="handlePageChange"
-              :border="['outer']"
-            >
-              <bk-table-column
-                :label="t('网关名称')"
-                field="name"
-              >
-                <template #default="{ data }">
-                  <span class="link-name" @click="gotoDetails(data)">{{ data?.name || '--' }}</span>
-                  <bk-tag theme="success" v-if="data?.is_official">
-                    {{ t('官方') }}
-                  </bk-tag>
-                </template>
-              </bk-table-column>
-              <bk-table-column
-                :label="t('网关描述')"
-                field="description"
-              >
-                <template #default="{ data }">
-                  {{ data?.description || '--' }}
-                </template>
-              </bk-table-column>
-              <bk-table-column
-                :label="t('网关负责人')"
-                field="maintainers"
-              >
-                <template #default="{ data }">
-                  {{ data?.maintainers?.join(', ') || '--' }}
-                </template>
-              </bk-table-column>
-              <bk-table-column
-                :label="t('SDK 包名称')"
-                field="maintainers"
-              >
-                <template #default="{ row }">
-                  {{ row?.sdk?.name || '--' }}
-                </template>
-              </bk-table-column>
-              <bk-table-column
-                :label="t('SDK 最新版本')"
-                field="maintainers"
-              >
-                <template #default="{ row }">
-                  {{ row?.sdk?.version || '--' }}
-                </template>
-              </bk-table-column>
-              <bk-table-column
-                :label="t('操作')"
-                width="180"
-                fixed="right"
-              >
-                <template #default="{ row }">
-                  <bk-button
-                    text
-                    theme="primary"
-                    @click="handleSdkDetailClick(row)"
-                  >
-                    {{ t('查看 SDK') }}
-                  </bk-button>
-                  <a
-                    class="ag-link pl10 pr10"
-                    :href="row?.sdk_download_url ?? ''"
-                  >
-                    {{ t('下载 SDK') }}
-                  </a>
-                </template>
-              </bk-table-column>
-              <template #empty>
-                <TableEmpty
-                  :keyword="tableEmptyConf.keyword"
-                  :abnormal="tableEmptyConf.isAbnormal"
-                  @reacquire="getList"
-                  @clear-filter="handleClearFilterKey"
-                />
-              </template>
-            </bk-table>
-          </bk-loading>
-        </div>
-      </div>
-      <!--  当选中 组件API文档 时  -->
-      <div v-else-if="curTab === 'component'" class="content-of-component">
-        <main class="category-list">
-          <article class="category-wrap" v-for="system in componentSystemList" :key="system.board">
-            <!--  system 类别 title 和搜索栏  -->
-            <header class="top-bar">
-              <main class="bar-title">
-                <span class="title">{{ system.board_label }}</span>
-                <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
-                  <i class="apigateway-icon icon-ag-document f14"></i>
-                  {{ t('查看 SDK') }}
-                </bk-link>
-                <bk-link
-                  :href="system.sdk?.sdk_download_url"
-                  :disabled="!system.sdk?.sdk_download_url"
-                  theme="primary"
-                  v-bk-tooltips="{ content: t('SDK未生成，可联系负责人生成SDK'), disabled: system.sdk?.sdk_download_url }"
-                  class="f12"
-                >
-                  <i class="apigateway-icon icon-ag-download f14"></i>
-                  {{ t('下载 SDK') }}
-                </bk-link>
-              </main>
-              <aside>
-                <bk-input
-                  type="search"
-                  :placeholder="t('搜索内部版组件')"
-                  v-model="filterData.keyword"
-                  clearable
-                  style="width: 320px"
-                />
-              </aside>
-            </header>
-            <!--  组件  -->
-            <main class="components-wrap">
-              <!--  组件分类  -->
-              <article
-                class="component-group"
-                v-for="cat in system.categories"
-                :key="cat.id"
-                :data-_nav-id="`${system.board}-${cat.id}`"
-                :ref="catRefs.set"
-              >
-                <header class="group-title">
-                  <span class="name">{{ cat.name }}</span>
-                  <span class="count">{{ `(${cat.systems.length})` }}</span>
-                </header>
-                <!--  分类中的组件卡片  -->
-                <main class="group-items">
-                  <article
-                    class="item"
-                    v-for="component in cat.systems"
-                    :key="component.name"
-                    @click="gotoDetails(component)"
-                  >
-                    <main class="title">
-                      <div class="name">{{ component.description }}</div>
-                      <div class="name-en">{{ component.name }}</div>
-                    </main>
-                    <aside class="background-image">
-                      <i class="apigateway-icon icon-ag-component-intro"></i>
-                    </aside>
-                  </article>
-                </main>
-              </article>
-            </main>
-          </article>
-        </main>
-        <!--  右侧导航目录  -->
-        <bk-affix :offset-top="128">
-          <aside class="component-nav-list">
-            <bk-collapse
-              class="collapse-cls"
-              v-model="navPanelNamesList"
-              use-card-theme
-            >
-              <bk-collapse-panel v-for="system in componentSystemList" :key="system.board" :name="system.board">
-                <template #header>
-                  <div class="panel-header">
-                    <main class="flex-row align-items-center">
-                      <angle-up-fill
-                        :class="[navPanelNamesList.includes(system.board) ? 'panel-header-show' : 'panel-header-hide']"
-                      />
-                      <div class="title ml4">
-                        {{ system.board_label }}
-                      </div>
-                    </main>
-                  </div>
-                </template>
-                <template #content>
-                  <nav class="panel-content">
-                    <article
-                      v-for="cat in system.categories"
-                      :key="cat.id"
-                      class="panel-content-cat-item"
-                      :class="{ 'active': curCatNavId === cat._navId }"
-                      @click="handleNavClick(cat)"
-                    >{{ cat.name }}
-                    </article>
-                  </nav>
-                </template>
-              </bk-collapse-panel>
-            </bk-collapse>
-          </aside>
-        </bk-affix>
-      </div>
-    </main>
-    <!--  SDK使用说明 Slider  -->
-    <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
-    <!--  网关 SDK 地址 dialog  -->
-    <SdkDetailDialog v-model="isSdkDetailDialogShow"></SdkDetailDialog>
+            <template #default="{ data }">
+              <span class="link-name" @click="gotoDetails(data)">{{data?.name || '--'}}</span>
+              <bk-tag theme="success" v-if="data?.is_official">
+                {{ t('官方') }}
+              </bk-tag>
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="t('网关描述')"
+            field="description"
+          >
+            <template #default="{ data }">
+              {{ data?.description || '--' }}
+            </template>
+          </bk-table-column>
+          <bk-table-column
+            :label="t('网关负责人')"
+            field="maintainers"
+          >
+            <template #default="{ data }">
+              {{ data?.maintainers?.join(', ') || '--' }}
+            </template>
+          </bk-table-column>
+          <template #empty>
+            <TableEmpty
+              :keyword="tableEmptyConf.keyword"
+              :abnormal="tableEmptyConf.isAbnormal"
+              @reacquire="getList"
+              @clear-filter="handleClearFilterKey"
+            />
+          </template>
+        </bk-table>
+      </bk-loading>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {
-  onMounted,
-  provide,
-  ref,
-  watch,
-} from 'vue';
+import { ref, watch } from 'vue';
 import { useQueryList } from '@/hooks';
 import { useI18n } from 'vue-i18n';
-import {
-  getComponentSystemList,
-  getGatewaysDocs,
-} from '@/http';
+import { getGatewaysDocs } from '@/http';
 import { useRouter } from 'vue-router';
 import TableEmpty from '@/components/table-empty.vue';
-import SdkInstructionSlider from '@/views/apigwDocs/components/sdk-instruction-slider.vue';
-import useMaxTableLimit from '@/hooks/use-max-table-limit';
-import SdkDetailDialog from '@/views/apigwDocs/components/sdk-detail-dialog.vue';
-import {
-  IApiGatewaySdk,
-  ICategory,
-  ISystem,
-  TabType,
-} from '@/views/apigwDocs/types';
-import { AngleUpFill } from 'bkui-vue/lib/icon';
-import { useTemplateRefsList } from '@vueuse/core';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -278,48 +87,22 @@ const {
   handlePageChange,
   handlePageSizeChange,
   getList,
-} = useQueryList(getGatewaysDocs, filterData, null, true);
-
-
-// 当前视口高度能展示最多多少条表格数据
-const maxTableLimit = ref(10);
-maxTableLimit.value = useMaxTableLimit(271);
-
-// 注意，pagination 的 limit 必须在 limitList 里才能生效
-// 所以要先放进 limitList 里
-pagination.value.limitList.unshift(maxTableLimit.value);
-pagination.value.limit = maxTableLimit.value;
+} = useQueryList(getGatewaysDocs, filterData);
 
 
 // const handleGoApigw = () => {
 //   window.open(window.BK_DASHBOARD_URL);
 // };
-const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
+const tableEmptyConf = ref<{keyword: string, isAbnormal: boolean}>({
   keyword: '',
   isAbnormal: false,
 });
 
-// 当前展示的是 网关 | 组件 相关内容
-const curTab = ref<TabType>('apigw');
-const board = ref('default');
-const curCatNavId = ref('');
-const navPanelNamesList = ref<string[]>([]);
-
-const catRefs = useTemplateRefsList<HTMLElement>();
-
-// 提供当前 tab 的值
-// 注入时请使用：const curTab = inject<Ref<TabType>>('curTab');
-provide('curTab', curTab);
-
-const isSdkInstructionSliderShow = ref(false);
-const isSdkDetailDialogShow = ref(false);
-
 const gotoDetails = (data: any) => {
   router.push({
-    name: 'apiDocDetail',
+    name: 'apigwAPIDetailIntro',
     params: {
-      targetName: data?.name,
-      curTab: curTab.value,
+      apigwId: data?.name,
     },
   });
 };
@@ -347,40 +130,6 @@ const updateTableEmptyConfig = () => {
   tableEmptyConf.value.keyword = '';
 };
 
-const componentSystemList = ref<ISystem[]>([]);
-
-const fetchComponentList = async () => {
-  try {
-    const res = await getComponentSystemList(board.value) as ISystem[];
-    res.forEach((system) => {
-      // 给组件分类添加一个跳转用的 _navId
-      system.categories.forEach((cat) => {
-        cat._navId = `${system.board}-${cat.id}`;
-      });
-      componentSystemList.value.push(system);
-      navPanelNamesList.value.push(system.board);
-    });
-  } catch {
-    componentSystemList.value = [];
-  }
-};
-
-const handleNavClick = (cat: ICategory) => {
-  const { _navId } = cat;
-  curCatNavId.value = _navId;
-  const catRef = catRefs.value.find(item => item.dataset?._navId === _navId);
-  if (catRef?.scrollIntoView) {
-    catRef.scrollIntoView({ behavior: 'smooth' });
-  }
-};
-
-const curSdks = ref<IApiGatewaySdk[]>([]);
-
-const handleSdkDetailClick = (row: any) => {
-  curSdks.value = row?.sdks ?? [];
-  isSdkDetailDialogShow.value = true;
-};
-
 watch(
   () => tableData.value, () => {
     updateTableEmptyConfig();
@@ -390,250 +139,24 @@ watch(
   },
 );
 
-onMounted(async () => {
-  await fetchComponentList();
-});
-
 </script>
 
 <style lang="scss" scoped>
-$primary-color: #3a84ff;
-
 .docs-main {
-
-  .page-tabs {
-    height: 52px;
-    margin-bottom: 24px;
-    position: sticky;
-    top: 0;
+  width: 90%;
+  min-width: 1000px;
+  max-width: 1200px;
+  margin: auto;
+  padding: 28px 0;
+  .top-bar {
+    margin-bottom: 16px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    background: #fff;
-    box-shadow: 0 3px 4px 0 #0000000a;
-    z-index: 1;
-
-    .tabs-group {
-      display: flex;
-      justify-content: center;
-
-      .page-tab {
-        width: 135px;
-        height: 52px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-
-        &:hover {
-          color: #3a84ff;
-        }
-
-        &.active {
-          background-color: #f0f5ff;
-          border-top: 3px solid #3a84ff;
-          color: #3a84ff;
-        }
-      }
-    }
+    justify-content: space-between;
   }
-
-  .docs-main-content {
-    width: 1280px;
-    margin: auto;
-
-    .content-of-apigw {
-      .top-bar {
-        margin-bottom: 16px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-      }
-
-      .link-name {
-        color: #3a84ff;
-        cursor: pointer;
-      }
-    }
-
-    .content-of-component {
-      padding-bottom: 12px;
-      display: flex;
-
-      .category-list {
-        width: 1000px;
-
-        .category-wrap {
-          margin-bottom: 4px;
-
-          .top-bar {
-            margin-bottom: 16px;
-            height: 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .bar-title {
-              display: flex;
-              align-items: center;
-              gap: 24px;
-
-              .title {
-                font-weight: 700;
-                font-size: 16px;
-                color: #313238;
-                letter-spacing: 0;
-                line-height: 24px;
-              }
-            }
-          }
-
-          .components-wrap {
-            .component-group {
-              margin-bottom: 16px;
-              scroll-margin-top: 68px;
-
-              .group-title {
-                padding-inline: 16px;
-                margin-bottom: 16px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                border-radius: 2px;
-                background: #eaebf0;
-
-                .name {
-                  margin-right: 8px;
-                  font-size: 14px;
-                  color: #313238;
-                }
-
-                .count {
-                  color: #979ba5;
-                }
-              }
-
-              .group-items {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 16px;
-
-                .item {
-                  position: relative;
-                  padding: 16px;
-                  width: 238px;
-                  height: 80px;
-                  background: #fff;
-                  box-shadow: 0 2px 4px 0 #1919290d;
-                  border-radius: 2px;
-                  transition: box-shadow .2s ease-in-out;
-
-                  .title {
-                    .name, .name-en {
-                      font-size: 14px;
-                      letter-spacing: 0;
-                      line-height: 22px;
-                    }
-
-                    .name {
-                      margin-bottom: 5px;
-                      color: #313238;
-                      transition: color .2s ease-in-out;
-                    }
-
-                    .name-en {
-                      color: #c4c6cc;
-                    }
-                  }
-
-                  .background-image {
-                    position: absolute;
-                    top: 20px;
-                    right: 16px;
-                    width: 40px;
-                    height: 40px;
-                    display: flex;
-                    align-items: center;
-                    font-size: 40px;
-                    color: #f0f5ff;
-                  }
-
-                  &:hover {
-                    box-shadow: 0 2px 4px 0 #0000001a, 0 2px 4px 0 #1919290d;
-                    cursor: pointer;
-
-                    .title {
-                      .name {
-                        color: $primary-color;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      .component-nav-list {
-        padding-left: 24px;
-        width: 187px;
-
-        :deep(.collapse-cls) {
-          .bk-collapse-item {
-            box-shadow: none;
-          }
-        }
-
-        :deep(.bk-collapse-content) {
-          padding: 0 !important;
-          font-size: 14px;
-        }
-
-        .panel-header {
-          padding-left: 9px;
-          padding-bottom: 7px;
-          display: flex;
-          align-items: center;
-          border-left: 1px solid #dcdee5;
-          cursor: pointer;
-
-          .title {
-            height: 22px;
-          }
-
-          .panel-header-show {
-            transition: .2s;
-            transform: rotate(0deg);
-          }
-
-          .panel-header-hide {
-            transition: .2s;
-            transform: rotate(-90deg);
-          }
-        }
-
-        .panel-content {
-
-          .panel-content-cat-item {
-            padding-left: 40px;
-            padding-block: 7px;
-            line-height: 22px;
-            border-left: 1px solid #dcdee5;
-            cursor: pointer;
-
-            &:hover {
-              color: $primary-color;
-            }
-
-            &.active {
-              border-color: $primary-color;
-            }
-          }
-        }
-      }
-    }
-
+  .link-name {
+    color: #3A84FF;
+    cursor: pointer;
   }
 }
 </style>
