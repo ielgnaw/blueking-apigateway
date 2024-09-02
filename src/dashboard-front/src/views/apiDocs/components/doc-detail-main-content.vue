@@ -195,7 +195,7 @@ $code-color: #63656e;
   align-items: flex-start;
 
   .target-detail {
-    flex-grow: 1;
+    //flex-grow: 1;
     padding-right: 8px;
     padding-left: 8px;
     max-width: 1000px;

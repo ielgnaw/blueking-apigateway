@@ -23,9 +23,7 @@ import { copy } from '@/common/util';
 
 import {
   getESBSDKDoc,
-  getESBSDKlist,
   getGatewaySDKDoc,
-  getGatewaySDKlist,
 } from '@/http';
 import {
   LanguageType,
@@ -39,26 +37,14 @@ const language = ref<LanguageType>('python');
 const board = ref('default');
 const sdkDoc = ref('');
 const markdownHtml = ref('');
-const active = ref('sdk');
 const renderKey = ref(0);
 const renderHtmlIndex = ref(0);
-const keyword = ref('');
 const isLoading = ref(false);
 const pagination = ref({
   offset: 0,
   count: 0,
   limit: 10,
 });
-const curPageData = ref([]);
-
-
-// 监听搜索关键词的变化
-watch(
-  () => keyword.value,
-  (v: string) => {
-    getSDKlist(v);
-  },
-);
 
 const md = new MarkdownIt({
   linkify: false,
@@ -117,31 +103,6 @@ const initMarkdownHtml = (content: string) => {
   });
 };
 
-// 获取SDK list
-const getSDKlist = async (keyword: any | string = null) => {
-  const pageParams = {
-    limit: pagination.value.limit,
-    offset: pagination.value.offset,
-    language: language.value,
-    keyword,
-  };
-  isLoading.value = true;
-  try {
-    if (curTab.value === 'apigw') {
-      const res = await getGatewaySDKlist(pageParams);
-      curPageData.value = res.results;
-      pagination.value.count = res.count;
-    } else {
-      const res = await getESBSDKlist(board.value, pageParams);
-      curPageData.value = res;
-      pagination.value.count = res.length;
-    }
-    isLoading.value = false;
-  } catch {
-    isLoading.value = false;
-  }
-};
-
 // 获取SDK 说明
 const getSDKDoc = async () => {
   const params = { language: language.value };
@@ -168,12 +129,10 @@ const handleLangSelect = (lang: LanguageType) => {
 
 const init = () => {
   try {
-    getSDKlist();
     getSDKDoc();
   } catch {
     sdkDoc.value = '';
     markdownHtml.value = '';
-    curPageData.value = [];
     pagination.value = {
       offset: 0,
       count: 0,
@@ -186,8 +145,6 @@ const init = () => {
 watch(
   () => curTab.value,
   () => {
-    active.value = 'sdk';
-    curPageData.value = [];
     // eslint-disable-next-line no-plusplus
     renderKey.value++;
     init();

@@ -1,4 +1,5 @@
 type TabType = 'apigw' | 'component';
+type LanguageType = 'python' | 'java';
 
 interface ICategory {
   id: string;
@@ -12,8 +13,6 @@ interface INavItem {
   name: string;
 }
 
-type LanguageType = 'python' | 'java';
-
 // 网关类型
 
 interface IApiGatewayBasics {
@@ -23,12 +22,13 @@ interface IApiGatewayBasics {
   maintainers: string[];
   is_official: boolean;
   api_url: string;
+  sdks?: IApiGatewaySdk[];
 }
 
 interface IApiGatewaySdkDoc {
   language: LanguageType;
   resource_version: IResourceVersion;
-  sdk?: IApiGatewaySdk | IApiGatewaySdk[];
+  sdk: IApiGatewaySdk[];
   stage: { id: number, name: string }
 }
 
@@ -98,16 +98,22 @@ interface IComponentSdk {
   language: LanguageType;
 }
 
+// 其他
+
+interface ISdk extends Partial<IApiGatewaySdk>, Partial<IComponentSdk> {
+}
+
 export {
   IApiGatewayBasics,
-  IApiGatewaySdkDoc,
   IApiGatewaySdk,
+  IApiGatewaySdkDoc,
   ICategory,
   IComponent,
   IComponentSdk,
   INavItem,
   IResource,
   IResourceVersion,
+  ISdk,
   IStage,
   ISystem,
   ISystemBasics,

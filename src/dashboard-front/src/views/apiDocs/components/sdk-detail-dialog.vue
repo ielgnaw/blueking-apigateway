@@ -10,111 +10,25 @@
     <main class="dialog-content">
       <div class="dialog-main">
         <LangSelector v-model="language" :sdk-languages="sdks.map(item => item.language)"></LangSelector>
-        <div class="data-box">
-          <article class="row-item">
-            <aside class="key">
-              <span class="column-key"> {{ t('SDK包名称') }}: </span>
-            </aside>
-            <main class="value">
-              <span class="column-value" v-bk-overflow-tips>{{ curSdk.name ?? '--' }}</span>
-            </main>
-          </article>
-          <article class="row-item">
-            <aside class="key">
-              <span class="column-key"> {{ t('SDK版本') }}: </span>
-            </aside>
-            <main class="value">
-              <span class="column-value" v-bk-overflow-tips>{{ curSdk.version ?? '--' }}</span>
-            </main>
-          </article>
-          <article class="row-item">
-            <aside class="key">
-              <span class="column-key"> {{ t('SDK地址') }}: </span>
-            </aside>
-            <main class="value flex-row align-items-center">
-              <bk-popover placement="top" width="600" theme="dark" :disabled="!curSdk.url">
-                <span class="column-value vm">{{ curSdk.url ?? '--' }}</span>
-                <template #content>
-                  <div class="popover-text">
-                    {{ curSdk.url }}
-                  </div>
-                </template>
-              </bk-popover>
-              <i
-                @click="copy(curSdk.url)"
-                class="doc-copy vm icon-hover apigateway-icon icon-ag-copy ag-doc-icon"
-                v-if="curSdk.url" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curSdk.url"
-              ></i>
-              <i
-                class="ag-doc-icon doc-download-line vm icon-hover apigateway-icon icon-ag-download-line"
-                v-if="curSdk.url" v-bk-tooltips="t('下载')" @click="handleDownload"
-              ></i>
-            </main>
-          </article>
-          <article class="row-item">
-            <aside class="key">
-              <span class="column-key"> {{ t('安装') }}: </span>
-            </aside>
-            <main class="value flex-row align-items-center">
-              <bk-popover placement="top" width="600" theme="dark" :disabled="!curSdk.install_command">
-                <span class="column-value vm">{{ curSdk.install_command || '--' }}</span>
-                <template #content>
-                  <div class="popover-text">
-                    {{ curSdk.install_command }}
-                  </div>
-                </template>
-              </bk-popover>
-              <i
-                @click="copy(curSdk.install_command)"
-                class="ag-doc-icon doc-copy vm icon-hover apigateway-icon icon-ag-copy"
-                v-if="curSdk.install_command" v-bk-tooltips="t('复制')"
-                :data-clipboard-text="curSdk.install_command"
-              >
-              </i>
-            </main>
-          </article>
-          <article class="row-item">
-            <aside class="key">
-              <span class="column-key">
-                {{ t('资源版本') }}
-                <span v-bk-tooltips="t('该SDK关联的API资源版本')">
-                  <i class="icon apigateway-icon icon-ag-help"></i>
-                </span>
-                :
-              </span>
-            </aside>
-            <main class="value">
-              <span
-                class="column-value"
-                v-bk-tooltips.top="{ content: curSdk.version, allowHTML: false }"
-              >
-                {{ curSdk.version ?? '--' }}
-              </span>
-            </main>
-          </article>
-        </div>
+        <SdkDetail :sdk="curSdk" is-apigw></SdkDetail>
       </div>
     </main>
   </bk-dialog>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import {
   computed,
   defineModel,
   ref,
   toRefs,
 } from 'vue';
-import { copy } from '@/common/util';
 import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
 import {
-  IApiGatewaySdk,
+  ISdk,
   LanguageType,
 } from '@/views/apiDocs/types';
-
-const { t } = useI18n();
+import SdkDetail from '@/views/apiDocs/components/sdk-detail.vue';
 
 const isShow = defineModel<boolean>({
   required: true,
@@ -122,7 +36,7 @@ const isShow = defineModel<boolean>({
 });
 
 interface IProps {
-  sdks: IApiGatewaySdk[];
+  sdks: ISdk[];
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -134,22 +48,9 @@ const { sdks } = toRefs(props);
 const language = ref<LanguageType>('python');
 
 const curSdk = computed(() => {
-  const sdk = sdks.value.find((item: IApiGatewaySdk) => item.language === language.value);
-  return sdk || {
-    language: 'python',
-    name: '--',
-    version: '--',
-    url: '--',
-    install_command: '--',
-  };
+  return sdks.value.find(item => item.language === language.value) ?? null;
 });
 
-// 下载
-const handleDownload = () => {
-  if (curSdk.value?.url) {
-    window.open(curSdk.value.url);
-  }
-};
 </script>
 
 <style scoped lang="scss">

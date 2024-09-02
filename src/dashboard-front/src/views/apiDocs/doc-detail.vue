@@ -28,7 +28,7 @@
         collapsible
         initial-divide="392px"
         :max="480"
-        :min="392"
+        :min="293"
         style="flex-grow: 1;"
         @collapse-change="updateIsRightAsideCollapsed"
       >

@@ -63,6 +63,7 @@
               <bk-table-column
                 :label="t('网关描述')"
                 field="description"
+                :min-width="500"
               >
                 <template #default="{ data }">
                   {{ data?.description || '--' }}
@@ -76,12 +77,12 @@
                   {{ data?.maintainers?.join(', ') || '--' }}
                 </template>
               </bk-table-column>
-              <bk-table-column
+              <!--  <bk-table-column
                 :label="t('SDK 包名称')"
                 field="maintainers"
               >
                 <template #default="{ row }">
-                  {{ row?.sdk?.name || '--' }}
+                  {{ row?.sdk?.name || '&#45;&#45;' }}
                 </template>
               </bk-table-column>
               <bk-table-column
@@ -89,15 +90,15 @@
                 field="maintainers"
               >
                 <template #default="{ row }">
-                  {{ row?.sdk?.version || '--' }}
+                  {{ row?.sdk?.version || '&#45;&#45;' }}
                 </template>
-              </bk-table-column>
+              </bk-table-column>-->
               <bk-table-column
                 :label="t('操作')"
                 width="180"
                 fixed="right"
               >
-                <template #default="{ row }">
+                <template #default="{ row }: { row: IApiGatewayBasics }">
                   <bk-button
                     text
                     theme="primary"
@@ -105,12 +106,12 @@
                   >
                     {{ t('查看 SDK') }}
                   </bk-button>
-                  <a
-                    class="ag-link pl10 pr10"
-                    :href="row?.sdk_download_url ?? ''"
-                  >
-                    {{ t('下载 SDK') }}
-                  </a>
+                  <!--                  <a-->
+                  <!--                    class="ag-link pl10 pr10"-->
+                  <!--        :href="row?.sdk_download_url ?? ''"-->
+                  <!--                  >-->
+                  <!--                    {{ t('下载 SDK') }}-->
+                  <!--                  </a>-->
                 </template>
               </bk-table-column>
               <template #empty>
@@ -235,7 +236,7 @@
     <!--  SDK使用说明 Slider  -->
     <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
     <!--  网关 SDK 地址 dialog  -->
-    <SdkDetailDialog v-model="isSdkDetailDialogShow"></SdkDetailDialog>
+    <SdkDetailDialog v-model="isSdkDetailDialogShow" :sdks="curSdks"></SdkDetailDialog>
   </div>
 </template>
 
@@ -258,8 +259,9 @@ import SdkInstructionSlider from '@/views/apiDocs/components/sdk-instruction-sli
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import SdkDetailDialog from '@/views/apiDocs/components/sdk-detail-dialog.vue';
 import {
-  IApiGatewaySdk,
+  IApiGatewayBasics,
   ICategory,
+  ISdk,
   ISystem,
   TabType,
 } from '@/views/apiDocs/types';
@@ -374,10 +376,10 @@ const handleNavClick = (cat: ICategory) => {
   }
 };
 
-const curSdks = ref<IApiGatewaySdk[]>([]);
+const curSdks = ref<ISdk[]>([]);
 
-const handleSdkDetailClick = (row: any) => {
-  curSdks.value = row?.sdks ?? [];
+const handleSdkDetailClick = (row: IApiGatewayBasics) => {
+  curSdks.value = row.sdks ?? [];
   isSdkDetailDialogShow.value = true;
 };
 
