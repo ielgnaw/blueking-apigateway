@@ -5,7 +5,7 @@
       <main class="flex-row align-items-center header-main">
         <i
           class="icon apigateway-icon icon-ag-return-small"
-          @click="router.back()"
+          @click="handleGoBack()"
         ></i>
         {{ curTargetName }}
         <!--        <div class="title-name">-->
@@ -364,6 +364,15 @@ const toggleAsideVisible = () => {
 const updateIsRightAsideCollapsed = (collapsed: boolean) => {
   isAsideVisible.value = !collapsed;
 };
+
+const handleGoBack = () => {
+  router.push({
+    name: 'apiDocs',
+    params: {
+      curTab: curTab.value,
+    },
+  });
+}
 
 onBeforeMount(() => {
   const { params } = route;

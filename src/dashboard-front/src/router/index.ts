@@ -322,7 +322,7 @@ const routes: RouteRecordRaw[] = [
     component: docsComponent,
     children: [
       {
-        path: 'apigw-api',
+        path: 'apigw-api/:curTab?',
         name: 'apiDocs',
         component: ApiDocs,
         meta: {

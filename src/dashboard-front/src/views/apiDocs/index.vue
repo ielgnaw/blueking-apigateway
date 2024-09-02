@@ -54,7 +54,7 @@
                 field="name"
               >
                 <template #default="{ data }">
-                  <span class="link-name" @click="gotoDetails(data)">{{ data?.name || '--' }}</span>
+                  <span class="link-name" @click="gotoDetails(data)">{{ data.name || '--' }}</span>
                   <bk-tag theme="success" v-if="data?.is_official">
                     {{ t('官方') }}
                   </bk-tag>
@@ -236,6 +236,7 @@
 
 <script lang="ts" setup>
 import {
+  onBeforeMount,
   onMounted,
   provide,
   ref,
@@ -247,7 +248,10 @@ import {
   getComponentSystemList,
   getGatewaysDocs,
 } from '@/http';
-import { useRouter } from 'vue-router';
+import {
+  useRoute,
+  useRouter,
+} from 'vue-router';
 import useMaxTableLimit from '@/hooks/use-max-table-limit';
 import TableEmpty from '@/components/table-empty.vue';
 import SdkInstructionSlider from '@/views/apiDocs/components/sdk-instruction-slider.vue';
@@ -256,6 +260,8 @@ import ComponentSearcher from '@/views/apiDocs/components/component-searcher.vue
 import {
   IApiGatewayBasics,
   ICategory,
+  IComponent,
+  IResource,
   ISdk,
   ISystem,
   TabType,
@@ -264,6 +270,7 @@ import { AngleUpFill } from 'bkui-vue/lib/icon';
 import { useTemplateRefsList } from '@vueuse/core';
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 
 const filterData = ref({ keyword: '' });
@@ -307,11 +314,11 @@ provide('curTab', curTab);
 const isSdkInstructionSliderShow = ref(false);
 const isSdkDetailDialogShow = ref(false);
 
-const gotoDetails = (data: any) => {
+const gotoDetails = (data: IResource | IComponent) => {
   router.push({
     name: 'apiDocDetail',
     params: {
-      targetName: data?.name,
+      targetName: data.name,
       curTab: curTab.value,
     },
   });
@@ -382,6 +389,11 @@ watch(
     deep: true,
   },
 );
+
+onBeforeMount(() => {
+  const { params } = route;
+  curTab.value = params.curTab as TabType || 'apigw';
+});
 
 onMounted(async () => {
   await fetchComponentList();
