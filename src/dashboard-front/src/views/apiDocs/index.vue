@@ -230,7 +230,7 @@
     <!--  SDK使用说明 Slider  -->
     <SdkInstructionSlider v-model="isSdkInstructionSliderShow"></SdkInstructionSlider>
     <!--  网关 SDK 地址 dialog  -->
-    <SdkDetailDialog v-model="isSdkDetailDialogShow" :sdks="curSdks"></SdkDetailDialog>
+    <SdkDetailDialog v-model="isSdkDetailDialogShow" :sdks="curSdks" :apigw-name="curTargetName"></SdkDetailDialog>
   </div>
 </template>
 
@@ -300,6 +300,7 @@ const tableEmptyConf = ref<{ keyword: string, isAbnormal: boolean }>({
 
 // 当前展示的是 网关 | 组件 相关内容
 const curTab = ref<TabType>('apigw');
+const curTargetName = ref('');
 const board = ref('default');
 const curCatNavId = ref('');
 const navPanelNamesList = ref<string[]>([]);
@@ -376,6 +377,7 @@ const handleNavClick = (cat: ICategory) => {
 const curSdks = ref<ISdk[]>([]);
 
 const handleSdkDetailClick = (row: IApiGatewayBasics) => {
+  curTargetName.value = row.name;
   curSdks.value = row.sdks ?? [];
   isSdkDetailDialogShow.value = true;
 };

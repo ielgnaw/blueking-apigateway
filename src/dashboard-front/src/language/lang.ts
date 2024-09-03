@@ -1140,6 +1140,7 @@ const lang: ILANG = {
   '网关 API 文档': ['Gateway API Doc'],
   '组件 API SDK': ['Component API SDK'],
   '网关 API SDK': ['Gateway API SDK'],
+  '网关 API SDK: {name}': ['Gateway API SDK: {name}'],
   '查看 SDK': ['Check SDK'],
   '下载 SDK': ['Download SDK'],
   '上下结构无侧栏导航': ['Top-down Structure Without Sidebar Navigation'],

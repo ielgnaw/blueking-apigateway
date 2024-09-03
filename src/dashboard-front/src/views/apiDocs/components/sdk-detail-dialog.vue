@@ -2,7 +2,7 @@
   <!--  查看 SDK 弹窗  -->
   <bk-dialog
     v-model:is-show="isShow"
-    title="网关API SDK:"
+    :title="title"
     class="custom-main-dialog"
     width="640"
     mask-close
@@ -29,6 +29,9 @@ import {
   LanguageType,
 } from '@/views/apiDocs/types';
 import SdkDetail from '@/views/apiDocs/components/sdk-detail.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const isShow = defineModel<boolean>({
   required: true,
@@ -37,18 +40,24 @@ const isShow = defineModel<boolean>({
 
 interface IProps {
   sdks: ISdk[];
+  apigwName: string;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   sdks: () => [],
+  apigwName: '',
 });
 
-const { sdks } = toRefs(props);
+const { sdks, apigwName } = toRefs(props);
 
 const language = ref<LanguageType>('python');
 
 const curSdk = computed(() => {
   return sdks.value.find(item => item.language === language.value) ?? null;
+});
+
+const title = computed(() => {
+  return apigwName.value ? t('网关 API SDK: {name}', { name: apigwName.value } ) : t('网关 API SDK');
 });
 
 </script>
