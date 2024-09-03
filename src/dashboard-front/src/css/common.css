@@ -507,6 +507,10 @@
   width: 700px !important;
 }
 
+.fw-normal {
+  font-weight: normal;
+}
+
 .fw700{
   font-weight: 700;
 }

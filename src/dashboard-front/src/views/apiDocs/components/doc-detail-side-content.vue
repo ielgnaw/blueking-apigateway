@@ -90,7 +90,10 @@
         <main class="content-main">{{ basics.comment }}</main>
         <header class="content-title">{{ t('网关负责人') }}</header>
         <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
-        <header class="content-title">{{ t('组件 API SDK') }}</header>
+        <header class="content-title">
+          {{ t('组件 API SDK') }}
+          <bk-tag class="ml20 fw-normal" theme="info">Python</bk-tag>
+        </header>
         <main class="content-main">
           <SdkDetail :sdk="sdks[0]"></SdkDetail>
         </main>
