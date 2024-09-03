@@ -26,14 +26,13 @@
         <main class="content-main">{{ basics.api_url }}</main>
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
           <header class="content-title">{{ t('网关 SDK') }}</header>
-          <LangSelector :width="90" :margin-bottom="0"></LangSelector>
+          <LangSelector :width="90" :margin-bottom="12" @select="handleLangSelect"></LangSelector>
         </template>
       </div>
 
       <!--  网关SDK信息表格  -->
       <template v-if="userStore.featureFlags?.ENABLE_SDK">
         <bk-table
-          style="margin-top: 15px;"
           :data="sdks"
           show-overflow-tooltip
           :border="['outer']"
@@ -121,6 +120,7 @@ import {
   IApiGatewaySdkDoc,
   IComponentSdk,
   ISystemBasics,
+  LanguageType,
   TabType,
 } from '@/views/apiDocs/types';
 import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
@@ -142,6 +142,10 @@ const {
   basics,
   sdks,
 } = toRefs(props);
+
+const emit = defineEmits<{
+  'lang-change': [language: LanguageType]
+}>();
 
 const userStore = useUser();
 const { t } = useI18n();
@@ -172,6 +176,10 @@ const handleShow = (data: any) => {
 
 const handleDownload = (data: any) => {
   window.open(data?.sdk?.url);
+};
+
+const handleLangSelect = (language: LanguageType) => {
+  emit('lang-change', language);
 };
 
 </script>

@@ -141,6 +141,7 @@
               <DocDetailSideContent
                 :basics="curTargetBasics"
                 :sdks="sdks"
+                @lang-change="handleLangChange"
               ></DocDetailSideContent>
             </main>
           </aside>
@@ -276,6 +277,10 @@ const fetchSdks = async (language: LanguageType = 'python') => {
   }
 };
 
+const handleLangChange = async (language: LanguageType) => {
+  await fetchSdks(language);
+};
+
 const fetchApigwStages = async () => {
   try {
     const query = {
@@ -398,7 +403,9 @@ const init = async () => {
   await fetchBasics();
   await fetchSdks();
   await fetchResources();
-  await fetchBoardList();
+  if (curTab.value === 'component') {
+    await fetchBoardList();
+  }
 };
 
 const toggleAsideVisible = () => {
