@@ -690,7 +690,9 @@ const lang: ILANG = {
   '发布状态': ['Release Status'],
   '查看资源': ['View'],
   '克隆': ['Clone'],
-  '删除资源后，需要生成新的版本，并发布到目标环境才能生效': ['After deletion, a new version needs to be generated and released to the target stage to take effect'],
+  // 以下行有重复，暂时注释掉
+  // '删除资源后，需要生成新的版本，并发布到目标环境才能生效':
+  // ['After deletion, a new version needs to be generated and released to the target stage to take effect'],
   '请选择导出的格式': ['Select export format'],
   '选择全部资源': ['Select all resources'],
   '已选择全部资源': ['Selected all resources'],
@@ -1142,6 +1144,7 @@ const lang: ILANG = {
   '网关API SDK': ['Gateway API SDK'],
   '组件 API 文档': ['Component API Doc'],
   '网关 API 文档': ['Gateway API Doc'],
+  '没有对应文档': ['No Doc'],
   '组件 API SDK': ['Component API SDK'],
   '网关 API SDK': ['Gateway API SDK'],
   '网关 API SDK: {name}': ['Gateway API SDK: {name}'],
