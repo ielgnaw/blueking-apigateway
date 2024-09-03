@@ -7,7 +7,7 @@
     <bk-exception
       v-else
       class="exception-wrap-item exception-part"
-      description="没有对应文档"
+      :description="t('没有对应文档')"
       scene="part"
       type="empty"
     />
@@ -37,6 +37,9 @@ import {
   TabType,
 } from '@/views/apiDocs/types';
 import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const curTab = inject<Ref<TabType>>('curTab');
 
