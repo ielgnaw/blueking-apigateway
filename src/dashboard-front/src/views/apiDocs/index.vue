@@ -53,9 +53,9 @@
                 :label="t('网关名称')"
                 field="name"
               >
-                <template #default="{ data }">
-                  <span class="link-name" @click="gotoDetails(data)">{{ data?.name || '--' }}</span>
-                  <bk-tag theme="success" v-if="data?.is_official">
+                <template #default="{ row }: { row: IApiGatewayBasics }">
+                  <span class="link-name" @click="gotoDetails(row)">{{ row.name || '--' }}</span>
+                  <bk-tag theme="success" v-if="row.is_official">
                     {{ t('官方') }}
                   </bk-tag>
                 </template>
@@ -65,16 +65,16 @@
                 field="description"
                 :min-width="500"
               >
-                <template #default="{ data }">
-                  {{ data?.description || '--' }}
+                <template #default="{ row }">
+                  {{ row.description || '--' }}
                 </template>
               </bk-table-column>
               <bk-table-column
                 :label="t('网关负责人')"
                 field="maintainers"
               >
-                <template #default="{ data }">
-                  {{ data?.maintainers?.join(', ') || '--' }}
+                <template #default="{ row }">
+                  {{ row.maintainers?.join(', ') || '--' }}
                 </template>
               </bk-table-column>
               <!--  <bk-table-column
@@ -313,11 +313,11 @@ provide('curTab', curTab);
 const isSdkInstructionSliderShow = ref(false);
 const isSdkDetailDialogShow = ref(false);
 
-const gotoDetails = (data: IApiGatewayBasics | ISystem) => {
+const gotoDetails = (row: IApiGatewayBasics | ISystem) => {
   router.push({
     name: 'apiDocDetail',
     params: {
-      targetName: data.name,
+      targetName: row.name,
       curTab: curTab.value,
     },
   });

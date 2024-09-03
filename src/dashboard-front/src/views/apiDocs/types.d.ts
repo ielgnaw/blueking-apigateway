@@ -21,7 +21,7 @@ interface IApiGatewayBasics {
 interface IApiGatewaySdkDoc {
   language: LanguageType;
   resource_version: IResourceVersion;
-  sdk: IApiGatewaySdk[];
+  sdk: IApiGatewaySdk;
   stage: { id: number, name: string }
 }
 
