@@ -3,7 +3,14 @@
   <div class="sdk-wrapper">
     <LangSelector v-model="language" :margin-bottom="0" @select="handleLangSelect"></LangSelector>
     <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="ag-markdown-view" id="markdown" :key="renderHtmlIndex" v-html="markdownHtml"></div>
+    <div v-if="sdkDoc" class="ag-markdown-view" id="markdown" :key="renderHtmlIndex" v-html="markdownHtml"></div>
+    <bk-exception
+      v-else
+      class="exception-wrap-item exception-part"
+      description="没有对应文档"
+      scene="part"
+      type="empty"
+    />
   </div>
 </template>
 
@@ -117,8 +124,9 @@ const getSDKDoc = async () => {
     }
     isLoading.value = false;
     initMarkdownHtml(sdkDoc.value);
-  } catch {
+  } catch (e) {
     isLoading.value = false;
+    throw e;
   }
 };
 
@@ -127,9 +135,9 @@ const handleLangSelect = (lang: LanguageType) => {
   init();
 };
 
-const init = () => {
+const init = async () => {
   try {
-    getSDKDoc();
+    await getSDKDoc();
   } catch {
     sdkDoc.value = '';
     markdownHtml.value = '';
