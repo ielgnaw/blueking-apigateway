@@ -307,6 +307,7 @@ $code-color: #63656e;
       top: 12px;
       background-color: $code-bc;
       color: $primary-color;
+      z-index: 1;
     }
   }
 

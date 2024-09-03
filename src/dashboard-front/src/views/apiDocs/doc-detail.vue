@@ -58,6 +58,7 @@
             :min="288"
             :border="false"
           >
+            <!--  左栏，API 列表  -->
             <template #aside>
               <div class="left">
                 <div class="left-aside-wrap">
@@ -122,6 +123,7 @@
                 </div>
               </div>
             </template>
+            <!--  中间栏，当前 API 文档内容  -->
             <template #main>
               <div class="main-content-wrap">
                 <DocDetailMainContent
@@ -130,11 +132,13 @@
                   :markdown-html="curResMarkdownHtml"
                   :updated-time="updatedTime"
                   @show-sdk-instruction="isSdkInstructionSliderShow = true"
+                  v-bkloading="{ loading: isLoading }"
                 ></DocDetailMainContent>
               </div>
             </template>
           </bk-resize-layout>
         </template>
+        <!--  右栏，网关/组件主要信息和SDK  -->
         <template #aside>
           <aside class="aside-right">
             <main class="apigw-desc-wrap custom-scroll-bar">
@@ -225,6 +229,7 @@ const navList = ref<INavItem[]>([]);
 const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null);
 // 记录右栏折叠状态
 const isAsideVisible = ref(true);
+const isLoading = ref(false);
 
 const searchPlaceholder = computed(() => {
   return t(
@@ -354,18 +359,23 @@ md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
 };
 
 const getApigwResourceDoc = async () => {
-  let res: any;
-  if (curTab.value === 'apigw') {
-    const query = {
-      stage_name: curStageName.value,
-    };
-    res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
-  } else if (curTab.value === 'component') {
-    res = await getSystemComponentDoc(board.value, curTargetName.value, curResource.value.name);
+  try {
+    isLoading.value = true;
+    let res: any;
+    if (curTab.value === 'apigw') {
+      const query = {
+        stage_name: curStageName.value,
+      };
+      res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
+    } else if (curTab.value === 'component') {
+      res = await getSystemComponentDoc(board.value, curTargetName.value, curResource.value.name);
+    }
+    const { content, updated_time } = res;
+    curResMarkdownHtml.value = md.render(content);
+    updatedTime.value = updated_time;
+  } finally {
+    isLoading.value = false;
   }
-  const { content, updated_time } = res;
-  curResMarkdownHtml.value = md.render(content);
-  updatedTime.value = updated_time;
 };
 
 const handleStageChange = async () => {
