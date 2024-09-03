@@ -1,5 +1,6 @@
 <template>
   <div class="docs-main" ref="docsMain">
+    <!--  顶部 网关 / 组件 Tab  -->
     <header class="page-tabs">
       <nav class="tabs-group">
         <section
@@ -16,10 +17,12 @@
         </section>
       </nav>
     </header>
+    <!--  正文  -->
     <main class="docs-main-content">
       <!--  当选中 网关API文档 时  -->
       <div v-if="curTab === 'apigw'" class="content-of-apigw">
-        <div class="top-bar">
+        <!--  搜索栏和 SDK使用说明  -->
+        <header class="top-bar">
           <bk-input
             type="search"
             :placeholder="t('请输入网关名称或描述')"
@@ -37,8 +40,9 @@
           >
             {{ t('网关管理') }}
           </bk-button> -->
-        </div>
-        <div class="docs-list">
+        </header>
+        <!--  网关列表  -->
+        <main class="docs-list">
           <bk-loading :loading="isLoading">
             <bk-table
               :data="tableData"
@@ -124,25 +128,25 @@
               </template>
             </bk-table>
           </bk-loading>
-        </div>
+        </main>
       </div>
       <!--  当选中 组件API文档 时  -->
       <div v-else-if="curTab === 'component'" class="content-of-component">
         <main class="category-list">
-          <article class="category-wrap" v-for="system in componentSystemList" :key="system.board">
+          <article class="category-wrap" v-for="systemBoard in componentSystemList" :key="systemBoard.board">
             <!--  system 类别 title 和搜索栏  -->
             <header class="top-bar">
               <main class="bar-title">
-                <span class="title">{{ system.board_label }}</span>
+                <span class="title">{{ systemBoard.board_label }}</span>
                 <bk-link theme="primary" class="f12" @click.prevent="isSdkInstructionSliderShow = true">
                   <i class="apigateway-icon icon-ag-document f14"></i>
                   {{ t('查看 SDK') }}
                 </bk-link>
                 <bk-link
-                  :href="system.sdk?.sdk_download_url"
-                  :disabled="!system.sdk?.sdk_download_url"
+                  :href="systemBoard.sdk?.sdk_download_url"
+                  :disabled="!systemBoard.sdk?.sdk_download_url"
                   theme="primary"
-                  v-bk-tooltips="{ content: t('SDK未生成，可联系负责人生成SDK'), disabled: system.sdk?.sdk_download_url }"
+                  v-bk-tooltips="{ content: t('SDK未生成，可联系负责人生成SDK'), disabled: systemBoard.sdk?.sdk_download_url }"
                   class="f12"
                 >
                   <i class="apigateway-icon icon-ag-download f14"></i>
@@ -158,9 +162,9 @@
               <!--  组件分类  -->
               <article
                 class="component-group"
-                v-for="cat in system.categories"
+                v-for="cat in systemBoard.categories"
                 :key="cat.id"
-                :data-_nav-id="`${system.board}-${cat.id}`"
+                :data-_nav-id="`${systemBoard.board}-${cat.id}`"
                 :ref="catRefs.set"
               >
                 <header class="group-title">
@@ -196,15 +200,21 @@
               v-model="navPanelNamesList"
               use-card-theme
             >
-              <bk-collapse-panel v-for="system in componentSystemList" :key="system.board" :name="system.board">
+              <bk-collapse-panel
+                v-for="systemBoard in componentSystemList"
+                :key="systemBoard.board"
+                :name="systemBoard.board"
+              >
                 <template #header>
                   <div class="panel-header">
                     <main class="flex-row align-items-center">
                       <angle-up-fill
-                        :class="[navPanelNamesList.includes(system.board) ? 'panel-header-show' : 'panel-header-hide']"
+                        :class="[
+                          navPanelNamesList.includes(systemBoard.board) ? 'panel-header-show' : 'panel-header-hide'
+                        ]"
                       />
                       <div class="title ml4">
-                        {{ system.board_label }}
+                        {{ systemBoard.board_label }}
                       </div>
                     </main>
                   </div>
@@ -212,7 +222,7 @@
                 <template #content>
                   <nav class="panel-content">
                     <article
-                      v-for="cat in system.categories"
+                      v-for="cat in systemBoard.categories"
                       :key="cat.id"
                       class="panel-content-cat-item"
                       :class="{ 'active': curCatNavId === cat._navId }"
@@ -393,6 +403,7 @@ watch(
 
 onBeforeMount(() => {
   const { params } = route;
+  // 记录返回到此页时选中的 tab
   curTab.value = params.curTab as TabType || 'apigw';
 });
 

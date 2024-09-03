@@ -1,5 +1,5 @@
 <template>
-  <!--  查看 SDK 弹窗  -->
+  <!--  网关 SDK 详情弹窗  -->
   <bk-dialog
     v-model:is-show="isShow"
     :title="title"
@@ -57,7 +57,7 @@ const curSdk = computed(() => {
 });
 
 const title = computed(() => {
-  return apigwName.value ? t('网关 API SDK: {name}', { name: apigwName.value } ) : t('网关 API SDK');
+  return apigwName.value ? t('网关 API SDK: {name}', { name: apigwName.value }) : t('网关 API SDK');
 });
 
 </script>

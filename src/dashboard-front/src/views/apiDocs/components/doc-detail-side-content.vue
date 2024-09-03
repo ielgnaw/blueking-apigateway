@@ -46,19 +46,19 @@
         </template> -->
 
           <bk-table-column :label="t('网关环境')" field="stage_name">
-            <template #default="{ row }: {  row: IApiGatewaySdkDoc }">
+            <template #default="{ row }: { row: IApiGatewaySdkDoc }">
               {{ row.stage?.name || '--' }}
             </template>
           </bk-table-column>
 
           <bk-table-column :label="t('网关API资源版本')" field="resource_version_display">
-            <template #default="{ row }: {  row: IApiGatewaySdkDoc }">
+            <template #default="{ row }: { row: IApiGatewaySdkDoc }">
               {{ row.resource_version?.version || '--' }}
             </template>
           </bk-table-column>
 
           <bk-table-column :label="t('SDK 版本号')" field="sdk_version_number">
-            <template #default="{ row }: {  row: IApiGatewaySdkDoc }">
+            <template #default="{ row }: { row: IApiGatewaySdkDoc }">
               {{ row.sdk?.version || '--' }}
             </template>
           </bk-table-column>
@@ -66,7 +66,6 @@
           <bk-table-column :label="t('SDK下载')">
             <template #default="{ row }: { row: IApiGatewaySdkDoc }">
               <template v-if="row.sdk?.url">
-                <bk-button theme="primary" class="mr5" text @click="handleShow(row)"> {{ t('查看') }}</bk-button>
                 <bk-button theme="primary" text @click="handleDownload(row)"> {{ t('下载') }}</bk-button>
               </template>
               <template v-else>
@@ -105,8 +104,6 @@
 import {
   computed,
   inject,
-  reactive,
-  ref,
   Ref,
   toRefs,
 } from 'vue';
@@ -124,6 +121,8 @@ import {
   TabType,
 } from '@/views/apiDocs/types';
 import LangSelector from '@/views/apiDocs/components/lang-selector.vue';
+
+const { t } = useI18n();
 
 // 注入当前的总 tab 变量
 const curTab = inject<Ref<TabType>>('curTab');
@@ -148,13 +147,6 @@ const emit = defineEmits<{
 }>();
 
 const userStore = useUser();
-const { t } = useI18n();
-const sdkConfig = reactive({
-  title: '',
-  isShow: false,
-});
-const curSdk = ref<any>({});
-const curApigwId = ref();
 
 const curUser = computed(() => userStore?.user);
 const userList = computed(() => {
@@ -167,12 +159,6 @@ const userList = computed(() => {
 });
 const chatName = computed(() => `${t('[蓝鲸网关API咨询] 网关')}${basics.value?.name}`);
 const chatContent = computed(() => `${t('网关API文档')}:${location.href}`);
-
-const handleShow = (row: IApiGatewaySdkDoc) => {
-  curSdk.value = row;
-  sdkConfig.title = `${t('网关API SDK')}：${curApigwId.value}`;
-  sdkConfig.isShow = true;
-};
 
 const handleDownload = (row: IApiGatewaySdkDoc) => {
   window.open(row.sdk?.url);

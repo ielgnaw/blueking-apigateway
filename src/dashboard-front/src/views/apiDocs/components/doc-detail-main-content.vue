@@ -1,10 +1,11 @@
 <template>
+  <!--  文档详情主内容  -->
   <div class="content-wrap">
-    <main v-if="resource" class="target-detail custom-scroll-bar" ref="detailWrapRef">
+    <main v-if="api" class="target-detail custom-scroll-bar" ref="detailWrapRef">
       <header class="detail-header">
-        <header class="res-name">{{ resource?.name ?? '--' }}</header>
+        <header class="res-name">{{ api.name ?? '--' }}</header>
         <footer class="res-header-footer">
-          <main class="res-desc">{{ resource?.description ?? '--' }}</main>
+          <main class="res-desc">{{ api.description ?? '--' }}</main>
           <aside class="res-sdk">
             <span class="f12" @click="handleSdkInstructionClick">
               <i class="apigateway-icon icon-ag-document f14"></i>
@@ -26,7 +27,7 @@
               <span class="label" v-bk-tooltips="appVerifiedTooltips">
                 {{ t('应用认证') }}
               </span>：
-              {{ resource.verified_app_required ? t('是') : t('否') }}
+              {{ api.verified_app_required ? t('是') : t('否') }}
             </span>
           </section>
           <section class="basic-cell">
@@ -36,7 +37,7 @@
               >
                 {{ t('权限申请') }}
               </span>：
-              {{ (resource.resource_perm_required || resource.component_permission_required) ? t('是') : t('否') }}
+              {{ (api.resource_perm_required || api.component_permission_required) ? t('是') : t('否') }}
             </span>
           </section>
           <section class="basic-cell">
@@ -44,24 +45,26 @@
               <span class="label" v-bk-tooltips="userVerifiedTooltips">
                 {{ t('用户认证') }}
               </span>：
-              {{ resource.verified_user_required ? t('是') : t('否') }}
+              {{ api.verified_user_required ? t('是') : t('否') }}
             </span>
           </section>
         </article>
+        <!--  API markdown 文档  -->
         <article v-if="markdownHtml" class="res-detail-content">
           <!-- eslint-disable-next-line vue/no-v-html -->
           <div class="ag-markdown-view" id="resMarkdown" v-html="markdownHtml"></div>
         </article>
       </main>
     </main>
+    <!--  右侧导航栏  -->
     <aside class="detail-nav-box">
-      <SideNav :list="navList"></SideNav>
+      <DocDetailSideNav :list="navList"></DocDetailSideNav>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-import SideNav from './side-nav.vue';
+import DocDetailSideNav from './doc-detail-side-nav.vue';
 import {
   IComponent,
   INavItem,
@@ -84,21 +87,21 @@ import { useScroll } from '@vueuse/core';
 const { t } = useI18n();
 
 interface IProps {
-  resource: IResource & IComponent | null;
+  api: IResource & IComponent | null;
   navList: INavItem[];
   markdownHtml: string;
   updatedTime: string;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
-  resource: () => null,
+  api: () => null,
   navList: () => [],
   markdownHtml: () => '',
   updatedTime: () => null,
 });
 
 const {
-  resource,
+  api,
   navList,
   markdownHtml,
   updatedTime,
@@ -176,7 +179,8 @@ watch(markdownHtml, () => {
   initMarkdownHtml('resMarkdown');
 });
 
-watch(resource, () => {
+// 切换 api 时滚动到顶部
+watch(api, () => {
   if (y.value === 0) return;
   nextTick(() => {
     y.value = 0;

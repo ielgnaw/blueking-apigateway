@@ -1,4 +1,5 @@
 <template>
+  <!--  文档详情的内容导航栏  -->
   <ul class="ag-component-nav">
     <li v-for="nav of list" :key="nav.id">
       <span

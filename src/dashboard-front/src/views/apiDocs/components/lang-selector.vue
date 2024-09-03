@@ -1,4 +1,5 @@
 <template>
+  <!--  sdk语言选择器  -->
   <div class="lang-selector-wrap bk-button-group">
     <bk-button
       v-for="lang in langList"
@@ -39,7 +40,7 @@ interface IProps {
 }
 
 const props = withDefaults(defineProps<IProps>(), {
-  width: 150,
+  width: 150,  // 按钮宽度
   marginBottom: 24,
   sdkLanguages: () => [
     'python',
@@ -58,6 +59,7 @@ const emit = defineEmits<{
   'select': [language: LanguageType]
 }>();
 
+// 检查是否已生成该语言的sdk
 const isSdkGenerated = (lang: LanguageType) => {
   return sdkLanguages.value.includes(lang);
 };

@@ -152,7 +152,7 @@ const init = async () => {
   }
 };
 
-// 监听type的变化
+// 监听 tab 的变化，改变内容时重新渲染
 watch(
   () => curTab.value,
   () => {

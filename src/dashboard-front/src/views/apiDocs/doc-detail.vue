@@ -1,8 +1,10 @@
 <template>
+  <!--  文档详情页  -->
   <div class="page-wrap">
+    <!-- 顶部带返回按钮和系统切换器的通栏 -->
     <header class="page-header">
-      <!-- 默认头部 -->
       <main class="flex-row align-items-center header-main">
+        <!--  返回按钮  -->
         <i
           class="icon apigateway-icon icon-ag-return-small"
           @click="handleGoBack()"
@@ -30,6 +32,7 @@
           </bk-dropdown>
         </aside>
       </main>
+      <!--  展示右侧网关/组件基础信息的开关  -->
       <aside
         class="detail-toggle"
         :class="{ 'active': isAsideVisible }"
@@ -37,6 +40,7 @@
       ><i class="apigateway-icon icon-ag-document f14"></i>
       </aside>
     </header>
+    <!--  正文  -->
     <main class="page-content">
       <bk-resize-layout
         ref="outerResizeLayoutRef"
@@ -62,10 +66,11 @@
             <template #aside>
               <div class="left">
                 <div class="left-aside-wrap">
+                  <!--  筛选器  -->
                   <header class="left-aside-header">
                     <header class="title">
                       {{ curTab === 'apigw' ? t('资源列表') : t('API列表') }}
-                      <aside v-if="resourceList.length" class="sub-title">{{ filteredResourceList.length }}</aside>
+                      <aside v-if="apiList.length" class="sub-title">{{ filteredApiList.length }}</aside>
                     </header>
                     <main class="nav-filters">
                       <article v-if="curTab === 'apigw'">
@@ -97,20 +102,21 @@
                       </article>
                     </main>
                   </header>
+                  <!--  API 列表  -->
                   <main class="resource-list custom-scroll-bar">
-                    <template v-if="filteredResourceList.length">
+                    <template v-if="filteredApiList.length">
                       <article
                         class="resource-item"
-                        v-for="resource in filteredResourceList"
-                        :key="resource.id"
-                        :class="{ active: resource.id === curResource?.id }"
-                        @click="handleResClick(resource.id)"
+                        v-for="api in filteredApiList"
+                        :key="api.id"
+                        :class="{ active: api.id === curApi?.id }"
+                        @click="handleApiClick(api.id)"
                       >
                         <!-- eslint-disable-next-line vue/no-v-html -->
-                        <header class="res-item-name" v-html="getHighlightedHtml(resource.name)" v-bk-overflow-tips
+                        <header class="res-item-name" v-html="getHighlightedHtml(api.name)" v-bk-overflow-tips
                         ></header>
                         <!-- eslint-disable-next-line vue/no-v-html -->
-                        <main class="res-item-desc" v-html="getHighlightedHtml(resource.description)"></main>
+                        <main class="res-item-desc" v-html="getHighlightedHtml(api.description)"></main>
                       </article>
                     </template>
                     <template v-else-if="keyword">
@@ -127,9 +133,9 @@
             <template #main>
               <div class="main-content-wrap">
                 <DocDetailMainContent
-                  :resource="curResource"
+                  :api="curApi"
                   :nav-list="navList"
-                  :markdown-html="curResMarkdownHtml"
+                  :markdown-html="curApiMarkdownHtml"
                   :updated-time="updatedTime"
                   @show-sdk-instruction="isSdkInstructionSliderShow = true"
                   v-bkloading="{ loading: isLoading }"
@@ -215,13 +221,14 @@ provide('curTab', curTab);
 
 const stageList = ref<IStage[]>([]);
 const curStageName = ref('');
-const keyword = ref('');
-const curTargetName = ref('');
-const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null);
-const resourceList = ref<(IResource & IComponent)[]>([]);
-const curComponentName = ref('');
-const curResource = ref<IResource & IComponent | null>(null);
-const curResMarkdownHtml = ref('');
+
+// 当前的网关或组件被命名为 target
+const curTargetName = ref(''); // 当前文档所属的网关或组件名称
+const curTargetBasics = ref<IApiGatewayBasics & ISystemBasics | null>(null); // 当前文档所属的target主要信息
+const apiList = ref<(IResource & IComponent)[]>([]); // 当前target下的所有api
+const curComponentApiName = ref(''); // 当前组件api名称，路由用
+const curApi = ref<IResource & IComponent | null>(null); // 当前选中的 api
+const curApiMarkdownHtml = ref('');
 const updatedTime = ref<string | null>(null);
 const sdks = ref<IApiGatewaySdkDoc[] & IComponentSdk[]>([]);
 const isSdkInstructionSliderShow = ref(false);
@@ -230,19 +237,20 @@ const outerResizeLayoutRef = ref<InstanceType<typeof ResizeLayout> | null>(null)
 // 记录右栏折叠状态
 const isAsideVisible = ref(true);
 const isLoading = ref(false);
+const keyword = ref('');  // 筛选器输入框的搜索关键字
 
 const searchPlaceholder = computed(() => {
   return t(
     '在{resourceLength}个{type}中搜索...',
     {
-      resourceLength: resourceList.value.length,
+      resourceLength: apiList.value.length,
       type: curTab.value === 'apigw' ? t('资源') : 'API',
     },
   );
 });
 
-const filteredResourceList = computed(() => {
-  return resourceList.value.filter(res => res.name.includes(keyword.value) || res.description.includes(keyword.value));
+const filteredApiList = computed(() => {
+  return apiList.value.filter(res => res.name.includes(keyword.value) || res.description.includes(keyword.value));
 });
 
 const allSystemList = computed(() => {
@@ -252,7 +260,7 @@ const allSystemList = computed(() => {
   return systems;
 });
 
-const fetchBasics = async () => {
+const fetchTargetBasics = async () => {
   try {
     if (curTab.value === 'apigw') {
       curTargetBasics.value = await getGatewaysDetailsDocs(curTargetName.value);
@@ -299,7 +307,7 @@ const fetchApigwStages = async () => {
   }
 };
 
-const fetchResources = async () => {
+const fetchApiList = async () => {
   try {
     let res: (IResource & IComponent)[] = [];
     navList.value = [];
@@ -313,25 +321,25 @@ const fetchResources = async () => {
     } else if (curTab.value === 'component') {
       res = await getSystemAPIList(board.value, curTargetName.value) as (IResource & IComponent)[];
     }
-    resourceList.value = res ?? [];
-    if (curComponentName.value) {
-      curResource.value = resourceList.value.find(resource => resource.name === curComponentName.value) ?? null;
+    apiList.value = res ?? [];
+    if (curComponentApiName.value) {
+      curApi.value = apiList.value.find(api => api.name === curComponentApiName.value) ?? null;
     } else {
-      curResource.value = resourceList.value[0] ?? null;
+      curApi.value = apiList.value[0] ?? null;
     }
-    if (curResource.value) {
+    if (curApi.value) {
       await getApigwResourceDoc();
     }
   } catch {
-    resourceList.value = [];
+    apiList.value = [];
   }
 };
 
-const handleResClick = async (resId: number) => {
-  if (curResource.value.id === resId) return;
+const handleApiClick = async (resId: number) => {
+  if (curApi.value.id === resId) return;
   navList.value = [];
-  curResource.value = resourceList.value.find(res => res.id === resId) ?? null;
-  if (curResource.value) {
+  curApi.value = apiList.value.find(res => res.id === resId) ?? null;
+  if (curApi.value) {
     await getApigwResourceDoc();
   }
 };
@@ -342,10 +350,12 @@ const md = new MarkdownIt({
   breaks: true,
 });
 
+// markdown 解析器自定义规则，用于给 ### 标题添加 id，导航要用
 md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
   const curToken = tokens[idx];
   const nextToken = tokens[idx + 1];
   let count = 2;
+  // 找到 ### 标题，并且只包含一行文本的 token
   if (curToken.markup === '###' && nextToken?.type === 'inline') {
     let headingText = nextToken.content;
     if (navList.value.find(item => item.name === headingText)) {
@@ -366,12 +376,12 @@ const getApigwResourceDoc = async () => {
       const query = {
         stage_name: curStageName.value,
       };
-      res = await getApigwResourceDocDocs(curTargetName.value, curResource.value.name, query);
+      res = await getApigwResourceDocDocs(curTargetName.value, curApi.value.name, query);
     } else if (curTab.value === 'component') {
-      res = await getSystemComponentDoc(board.value, curTargetName.value, curResource.value.name);
+      res = await getSystemComponentDoc(board.value, curTargetName.value, curApi.value.name);
     }
     const { content, updated_time } = res;
-    curResMarkdownHtml.value = md.render(content);
+    curApiMarkdownHtml.value = md.render(content);
     updatedTime.value = updated_time;
   } finally {
     isLoading.value = false;
@@ -379,7 +389,7 @@ const getApigwResourceDoc = async () => {
 };
 
 const handleStageChange = async () => {
-  await fetchResources();
+  await fetchApiList();
 };
 
 const getHighlightedHtml = (value: string) => {
@@ -402,7 +412,7 @@ const fetchBoardList = async () => {
 const handleSystemChange = async (system: ISystem) => {
   if (system.name === curTargetName.value) return;
   curTargetName.value = system.name;
-  curComponentName.value = '';
+  curComponentApiName.value = '';
   await init();
 };
 
@@ -410,9 +420,9 @@ const init = async () => {
   if (curTab.value === 'apigw') {
     await fetchApigwStages();
   }
-  await fetchBasics();
+  await fetchTargetBasics();
   await fetchSdks();
-  await fetchResources();
+  await fetchApiList();
   if (curTab.value === 'component') {
     await fetchBoardList();
   }
@@ -441,7 +451,7 @@ onBeforeMount(() => {
   const { params } = route;
   curTab.value = params.curTab as TabType || 'apigw';
   curTargetName.value = params.targetName as string;
-  curComponentName.value = params.componentName as string || '';
+  curComponentApiName.value = params.componentName as string || '';
   init();
 });
 

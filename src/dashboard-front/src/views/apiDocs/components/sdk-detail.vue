@@ -1,4 +1,5 @@
 <template>
+  <!--  sdk内容展示  -->
   <div v-if="sdk" class="data-box wrapper">
     <div class="row-item mb10">
       <div class="key">
