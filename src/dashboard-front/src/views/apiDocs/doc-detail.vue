@@ -7,8 +7,9 @@
           class="icon apigateway-icon icon-ag-return-small"
           @click="handleGoBack()"
         ></i>
-        {{ curTargetBasics?.description ?? '' }}
-        <div class="system-dropdown-wrap">
+        {{ curTab === 'apigw' ? curTargetName : curTargetBasics?.description ?? '' }}
+        <!--  组件系统下拉菜单  -->
+        <aside v-if="curTab === 'component'" class="system-dropdown-wrap">
           <bk-dropdown ref="dropdown" :popover-options="{ boundary: 'body', placement: 'bottom-start' }">
             <div class="dropdown-trigger-btn">
               <span>{{ curTargetName }}</span>
@@ -27,7 +28,7 @@
               </bk-dropdown-menu>
             </template>
           </bk-dropdown>
-        </div>
+        </aside>
       </main>
       <aside
         class="detail-toggle"
