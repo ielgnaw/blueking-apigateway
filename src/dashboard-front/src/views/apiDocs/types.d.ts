@@ -47,6 +47,7 @@ interface IResource {
   verified_user_required: boolean;
   verified_app_required: boolean;
   resource_perm_required: boolean;
+  allow_apply_permission: boolean;
   labels: string[];
 }
 
