@@ -153,7 +153,7 @@
                   {{ t('下载 SDK') }}
                 </bk-link>
               </main>
-              <aside>
+              <aside v-if="componentSystemList.length > 0">
                 <ComponentSearcher class="ag-searcher-box" :version-list="componentSystemList"></ComponentSearcher>
               </aside>
             </header>

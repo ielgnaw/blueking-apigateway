@@ -2,8 +2,8 @@
   <!--  页面右侧的网关详情/组件详情  -->
   <div v-if="basics" class="intro-side-content-wrap">
     <header class="intro-header">
-      <main v-if="curTab === 'apigw'" class="title">{{ t('网关详情') }}</main>
-      <main v-else-if="curTab === 'component'" class="title">{{ t('组件详情') }}</main>
+      <article v-if="curTab === 'apigw'" class="title">{{ t('网关详情') }}</article>
+      <article v-else-if="curTab === 'component'" class="title">{{ t('组件详情') }}</article>
       <aside>
         <chat
           v-if="userStore.featureFlags?.ALLOW_CREATE_APPCHAT"
@@ -18,15 +18,23 @@
     </header>
     <main v-if="curTab === 'apigw'" class="component-content">
       <div class="ag-markdown-view" id="markdown">
-        <header class="content-title">{{ t('网关描述') }}</header>
-        <main class="content-main">{{ basics.description }}</main>
-        <header class="content-title">{{ t('网关负责人') }}</header>
-        <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
-        <header class="content-title">{{ t('网关访问地址') }}</header>
-        <main class="content-main">{{ basics.api_url }}</main>
+        <article>
+          <header class="content-title">{{ t('网关描述') }}</header>
+          <main class="content-main">{{ basics.description }}</main>
+        </article>
+        <article>
+          <header class="content-title">{{ t('网关负责人') }}</header>
+          <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
+        </article>
+        <article>
+          <header class="content-title">{{ t('网关访问地址') }}</header>
+          <main class="content-main">{{ basics.api_url }}</main>
+        </article>
         <template v-if="userStore.featureFlags?.ENABLE_SDK">
-          <header class="content-title">{{ t('网关 SDK') }}</header>
-          <LangSelector :width="90" :margin-bottom="12" @select="handleLangSelect"></LangSelector>
+          <article>
+            <header class="content-title">{{ t('网关 SDK') }}</header>
+            <LangSelector :width="90" :margin-bottom="12" @select="handleLangSelect"></LangSelector>
+          </article>
         </template>
       </div>
 
@@ -84,17 +92,23 @@
 
     <main v-else-if="curTab === 'component'" class="component-content">
       <div class="ag-markdown-view">
-        <header class="content-title">{{ t('网关描述') }}</header>
-        <main class="content-main">{{ basics.comment }}</main>
-        <header class="content-title">{{ t('网关负责人') }}</header>
-        <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
-        <header class="content-title">
-          {{ t('组件 API SDK') }}
-          <bk-tag class="ml20 fw-normal" theme="info">Python</bk-tag>
-        </header>
-        <main class="content-main">
-          <SdkDetail :sdk="sdks[0]"></SdkDetail>
-        </main>
+        <article>
+          <header class="content-title">{{ t('网关描述') }}</header>
+          <main class="content-main">{{ basics.comment }}</main>
+        </article>
+        <article>
+          <header class="content-title">{{ t('网关负责人') }}</header>
+          <main class="content-main">{{ basics.maintainers.join(', ') }}</main>
+        </article>
+        <article>
+          <header class="content-title">
+            {{ t('组件 API SDK') }}
+            <bk-tag class="ml20 fw-normal" theme="info">Python</bk-tag>
+          </header>
+          <main class="content-main">
+            <SdkDetail :sdk="sdks[0]"></SdkDetail>
+          </main>
+        </article>
       </div>
     </main>
   </div>

@@ -74,8 +74,7 @@ const md = new MarkdownIt({
 
 const initMarkdownHtml = (content: string) => {
   markdownHtml.value = md.render(content);
-  // eslint-disable-next-line no-plusplus
-  renderHtmlIndex.value++;
+  renderHtmlIndex.value += 1;
   nextTick(() => {
     const markdownDom = document.getElementById('markdown');
 
@@ -156,8 +155,7 @@ const init = async () => {
 watch(
   () => curTab.value,
   () => {
-    // eslint-disable-next-line no-plusplus
-    renderKey.value++;
+    renderKey.value += 1;
     init();
   },
   { immediate: true, deep: true },

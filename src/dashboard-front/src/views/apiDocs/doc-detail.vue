@@ -420,9 +420,11 @@ const init = async () => {
   if (curTab.value === 'apigw') {
     await fetchApigwStages();
   }
-  await fetchTargetBasics();
-  await fetchSdks();
-  await fetchApiList();
+  await Promise.all([
+    fetchTargetBasics(),
+    fetchSdks(),
+    fetchApiList(),
+  ]);
   if (curTab.value === 'component') {
     await fetchBoardList();
   }

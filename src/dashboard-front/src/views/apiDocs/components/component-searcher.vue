@@ -1,6 +1,6 @@
 <template>
   <!--  组件搜索器  -->
-  <div class="searcher" v-if="curVersionList.length">
+  <div class="searcher">
     <bk-dropdown ref="dropdown" :popover-options="popoverOptions">
       <div class="dropdown-trigger-btn">
         <span>{{ curVersion.board_label }}</span>
@@ -124,7 +124,7 @@ const hightlightSystemName = (node: any) => {
 
 const triggerHandler = (version: any) => {
   curVersion.value = version;
-  dropdown?.value?.hide && dropdown.value.hide();
+  dropdown.value?.hide?.();
 };
 // 跳转指定组件
 const handleShowDoc = (version: any) => {
@@ -142,7 +142,7 @@ const handleSearch = async () => {
   try {
     isLoading.value = true;
     selectIndex.value = 0;
-    const curKeyword = keyword.value ? keyword.value : '';
+    const curKeyword = keyword.value || '';
     const curBoard = curVersion.value.board;
     const res = await searchAPI(curBoard, '-', { keyword: curKeyword });
     isLoading.value = false;
@@ -154,17 +154,15 @@ const handleSearch = async () => {
 const handleKeyup = (e: any) => {
   const curKeyCode = e.keyCode;
   const curLength = resultList.value.length;
-
+  e.preventDefault();
   switch (curKeyCode) {
     // 上
     case 38:
-      e.preventDefault();
       if (selectIndex.value === -1 || selectIndex.value === 0) {
         selectIndex.value = curLength - 1;
         searchListContainer.value.scrollTop = searchListContainer.value.scrollHeight;
       } else {
-        // eslint-disable-next-line no-plusplus
-        selectIndex.value--;
+        selectIndex.value -= 1;
         nextTick(() => {
           const curSelectNode = searchListContainer.value.querySelector('li.cur');
           const { offsetTop } = curSelectNode;
@@ -176,10 +174,8 @@ const handleKeyup = (e: any) => {
       break;
     // 下
     case 40:
-      e.preventDefault();
       if (selectIndex.value < curLength - 1) {
-        // eslint-disable-next-line no-plusplus
-        selectIndex.value++;
+        selectIndex.value += 1;
         nextTick(() => {
           const curSelectNode = searchListContainer.value.querySelector('li.cur');
           const { offsetTop } = curSelectNode;
@@ -195,11 +191,8 @@ const handleKeyup = (e: any) => {
       }
       break;
     case 13:
-      e.preventDefault();
-      // eslint-disable-next-line no-case-declarations
-      const curSelectIndex: any = selectIndex.value;
-      if (resultList[curSelectIndex as keyof typeof resultList]) {
-        handleShowDoc(resultList[curSelectIndex as keyof typeof resultList]);
+      if (resultList.value[selectIndex.value]) {
+        handleShowDoc(resultList.value[selectIndex.value]);
       }
       break;
     default:
